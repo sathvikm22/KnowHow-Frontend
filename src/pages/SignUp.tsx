@@ -40,13 +40,28 @@ const SignUp = () => {
       if (response.success) {
         setOtpStatus('idle');
         setStep('otp');
+        setErrorMessage(''); // Clear any previous errors
       } else {
         setOtpStatus('error');
-        setErrorMessage(response.message || 'Failed to send OTP');
+        // Check if it's an "already exists" error
+        const errorMsg = response.message || 'Failed to send OTP';
+        if (errorMsg.toLowerCase().includes('already registered') || 
+            errorMsg.toLowerCase().includes('already exists')) {
+          setErrorMessage(`${errorMsg} Would you like to login instead?`);
+        } else {
+          setErrorMessage(errorMsg);
+        }
       }
     } catch (error: any) {
       setOtpStatus('error');
-      setErrorMessage(error.message || 'Failed to send OTP. Please try again.');
+      const errorMsg = error.message || 'Failed to send OTP. Please try again.';
+      // Check if it's an "already exists" error
+      if (errorMsg.toLowerCase().includes('already registered') || 
+          errorMsg.toLowerCase().includes('already exists')) {
+        setErrorMessage(`${errorMsg} Would you like to login instead?`);
+      } else {
+        setErrorMessage(errorMsg);
+      }
     } finally {
       setIsLoading(false);
     }
@@ -129,10 +144,24 @@ const SignUp = () => {
         alert('Account created successfully!');
         window.location.href = '/home';
       } else {
-        setErrorMessage(response.message || 'Failed to create account');
+        const errorMsg = response.message || 'Failed to create account';
+        // Check if it's an "already exists" error
+        if (errorMsg.toLowerCase().includes('already registered') || 
+            errorMsg.toLowerCase().includes('already exists')) {
+          setErrorMessage(`${errorMsg} Would you like to login instead?`);
+        } else {
+          setErrorMessage(errorMsg);
+        }
       }
     } catch (error: any) {
-      setErrorMessage(error.message || 'Failed to create account. Please try again.');
+      const errorMsg = error.message || 'Failed to create account. Please try again.';
+      // Check if it's an "already exists" error
+      if (errorMsg.toLowerCase().includes('already registered') || 
+          errorMsg.toLowerCase().includes('already exists')) {
+        setErrorMessage(`${errorMsg} Would you like to login instead?`);
+      } else {
+        setErrorMessage(errorMsg);
+      }
     } finally {
       setIsLoading(false);
     }
@@ -174,8 +203,26 @@ const SignUp = () => {
           </div>
 
           {errorMessage && (
-            <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded-xl text-sm">
-              {errorMessage}
+            <div className="mb-4 p-4 bg-red-50 border-l-4 border-red-500 text-red-700 rounded-xl">
+              <div className="flex items-start">
+                <div className="flex-shrink-0">
+                  <svg className="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
+                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                  </svg>
+                </div>
+                <div className="ml-3 flex-1">
+                  <p className="text-sm font-medium">{errorMessage}</p>
+                  {(errorMessage.toLowerCase().includes('already registered') || 
+                     errorMessage.toLowerCase().includes('already exists')) && (
+                    <button
+                      onClick={() => window.location.href = '/'}
+                      className="mt-2 text-sm text-red-600 hover:text-red-800 font-semibold underline"
+                    >
+                      Go to Login Page
+                    </button>
+                  )}
+                </div>
+              </div>
             </div>
           )}
 

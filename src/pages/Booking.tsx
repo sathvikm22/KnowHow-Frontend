@@ -397,7 +397,7 @@ const allSelectedActivitiesDetailed = useMemo(() => {
                 <span className="w-8 h-8 bg-orange-100 dark:bg-orange-900 rounded-full flex items-center justify-center text-orange-600 dark:text-orange-400 mr-3 text-sm font-bold">3</span>
                 Select Activity
               </h2>
-              <p className="text-sm text-red-600 dark:text-red-300 mb-4">*Please note : Every activity is designed for 2 people in a combo and 1 person for special activities.</p>
+              <p className="text-sm text-red-600 dark:text-red-300 mb-4">*Please note : Every activity is designed for 2 people in a combo.</p>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {activities.map((activity) => {
                   const isSpecial = specialCombos.some(c => c.id === selectedCombo?.id);
