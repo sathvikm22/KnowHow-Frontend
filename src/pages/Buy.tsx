@@ -73,6 +73,8 @@ const Buy = () => {
     );
   }
 
+  const isSelectedKitInCart = cart.some(item => item.kit_name === selectedKit?.name);
+
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 w-full">
       <Navigation />
@@ -124,20 +126,21 @@ const Buy = () => {
                 </div>
                 
                 <div className="space-y-3">
-                  {justAdded ? (
-                    <div className="space-y-3">
-                      <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 text-green-700 dark:text-green-300 px-4 py-3 rounded-lg">
-                        Item added to cart!
-                      </div>
-                      <Button
-                        onClick={() => navigate('/cart')}
-                        className="w-full bg-orange-500 hover:bg-orange-600 text-white text-base sm:text-lg py-6 sm:py-7 rounded-xl font-semibold shadow-lg"
-                        size="lg"
-                      >
-                        <ShoppingCart className="mr-2 h-5 w-5 sm:h-6 sm:w-6" />
-                        View in Cart
-                      </Button>
+                  {justAdded && (
+                    <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 text-green-700 dark:text-green-300 px-4 py-3 rounded-lg">
+                      Item added to cart!
                     </div>
+                  )}
+
+                  {isSelectedKitInCart ? (
+                    <Button
+                      onClick={() => navigate('/cart')}
+                      className="w-full bg-orange-500 hover:bg-orange-600 text-white text-base sm:text-lg py-6 sm:py-7 rounded-xl font-semibold shadow-lg"
+                      size="lg"
+                    >
+                      <ShoppingCart className="mr-2 h-5 w-5 sm:h-6 sm:w-6" />
+                      View in Cart
+                    </Button>
                   ) : (
                     <Button
                       onClick={handleAddToCart}

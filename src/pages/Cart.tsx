@@ -50,6 +50,24 @@ const Cart = () => {
     navigate('/buy', { state: { checkout: true } });
   };
 
+  const handleBrowseDIYKits = () => {
+    const currentPath = window.location.pathname;
+    if (currentPath !== '/home') {
+      navigate('/home');
+      setTimeout(() => {
+        const element = document.getElementById('shop-diy-kits');
+        if (element) {
+          element.scrollIntoView({ behavior: 'smooth' });
+        }
+      }, 100);
+    } else {
+      const element = document.getElementById('shop-diy-kits');
+      if (element) {
+        element.scrollIntoView({ behavior: 'smooth' });
+      }
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 w-full">
       <Navigation />
@@ -83,7 +101,7 @@ const Cart = () => {
                 Looks like you haven't added any DIY kits to your cart yet.
               </p>
               <Button
-                onClick={() => navigate('/home')}
+                onClick={handleBrowseDIYKits}
                 className="bg-orange-500 hover:bg-orange-600 text-white px-8 py-3 rounded-full"
               >
                 Browse DIY Kits
