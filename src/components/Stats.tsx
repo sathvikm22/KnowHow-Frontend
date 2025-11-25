@@ -1,5 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import { useState, useRef } from 'react';
+import { diyKits, getImagePath } from '@/data/diyKits';
 
 const Stats = () => {
   const navigate = useNavigate();
@@ -9,30 +10,6 @@ const Stats = () => {
   const handleBuyNow = (kitType: string) => {
     navigate('/buy', { state: { kitType } });
   };
-
-  const diyKits = [
-    { name: "DIY Make Your Own Candle Kit", price: 499 },
-    { name: "DIY Avengers Wall Hanger Kits", price: 399 },
-    { name: "DIY DC Super Hero Kits", price: 399 },
-    { name: "DIY Crochet Keyring Kit", price: 299 },
-    { name: "Lippan Art Kit", price: 499 },
-    { name: "Mandala Art Kit", price: 499 },
-    { name: "Paint Your Own Photo Frame", price: 349 },
-    { name: "Paint By Numbers", price: 299 },
-    { name: "Diamond Painting Kit", price: 399 },
-    { name: "Diamond Painting Clock Kit", price: 499 },
-    { name: "DIY Mason Jar Kit", price: 499 },
-    { name: "DIY Fridge Magnet with Bag Kit", price: 399 },
-    { name: "DIY Embroidery Kit", price: 399 },
-    { name: "DIY Pouch Embroidery Kit", price: 399 },
-    { name: "DIY Tote Bag Embroidery Kit", price: 399 },
-    { name: "DIY Punch Needles Kit", price: 499 },
-    { name: "DIY Origami Kit", price: 199 },
-    { name: "DIY Clock Kit", price: 799 },
-    { name: "Animal Kingdom Kit", price: 299 },
-    { name: "Wall Hanger Kits", price: 299 },
-    { name: "Mandala Coaster Kits", price: 399 }
-  ];
 
   const kitsToShow = showAll ? diyKits : diyKits.slice(0, 10);
 
@@ -60,13 +37,42 @@ const Stats = () => {
             <div
               key={kit.name}
               className={
-                `rounded-2xl shadow-2xl hover:shadow-2xl transition-shadow duration-300 overflow-hidden flex flex-col items-center p-8 border-0 w-full max-w-sm min-h-[240px] ` +
+                `rounded-2xl shadow-2xl hover:shadow-2xl transition-shadow duration-300 overflow-hidden flex flex-col items-center p-6 border-0 w-full max-w-sm ` +
                 boxColors[idx % boxColors.length]
               }
             >
-              <h4 className="font-semibold text-gray-800 dark:text-white mb-6 text-lg text-center line-clamp-2 min-h-[3rem] tracking-tight drop-shadow-sm">
+              {/* Image Section - Add images to /public/lovable-uploads/diy-kits/ folder */}
+              <div className="w-full mb-4 rounded-xl overflow-hidden bg-white/50 dark:bg-gray-700/50 aspect-square flex items-center justify-center shadow-inner">
+                <img 
+                  src={getImagePath(kit)}
+                  alt={kit.name}
+                  className="w-full h-full object-cover"
+                  onError={(e) => {
+                    // Show placeholder icon if image doesn't exist
+                    const target = e.target as HTMLImageElement;
+                    target.style.display = 'none';
+                    const parent = target.parentElement;
+                    if (parent && !parent.querySelector('.placeholder-icon')) {
+                      const placeholder = document.createElement('div');
+                      placeholder.className = 'placeholder-icon w-full h-full flex flex-col items-center justify-center text-gray-400 dark:text-gray-500';
+                      placeholder.innerHTML = `
+                        <svg class="w-16 h-16 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                        </svg>
+                        <span class="text-xs text-center px-2">Image Placeholder</span>
+                      `;
+                      parent.appendChild(placeholder);
+                    }
+                  }}
+                />
+              </div>
+              
+              {/* Product Name */}
+              <h4 className="font-semibold text-gray-800 dark:text-white mb-4 text-lg text-center line-clamp-2 min-h-[3rem] tracking-tight drop-shadow-sm">
                 {kit.name}
               </h4>
+              
+              {/* Price and Buy Now Button */}
               <div className="flex flex-col items-center w-full mt-auto">
                 <span className="text-2xl font-bold text-orange-600 mb-4 drop-shadow">₹{kit.price}</span>
                 <button

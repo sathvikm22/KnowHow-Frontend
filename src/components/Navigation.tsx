@@ -1,13 +1,31 @@
 import { useState, useEffect } from 'react';
-import { Menu, X, LogOut, Moon, Sun, Shield } from 'lucide-react';
+import { Menu, X, LogOut, Moon, Sun, Shield, ShoppingCart } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { logout, getCurrentUser } from '../lib/api';
+import { useCart } from '../contexts/CartContext';
 
 const Navigation = () => {
   const [isOpen, setIsOpen] = useState(false);
-  const [userName, setUserName] = useState('');
-  const [isDarkMode, setIsDarkMode] = useState(false);
+  // Initialize userName from localStorage immediately to prevent layout shift
+  const [userName, setUserName] = useState(() => {
+    if (typeof window !== 'undefined') {
+      return localStorage.getItem('userName') || '';
+    }
+    return '';
+  });
+  // Initialize isDarkMode from localStorage immediately to prevent layout shift
+  const [isDarkMode, setIsDarkMode] = useState(() => {
+    if (typeof window !== 'undefined') {
+      const savedTheme = localStorage.getItem('theme');
+      if (savedTheme === 'dark') {
+        document.documentElement.classList.add('dark');
+        return true;
+      }
+    }
+    return false;
+  });
   const navigate = useNavigate();
+  const { cartCount } = useCart();
 
   useEffect(() => {
     // Try to get user from API first, fallback to localStorage
@@ -21,21 +39,14 @@ const Navigation = () => {
       } catch (error) {
         // If API call fails, check localStorage as fallback
         const storedUser = localStorage.getItem('userName');
-        if (storedUser) {
+        if (storedUser && storedUser !== userName) {
           setUserName(storedUser);
         }
       }
     };
 
     fetchUser();
-    
-    // Check for saved dark mode preference
-    const savedTheme = localStorage.getItem('theme');
-    if (savedTheme === 'dark') {
-      setIsDarkMode(true);
-      document.documentElement.classList.add('dark');
-    }
-  }, []);
+  }, [userName]);
 
   const scrollToSection = (sectionId: string, targetPath: string = '/home') => {
     const currentPath = window.location.pathname;
@@ -119,9 +130,10 @@ const Navigation = () => {
             </span>
           </div>
           
-          {/* Center - Navigation Items (Hidden on mobile) */}
+          {/* Center - Navigation Items and Icons/Buttons */}
           <div className="hidden lg:flex items-center justify-center flex-1 px-4">
-            <div className="flex items-center space-x-4 xl:space-x-8">
+            <div className="flex items-center space-x-4 xl:space-x-6">
+              {/* Navigation Items */}
               {navItems.map((item) => (
                 <button
                   key={item.name}
@@ -131,11 +143,68 @@ const Navigation = () => {
                   {item.name}
                 </button>
               ))}
+              
+              {/* Icons and Buttons - Center aligned */}
+              <div className="flex items-center space-x-2 xl:space-x-3 ml-4 xl:ml-6">
+                <button
+                  onClick={toggleDarkMode}
+                  className="text-white hover:text-yellow-300 p-1.5 sm:p-2 rounded-lg transition-colors duration-300"
+                >
+                  {isDarkMode ? <Sun size={18} className="sm:w-5 sm:h-5" /> : <Moon size={18} className="sm:w-5 sm:h-5" />}
+                </button>
+                <button
+                  onClick={() => navigate('/privacy-policy')}
+                  className="text-white hover:text-yellow-300 p-1.5 sm:p-2 rounded-lg transition-colors duration-300"
+                  title="Privacy & Cookies Policy"
+                  aria-label="Privacy & Cookies Policy"
+                >
+                  <Shield size={18} className="sm:w-5 sm:h-5" />
+                </button>
+                {userName && (
+                  <button
+                    onClick={() => navigate('/cart')}
+                    className="relative text-white hover:text-yellow-300 p-1.5 sm:p-2 rounded-lg transition-colors duration-300"
+                    title="Shopping Cart"
+                    aria-label="Shopping Cart"
+                  >
+                    <ShoppingCart size={18} className="sm:w-5 sm:h-5" />
+                    {cartCount > 0 && (
+                      <span className="absolute -top-1 -right-1 bg-orange-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
+                        {cartCount > 9 ? '9+' : cartCount}
+                      </span>
+                    )}
+                  </button>
+                )}
+                {userName ? (
+                  <>
+                    <button 
+                      onClick={handleBookNow}
+                      className="bg-orange-500 text-white px-2 sm:px-3 py-1 sm:py-1.5 rounded-lg text-xs sm:text-sm font-medium hover:bg-orange-600 transition-colors duration-300 whitespace-nowrap"
+                    >
+                      Book Now
+                    </button>
+                    <span className="text-white text-xs sm:text-sm font-medium px-2 sm:px-3 py-1 sm:py-1.5 bg-pink-500 rounded-lg max-w-20 sm:max-w-none truncate">{userName}</span>
+                    <button 
+                      onClick={handleLogout}
+                      className="bg-yellow-400 text-gray-800 p-1 sm:p-1.5 rounded-lg hover:bg-yellow-500 transition-colors duration-300"
+                    >
+                      <LogOut size={14} className="sm:w-4 sm:h-4" />
+                    </button>
+                  </>
+                ) : (
+                  <button 
+                    onClick={handleLogin}
+                    className="bg-pink-500 text-white px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg text-xs sm:text-sm font-medium hover:bg-pink-600 transition-colors duration-300 whitespace-nowrap"
+                  >
+                    Login
+                  </button>
+                )}
+              </div>
             </div>
           </div>
           
-          {/* Right side - User actions and dark mode toggle */}
-          <div className="hidden md:flex items-center space-x-1 sm:space-x-2 lg:space-x-3 flex-shrink-0">
+          {/* Right side - Icons/Buttons for medium screens (md but not lg) */}
+          <div className="hidden md:flex lg:hidden items-center space-x-2 flex-shrink-0">
             <button
               onClick={toggleDarkMode}
               className="text-white hover:text-yellow-300 p-1.5 sm:p-2 rounded-lg transition-colors duration-300"
@@ -150,6 +219,21 @@ const Navigation = () => {
             >
               <Shield size={18} className="sm:w-5 sm:h-5" />
             </button>
+            {userName && (
+              <button
+                onClick={() => navigate('/cart')}
+                className="relative text-white hover:text-yellow-300 p-1.5 sm:p-2 rounded-lg transition-colors duration-300"
+                title="Shopping Cart"
+                aria-label="Shopping Cart"
+              >
+                <ShoppingCart size={18} className="sm:w-5 sm:h-5" />
+                {cartCount > 0 && (
+                  <span className="absolute -top-1 -right-1 bg-orange-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
+                    {cartCount > 9 ? '9+' : cartCount}
+                  </span>
+                )}
+              </button>
+            )}
             {userName ? (
               <>
                 <button 
@@ -184,6 +268,23 @@ const Navigation = () => {
             >
               {isDarkMode ? <Sun size={18} /> : <Moon size={18} />}
             </button>
+            {userName && (
+              <button
+                onClick={() => {
+                  navigate('/cart');
+                  setIsOpen(false);
+                }}
+                className="relative text-white hover:text-yellow-300 p-1.5 sm:p-2"
+                title="Shopping Cart"
+              >
+                <ShoppingCart size={18} />
+                {cartCount > 0 && (
+                  <span className="absolute -top-1 -right-1 bg-orange-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
+                    {cartCount > 9 ? '9+' : cartCount}
+                  </span>
+                )}
+              </button>
+            )}
             <button
               onClick={() => setIsOpen(!isOpen)}
               className="text-white hover:text-yellow-300 p-1.5 sm:p-2"

@@ -178,6 +178,40 @@ class ApiClient {
       body: JSON.stringify({ consent }),
     });
   }
+
+  // Cart endpoints
+  async getCart(): Promise<ApiResponse<{ cart: Array<{ id: string; kit_name: string; price: number; quantity: number }> }>> {
+    return this.request('/auth/cart', {
+      method: 'GET',
+    });
+  }
+
+  async addToCart(kitName: string, price: number, quantity: number = 1): Promise<ApiResponse> {
+    return this.request('/auth/cart/add', {
+      method: 'POST',
+      body: JSON.stringify({ kitName, price, quantity }),
+    });
+  }
+
+  async updateCartItem(kitName: string, quantity: number): Promise<ApiResponse> {
+    return this.request('/auth/cart/update', {
+      method: 'PUT',
+      body: JSON.stringify({ kitName, quantity }),
+    });
+  }
+
+  async removeFromCart(kitName: string): Promise<ApiResponse> {
+    return this.request('/auth/cart/remove', {
+      method: 'DELETE',
+      body: JSON.stringify({ kitName }),
+    });
+  }
+
+  async clearCart(): Promise<ApiResponse> {
+    return this.request('/auth/cart/clear', {
+      method: 'DELETE',
+    });
+  }
 }
 
 export const api = new ApiClient(API_BASE_URL);

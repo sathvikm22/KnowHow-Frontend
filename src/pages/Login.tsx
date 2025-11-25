@@ -47,7 +47,7 @@ const Login = () => {
           localStorage.setItem('userEmail', response.user.email);
         }
         
-        // Dispatch custom event to notify CookieConsent component
+        // Dispatch custom event to notify CookieConsent and Cart components
         window.dispatchEvent(new CustomEvent('authStateChanged'));
         
         // Check if user is admin (from backend response or email check)

@@ -11,6 +11,7 @@ import Activities from "./pages/Activities";
 import Login from "./pages/Login";
 import SignUp from "./pages/SignUp";
 import Buy from "./pages/Buy";
+import Cart from "./pages/Cart";
 import ForgotPassword from "./pages/ForgotPassword";
 import AdminBookings from './pages/AdminBookings';
 import AdminUsers from './pages/AdminUsers';
@@ -18,6 +19,7 @@ import GoogleAuthCallback from './pages/GoogleAuthCallback';
 import PrivacyPolicy from './pages/PrivacyPolicy';
 import CookieConsent from './components/CookieConsent';
 import { initializeCookieConsent } from './utils/cookieConsent';
+import { CartProvider } from './contexts/CartContext';
 
 const queryClient = new QueryClient();
 
@@ -35,26 +37,29 @@ const App = () => {
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
-        <Toaster />
-        <Sonner />
-        <Router>
-          <Routes>
-            <Route path="/" element={<Login />} />
-            <Route path="/signup" element={<SignUp />} />
-            <Route path="/home" element={<Index />} />
-            <Route path="/booking" element={<Booking />} />
-            <Route path="/activities" element={<Activities />} />
-            <Route path="/buy" element={<Buy />} />
-            <Route path="/forgot-password" element={<ForgotPassword />} />
-            <Route path="/auth/google/callback" element={<GoogleAuthCallback />} />
-            <Route path="/privacy-policy" element={<PrivacyPolicy />} />
-            <Route path="/admin/dashboard/bookings" element={<AdminRoute><AdminBookings /></AdminRoute>} />
-            <Route path="/admin/dashboard/users" element={<AdminRoute><AdminUsers /></AdminRoute>} />
-            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-          <CookieConsent />
-        </Router>
+        <CartProvider>
+          <Toaster />
+          <Sonner />
+          <Router>
+            <Routes>
+              <Route path="/" element={<Login />} />
+              <Route path="/signup" element={<SignUp />} />
+              <Route path="/home" element={<Index />} />
+              <Route path="/booking" element={<Booking />} />
+              <Route path="/activities" element={<Activities />} />
+              <Route path="/buy" element={<Buy />} />
+              <Route path="/cart" element={<Cart />} />
+              <Route path="/forgot-password" element={<ForgotPassword />} />
+              <Route path="/auth/google/callback" element={<GoogleAuthCallback />} />
+              <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+              <Route path="/admin/dashboard/bookings" element={<AdminRoute><AdminBookings /></AdminRoute>} />
+              <Route path="/admin/dashboard/users" element={<AdminRoute><AdminUsers /></AdminRoute>} />
+              {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+            <CookieConsent />
+          </Router>
+        </CartProvider>
       </TooltipProvider>
     </QueryClientProvider>
   );

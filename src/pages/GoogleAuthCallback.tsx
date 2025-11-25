@@ -79,7 +79,7 @@ const GoogleAuthCallback = () => {
           localStorage.removeItem('isAdmin');
         }
 
-        // Dispatch custom event to notify CookieConsent component
+        // Dispatch custom event to notify CookieConsent and Cart components
         window.dispatchEvent(new CustomEvent('authStateChanged'));
 
         setStatus('Authentication successful! Redirecting...');
