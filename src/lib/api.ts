@@ -62,6 +62,13 @@ class ApiClient {
         throw new Error(text || `HTTP ${response.status}: ${response.statusText}`);
       }
       
+      // For 400 errors, return the data so frontend can check response.success
+      // This allows proper error handling for validation errors, duplicate emails, etc.
+      if (!response.ok && response.status === 400 && data.success === false) {
+        return data;
+      }
+      
+      // For other errors, throw
       if (!response.ok) {
         throw new Error(data.message || `Request failed with status ${response.status}`);
       }
@@ -157,6 +164,19 @@ class ApiClient {
       localStorage.removeItem('authToken');
       return { success: true, message: 'Logged out successfully' };
     }
+  }
+
+  async getCookieConsent(): Promise<ApiResponse<{ cookieConsent: 'accepted' | 'declined' | null }>> {
+    return this.request('/auth/cookie-consent', {
+      method: 'GET',
+    });
+  }
+
+  async updateCookieConsent(consent: 'accepted' | 'declined'): Promise<ApiResponse> {
+    return this.request('/auth/cookie-consent', {
+      method: 'POST',
+      body: JSON.stringify({ consent }),
+    });
   }
 }
 

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Eye, EyeOff, Mail, Lock, User } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { api } from '@/lib/api';
@@ -22,6 +22,7 @@ const Login = () => {
   const [otp, setOtp] = useState('');
   const [otpStatus, setOtpStatus] = useState<'idle' | 'sending' | 'verified' | 'wrong' | 'not-verified'>('idle');
   const [errorMessage, setErrorMessage] = useState('');
+  const [countdown, setCountdown] = useState(0); // Countdown in seconds
   const navigate = useNavigate();
 
   const handleLogin = async (e: React.FormEvent) => {
@@ -45,6 +46,9 @@ const Login = () => {
           localStorage.setItem('userName', response.user.name);
           localStorage.setItem('userEmail', response.user.email);
         }
+        
+        // Dispatch custom event to notify CookieConsent component
+        window.dispatchEvent(new CustomEvent('authStateChanged'));
         
         // Check if user is admin (from backend response or email check)
         if (response.isAdmin || loginData.email.toLowerCase() === ADMIN_EMAIL.toLowerCase()) {
@@ -100,6 +104,9 @@ const Login = () => {
         }
         localStorage.removeItem('isAdmin');
         
+        // Dispatch custom event to notify CookieConsent component
+        window.dispatchEvent(new CustomEvent('authStateChanged'));
+        
         setUserName(response.user?.name || '');
         setIsLoggedIn(true);
         window.location.href = '/home';
@@ -130,19 +137,25 @@ const Login = () => {
     }
     
     setOtpStatus('sending');
-    setShowOtpModal(true);
     setErrorMessage('');
     
     try {
       const response = await api.sendSignupOTP(signupData.email, signupData.name);
       if (response.success) {
+        // Only show OTP modal if email doesn't exist (success means OTP was sent)
         setOtpStatus('idle');
+        setShowOtpModal(true);
+        // Start 10-minute countdown (600 seconds)
+        setCountdown(600);
       } else {
+        // Email exists or other error - don't show modal, just show error message
         setOtpStatus('idle');
-        setErrorMessage(response.message || 'Failed to send OTP');
+        setShowOtpModal(false);
+        setErrorMessage(response.message || 'Email exists already');
       }
     } catch (error: any) {
       setOtpStatus('idle');
+      setShowOtpModal(false);
       setErrorMessage(error.message || 'Failed to send OTP. Please try again.');
     }
   };
@@ -185,6 +198,37 @@ const Login = () => {
     setShowOtpModal(false);
     setOtp('');
     setOtpStatus('idle');
+    setCountdown(0);
+  };
+
+  // Countdown timer effect
+  useEffect(() => {
+    let interval: NodeJS.Timeout | null = null;
+    if (countdown > 0 && showOtpModal) {
+      interval = setInterval(() => {
+        setCountdown((prev) => {
+          if (prev <= 1) {
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 1000);
+    }
+    return () => {
+      if (interval) clearInterval(interval);
+    };
+  }, [countdown, showOtpModal]);
+
+  // Format countdown as MM:SS
+  const formatCountdown = (seconds: number) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+  };
+
+  const handleResendOtp = async () => {
+    if (countdown > 0) return; // Don't allow resend during countdown
+    await handleSendOtp();
   };
 
   return (
@@ -573,10 +617,15 @@ const Login = () => {
                 <p className="text-xs text-gray-500">
                   Didn't receive the code? 
                   <button 
-                    onClick={handleSendOtp}
-                    className="text-blue-600 hover:text-blue-700 ml-1 font-medium"
+                    onClick={handleResendOtp}
+                    disabled={countdown > 0}
+                    className={`ml-1 font-medium ${
+                      countdown > 0 
+                        ? 'text-gray-400 cursor-not-allowed' 
+                        : 'text-blue-600 hover:text-blue-700'
+                    }`}
                   >
-                    Resend
+                    {countdown > 0 ? `Resend in ${formatCountdown(countdown)}` : 'Resend'}
                   </button>
                 </p>
               </div>

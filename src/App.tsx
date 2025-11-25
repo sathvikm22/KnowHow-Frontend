@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -14,6 +15,9 @@ import ForgotPassword from "./pages/ForgotPassword";
 import AdminBookings from './pages/AdminBookings';
 import AdminUsers from './pages/AdminUsers';
 import GoogleAuthCallback from './pages/GoogleAuthCallback';
+import PrivacyPolicy from './pages/PrivacyPolicy';
+import CookieConsent from './components/CookieConsent';
+import { initializeCookieConsent } from './utils/cookieConsent';
 
 const queryClient = new QueryClient();
 
@@ -22,29 +26,38 @@ function AdminRoute({ children }: { children: JSX.Element }) {
   return isAdmin ? children : <Navigate to="/" replace />;
 }
 
-const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <Router>
-        <Routes>
-          <Route path="/" element={<Login />} />
-          <Route path="/signup" element={<SignUp />} />
-          <Route path="/home" element={<Index />} />
-          <Route path="/booking" element={<Booking />} />
-          <Route path="/activities" element={<Activities />} />
-          <Route path="/buy" element={<Buy />} />
-          <Route path="/forgot-password" element={<ForgotPassword />} />
-          <Route path="/auth/google/callback" element={<GoogleAuthCallback />} />
-          <Route path="/admin/dashboard/bookings" element={<AdminRoute><AdminBookings /></AdminRoute>} />
-          <Route path="/admin/dashboard/users" element={<AdminRoute><AdminUsers /></AdminRoute>} />
-          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </Router>
-    </TooltipProvider>
-  </QueryClientProvider>
-);
+const App = () => {
+  useEffect(() => {
+    // Initialize cookie consent on app load
+    initializeCookieConsent();
+  }, []);
+
+  return (
+    <QueryClientProvider client={queryClient}>
+      <TooltipProvider>
+        <Toaster />
+        <Sonner />
+        <Router>
+          <Routes>
+            <Route path="/" element={<Login />} />
+            <Route path="/signup" element={<SignUp />} />
+            <Route path="/home" element={<Index />} />
+            <Route path="/booking" element={<Booking />} />
+            <Route path="/activities" element={<Activities />} />
+            <Route path="/buy" element={<Buy />} />
+            <Route path="/forgot-password" element={<ForgotPassword />} />
+            <Route path="/auth/google/callback" element={<GoogleAuthCallback />} />
+            <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+            <Route path="/admin/dashboard/bookings" element={<AdminRoute><AdminBookings /></AdminRoute>} />
+            <Route path="/admin/dashboard/users" element={<AdminRoute><AdminUsers /></AdminRoute>} />
+            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+          <CookieConsent />
+        </Router>
+      </TooltipProvider>
+    </QueryClientProvider>
+  );
+};
 
 export default App;

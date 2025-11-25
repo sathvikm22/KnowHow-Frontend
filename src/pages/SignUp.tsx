@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { ArrowLeft, Eye, EyeOff, Mail, Lock, User } from 'lucide-react';
 import { api } from '@/lib/api';
 
@@ -16,6 +16,36 @@ const SignUp = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [otpStatus, setOtpStatus] = useState<'idle' | 'sending' | 'verifying' | 'verified' | 'wrong' | 'error'>('idle');
   const [errorMessage, setErrorMessage] = useState('');
+  const [otpTimer, setOtpTimer] = useState(0); // Timer in seconds
+
+  // Countdown timer effect
+  useEffect(() => {
+    let interval: NodeJS.Timeout | null = null;
+    
+    if (otpTimer > 0 && step === 'otp') {
+      interval = setInterval(() => {
+        setOtpTimer((prev) => {
+          if (prev <= 1) {
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 1000);
+    }
+    
+    return () => {
+      if (interval) {
+        clearInterval(interval);
+      }
+    };
+  }, [otpTimer, step]);
+
+  // Format timer as MM:SS
+  const formatTimer = (seconds: number): string => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+  };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({
@@ -23,6 +53,10 @@ const SignUp = () => {
       [e.target.name]: e.target.value
     });
     setErrorMessage('');
+    // Reset to info step if user starts typing again after an error
+    if (step !== 'info') {
+      setStep('info');
+    }
   };
 
   const handleSendOTP = async () => {
@@ -31,34 +65,47 @@ const SignUp = () => {
       return;
     }
 
+    // Reset everything before making the request
+    setStep('info'); // Ensure we start on info step
+    setOtpStatus('idle');
+    setOtp(''); // Clear any previous OTP
     setIsLoading(true);
-    setOtpStatus('sending');
     setErrorMessage('');
 
     try {
       const response = await api.sendSignupOTP(formData.email, formData.name);
       if (response.success) {
+        // Only proceed to OTP step if successful
         setOtpStatus('idle');
         setStep('otp');
+        setOtpTimer(600); // Start 10-minute countdown (600 seconds)
         setErrorMessage(''); // Clear any previous errors
       } else {
-        setOtpStatus('error');
+        // Error response - stay on info step, don't show OTP modal
+        setStep('info'); // Explicitly stay on info step
+        setOtpStatus('idle'); // Reset OTP status
+        setOtp(''); // Clear OTP input
+        setOtpTimer(0); // Reset timer
         // Check if it's an "already exists" error
         const errorMsg = response.message || 'Failed to send OTP';
         if (errorMsg.toLowerCase().includes('already registered') || 
             errorMsg.toLowerCase().includes('already exists')) {
-          setErrorMessage(`${errorMsg} Would you like to login instead?`);
+          setErrorMessage(errorMsg); // Don't add extra text, backend message is clear
         } else {
           setErrorMessage(errorMsg);
         }
       }
     } catch (error: any) {
-      setOtpStatus('error');
+      // Network or other errors - stay on info step
+      setStep('info'); // Explicitly stay on info step
+      setOtpStatus('idle'); // Reset OTP status
+      setOtp(''); // Clear OTP input
+      setOtpTimer(0); // Reset timer
       const errorMsg = error.message || 'Failed to send OTP. Please try again.';
       // Check if it's an "already exists" error
       if (errorMsg.toLowerCase().includes('already registered') || 
           errorMsg.toLowerCase().includes('already exists')) {
-        setErrorMessage(`${errorMsg} Would you like to login instead?`);
+        setErrorMessage(errorMsg);
       } else {
         setErrorMessage(errorMsg);
       }
@@ -271,13 +318,23 @@ const SignUp = () => {
             </div>
           )}
 
-          {step === 'otp' && (
+          {step === 'otp' && !errorMessage && (
             <div className="space-y-6">
               <div className="text-center">
                 <p className="text-gray-600 mb-2">
                   We've sent a 6-digit code to
                 </p>
-                <p className="font-semibold text-orange-600">{formData.email}</p>
+                <p className="font-semibold text-orange-600 mb-3">{formData.email}</p>
+                {otpTimer > 0 && (
+                  <div className="inline-flex items-center space-x-2 bg-orange-50 border border-orange-200 rounded-lg px-4 py-2">
+                    <svg className="w-4 h-4 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <span className="text-sm font-semibold text-orange-700">
+                      Code expires in: <span className="font-mono">{formatTimer(otpTimer)}</span>
+                    </span>
+                  </div>
+                )}
               </div>
 
               <div className="relative">
@@ -327,6 +384,7 @@ const SignUp = () => {
                     setStep('info');
                     setOtp('');
                     setOtpStatus('idle');
+                    setOtpTimer(0); // Reset timer
                     setErrorMessage('');
                   }}
                   className="flex-1 bg-gray-200 text-gray-700 py-3 rounded-xl font-medium hover:bg-gray-300 transition-colors"
@@ -345,13 +403,22 @@ const SignUp = () => {
               <div className="text-center">
                 <p className="text-xs text-gray-500">
                   Didn't receive the code?{' '}
-                  <button 
-                    onClick={handleSendOTP}
-                    disabled={isLoading}
-                    className="text-orange-600 hover:text-orange-700 font-medium disabled:opacity-50"
-                  >
-                    Resend
-                  </button>
+                  {otpTimer > 0 ? (
+                    <span className="text-gray-400 font-medium">
+                      Resend available in {formatTimer(otpTimer)}
+                    </span>
+                  ) : (
+                    <button 
+                      onClick={() => {
+                        setOtpTimer(600); // Reset timer to 10 minutes
+                        handleSendOTP();
+                      }}
+                      disabled={isLoading}
+                      className="text-orange-600 hover:text-orange-700 font-medium disabled:opacity-50"
+                    >
+                      Resend
+                    </button>
+                  )}
                 </p>
               </div>
             </div>

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { ArrowLeft, Mail, Lock, Eye, EyeOff } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { api } from '@/lib/api';
@@ -15,6 +15,7 @@ const ForgotPassword = () => {
   const [otpStatus, setOtpStatus] = useState<'idle' | 'sending' | 'verifying' | 'verified' | 'wrong' | 'error'>('idle');
   const [errorMessage, setErrorMessage] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
+  const [countdown, setCountdown] = useState(0); // Countdown in seconds
   const navigate = useNavigate();
 
   const handleSendOTP = async (e?: React.FormEvent) => {
@@ -36,6 +37,8 @@ const ForgotPassword = () => {
         setOtpStatus('idle');
         setStep('otp');
         setSuccessMessage('OTP sent to your email');
+        // Start 10-minute countdown (600 seconds)
+        setCountdown(600);
       } else {
         setOtpStatus('error');
         setErrorMessage(response.message || 'Failed to send OTP');
@@ -46,6 +49,36 @@ const ForgotPassword = () => {
     } finally {
       setIsLoading(false);
     }
+  };
+
+  // Countdown timer effect
+  useEffect(() => {
+    let interval: NodeJS.Timeout | null = null;
+    if (countdown > 0 && step === 'otp') {
+      interval = setInterval(() => {
+        setCountdown((prev) => {
+          if (prev <= 1) {
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 1000);
+    }
+    return () => {
+      if (interval) clearInterval(interval);
+    };
+  }, [countdown, step]);
+
+  // Format countdown as MM:SS
+  const formatCountdown = (seconds: number) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+  };
+
+  const handleResendOTP = async () => {
+    if (countdown > 0) return; // Don't allow resend during countdown
+    await handleSendOTP();
   };
 
   const handleVerifyOTP = async () => {
@@ -267,6 +300,7 @@ const ForgotPassword = () => {
                     setOtp('');
                     setOtpStatus('idle');
                     setErrorMessage('');
+                    setCountdown(0);
                   }}
                   className="flex-1 bg-gray-200 text-gray-700 py-3 rounded-xl font-medium hover:bg-gray-300 transition-colors"
                 >
@@ -285,11 +319,15 @@ const ForgotPassword = () => {
                 <p className="text-xs text-gray-500">
                   Didn't receive the code?{' '}
                   <button 
-                    onClick={handleSendOTP}
-                    disabled={isLoading}
-                    className="text-purple-600 hover:text-purple-700 font-medium disabled:opacity-50"
+                    onClick={handleResendOTP}
+                    disabled={isLoading || countdown > 0}
+                    className={`font-medium ${
+                      countdown > 0 || isLoading
+                        ? 'text-gray-400 cursor-not-allowed' 
+                        : 'text-purple-600 hover:text-purple-700'
+                    }`}
                   >
-                    Resend
+                    {countdown > 0 ? `Resend in ${formatCountdown(countdown)}` : 'Resend'}
                   </button>
                 </p>
               </div>

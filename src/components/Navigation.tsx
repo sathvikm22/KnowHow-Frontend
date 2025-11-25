@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Menu, X, LogOut, Moon, Sun } from 'lucide-react';
+import { Menu, X, LogOut, Moon, Sun, Shield } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { logout, getCurrentUser } from '../lib/api';
 
@@ -142,6 +142,14 @@ const Navigation = () => {
             >
               {isDarkMode ? <Sun size={18} className="sm:w-5 sm:h-5" /> : <Moon size={18} className="sm:w-5 sm:h-5" />}
             </button>
+            <button
+              onClick={() => navigate('/privacy-policy')}
+              className="text-white hover:text-yellow-300 p-1.5 sm:p-2 rounded-lg transition-colors duration-300"
+              title="Privacy & Cookies Policy"
+              aria-label="Privacy & Cookies Policy"
+            >
+              <Shield size={18} className="sm:w-5 sm:h-5" />
+            </button>
             {userName ? (
               <>
                 <button 
@@ -236,6 +244,17 @@ const Navigation = () => {
                 Login
               </button>
             )}
+            <div className="pt-4 border-t border-white/20">
+              <button
+                onClick={() => {
+                  navigate('/privacy-policy');
+                  setIsOpen(false);
+                }}
+                className="text-white hover:text-yellow-300 block w-full text-left px-3 py-2 rounded-md text-xs sm:text-sm font-medium hover:bg-white/10"
+              >
+                Privacy & Cookies Policy
+              </button>
+            </div>
           </div>
         </div>
       )}
