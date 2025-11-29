@@ -1,7 +1,6 @@
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Navigation from '../components/Navigation';
-import { Link } from 'react-router-dom';
 import { api } from '../lib/api';
 
 const PrivacyPolicy = () => {
@@ -441,12 +440,18 @@ const PrivacyPolicy = () => {
               <p className="text-gray-600 dark:text-gray-400 text-sm">
                 This Privacy & Cookies Policy is effective as of the date listed above and applies to all users of Know How Café website.
               </p>
-              <Link
-                to="/home"
+              <button
+                onClick={() => {
+                  navigate('/home');
+                  // Scroll to top after navigation
+                  setTimeout(() => {
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                  }, 100);
+                }}
                 className="inline-block mt-6 bg-purple-500 text-white px-8 py-3 rounded-xl font-semibold hover:bg-purple-600 transition-colors duration-300"
               >
                 Back to Home
-              </Link>
+              </button>
             </div>
           </div>
         </div>
