@@ -18,6 +18,10 @@ import AdminBookings from './pages/AdminBookings';
 import AdminUsers from './pages/AdminUsers';
 import GoogleAuthCallback from './pages/GoogleAuthCallback';
 import PrivacyPolicy from './pages/PrivacyPolicy';
+import ShippingPolicy from './pages/ShippingPolicy';
+import TermsAndConditions from './pages/TermsAndConditions';
+import CancellationsAndRefunds from './pages/CancellationsAndRefunds';
+import ContactUs from './pages/ContactUs';
 import CookieConsent from './components/CookieConsent';
 import { initializeCookieConsent } from './utils/cookieConsent';
 import { CartProvider } from './contexts/CartContext';
@@ -54,6 +58,17 @@ const App = () => {
               <Route path="/forgot-password" element={<ForgotPassword />} />
               <Route path="/auth/google/callback" element={<GoogleAuthCallback />} />
               <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+              <Route path="/shipping-policy" element={<ShippingPolicy />} />
+              <Route path="/shipping" element={<ShippingPolicy />} />
+              <Route path="/terms-and-conditions" element={<TermsAndConditions />} />
+              <Route path="/terms" element={<TermsAndConditions />} />
+              <Route path="/terms-of-service" element={<TermsAndConditions />} />
+              <Route path="/cancellations-refunds" element={<CancellationsAndRefunds />} />
+              <Route path="/refund-policy" element={<CancellationsAndRefunds />} />
+              <Route path="/cancellation-policy" element={<CancellationsAndRefunds />} />
+              <Route path="/returns" element={<CancellationsAndRefunds />} />
+              <Route path="/contact-us" element={<ContactUs />} />
+              <Route path="/contact" element={<ContactUs />} />
               <Route path="/admin/dashboard/bookings" element={<AdminRoute><AdminBookings /></AdminRoute>} />
               <Route path="/admin/dashboard/users" element={<AdminRoute><AdminUsers /></AdminRoute>} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
