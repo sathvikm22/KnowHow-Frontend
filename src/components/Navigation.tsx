@@ -110,6 +110,8 @@ const Navigation = () => {
       localStorage.removeItem('userName');
       localStorage.removeItem('isAdmin');
       setUserName('');
+      // Dispatch logout event for components to react (CookieConsent, etc.)
+      window.dispatchEvent(new CustomEvent('userLoggedOut'));
       navigate('/');
     }
   };

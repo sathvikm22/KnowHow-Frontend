@@ -18,6 +18,13 @@ const CookieConsent = () => {
     '/privacy-policy'
   ];
 
+  // Helper function to check if user is still logged in
+  const isUserLoggedIn = (): boolean => {
+    const authToken = localStorage.getItem('authToken');
+    const userName = localStorage.getItem('userName');
+    return !!(authToken && userName);
+  };
+
   const checkAndShowConsent = async () => {
     // Don't show on login/signup pages
     if (excludedPaths.includes(location.pathname)) {
@@ -26,11 +33,8 @@ const CookieConsent = () => {
       return;
     }
 
-    // Check if user is logged in
-    const authToken = localStorage.getItem('authToken');
-    const userName = localStorage.getItem('userName');
-    
-    if (!authToken || !userName) {
+    // Check if user is logged in - if not, don't show popup
+    if (!isUserLoggedIn()) {
       setShow(false);
       setIsLoading(false);
       return;
@@ -50,6 +54,12 @@ const CookieConsent = () => {
         if (cookieConsent === null || cookieConsent === 'declined') {
           // Delay to ensure page is fully loaded after redirect
           setTimeout(() => {
+            // CRITICAL: Double-check user is still logged in before showing
+            if (!isUserLoggedIn()) {
+              setShow(false);
+              setIsLoading(false);
+              return;
+            }
             // Double-check we're still on an authenticated page
             if (!excludedPaths.includes(location.pathname)) {
               setShow(true);
@@ -69,6 +79,12 @@ const CookieConsent = () => {
         const localConsent = localStorage.getItem('cookieConsent');
         if (!localConsent || localConsent === 'declined') {
           setTimeout(() => {
+            // CRITICAL: Check user is still logged in before showing
+            if (!isUserLoggedIn()) {
+              setShow(false);
+              setIsLoading(false);
+              return;
+            }
             setShow(true);
             setIsLoading(false);
           }, 500);
@@ -83,6 +99,12 @@ const CookieConsent = () => {
       const localConsent = localStorage.getItem('cookieConsent');
       if (!localConsent || localConsent === 'declined') {
         setTimeout(() => {
+          // CRITICAL: Check user is still logged in before showing
+          if (!isUserLoggedIn()) {
+            setShow(false);
+            setIsLoading(false);
+            return;
+          }
           setShow(true);
           setIsLoading(false);
         }, 500);
@@ -108,24 +130,65 @@ const CookieConsent = () => {
 
     // Listen for custom auth events (for same-tab auth changes)
     const handleAuthChange = () => {
+      // Immediately hide popup if user logged out
+      if (!isUserLoggedIn()) {
+        setShow(false);
+        setIsLoading(false);
+        return;
+      }
+      
       // Don't check if on excluded page
       if (excludedPaths.includes(location.pathname)) {
         return;
       }
       // Wait a bit for localStorage to be set and page to load, then check consent
       setTimeout(() => {
+        // Double-check user is still logged in
+        if (!isUserLoggedIn()) {
+          setShow(false);
+          setIsLoading(false);
+          return;
+        }
         checkAndShowConsent();
       }, 1500); // Wait longer after auth change to ensure redirect is complete
     };
 
-    // Add event listener
+    // Listen for logout events - immediately hide popup
+    const handleLogout = () => {
+      setShow(false);
+      setIsLoading(false);
+    };
+
+    // Monitor localStorage changes for logout (cross-tab)
+    const handleStorageChange = (e: StorageEvent) => {
+      if (e.key === 'authToken' && !e.newValue) {
+        // authToken was removed = logout
+        setShow(false);
+        setIsLoading(false);
+      }
+    };
+
+    // Add event listeners
     window.addEventListener('authStateChanged', handleAuthChange);
+    window.addEventListener('userLoggedOut', handleLogout);
+    window.addEventListener('storage', handleStorageChange);
+    
+    // Also check periodically if popup is showing to ensure user is still logged in
+    const loginCheckInterval = setInterval(() => {
+      if (show && !isUserLoggedIn()) {
+        setShow(false);
+        setIsLoading(false);
+      }
+    }, 500); // Check every 500ms
 
     return () => {
       window.removeEventListener('authStateChanged', handleAuthChange);
+      window.removeEventListener('userLoggedOut', handleLogout);
+      window.removeEventListener('storage', handleStorageChange);
       clearTimeout(checkTimer);
+      clearInterval(loginCheckInterval);
     };
-  }, [location.pathname]); // Re-check when route changes
+  }, [location.pathname, show]); // Re-check when route changes or popup state changes
 
   const handleAccept = async () => {
     try {

@@ -11,7 +11,12 @@ const AdminLayout = ({ children }: { children: ReactNode }) => {
   const navigate = useNavigate();
 
   const handleLogout = () => {
+    // Clear all auth-related data
+    localStorage.removeItem('authToken');
+    localStorage.removeItem('userName');
     localStorage.removeItem('isAdmin');
+    // Dispatch logout event for components to react (CookieConsent, etc.)
+    window.dispatchEvent(new CustomEvent('userLoggedOut'));
     navigate('/');
   };
 

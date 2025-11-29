@@ -195,10 +195,18 @@ class ApiClient {
       });
       // Clear token from localStorage
       localStorage.removeItem('authToken');
+      localStorage.removeItem('userName');
+      localStorage.removeItem('isAdmin');
+      // Dispatch logout event for components to react
+      window.dispatchEvent(new CustomEvent('userLoggedOut'));
       return result;
     } catch (error) {
       // Even if API call fails, clear local token
       localStorage.removeItem('authToken');
+      localStorage.removeItem('userName');
+      localStorage.removeItem('isAdmin');
+      // Dispatch logout event for components to react
+      window.dispatchEvent(new CustomEvent('userLoggedOut'));
       return { success: true, message: 'Logged out successfully' };
     }
   }
