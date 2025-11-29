@@ -1,5 +1,5 @@
 // Get API base URL from environment variable
-// VITE_API_URL should be the base URL (e.g., http://localhost:3000 or https://knowhow-backend.onrender.com)
+// VITE_API_URL should be the base URL (e.g., http://localhost:3000 or https://knowhow-backend-d2gs.onrender.com)
 // We append /api to it
 const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:3000';
 const API_BASE_URL = `${API_BASE}/api`;

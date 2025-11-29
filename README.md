@@ -76,7 +76,7 @@ VITE_API_URL=http://localhost:3000
 
 Set in Vercel dashboard:
 ```env
-VITE_API_URL=https://knowhow-backend.onrender.com
+VITE_API_URL=https://knowhow-backend-d2gs.onrender.com
 ```
 
 ## 📦 Available Scripts
