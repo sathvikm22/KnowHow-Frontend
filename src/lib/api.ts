@@ -1,7 +1,18 @@
 // Get API base URL from environment variable
-// VITE_API_URL should be the base URL (e.g., http://localhost:3000 or https://knowhow-backend-d2gs.onrender.com)
+// VITE_BACKEND_URL should be the base URL (e.g., http://localhost:3000 or https://knowhow-backend-d2gs.onrender.com)
 // We append /api to it
-const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+// Remove trailing slashes and ensure HTTPS in production
+const getBackendUrl = () => {
+  const envUrl = import.meta.env.VITE_BACKEND_URL || import.meta.env.VITE_API_URL;
+  if (envUrl) {
+    // Remove trailing slashes
+    return envUrl.replace(/\/+$/, '');
+  }
+  // Default to localhost for development
+  return 'http://localhost:3000';
+};
+
+const API_BASE = getBackendUrl();
 const API_BASE_URL = `${API_BASE}/api`;
 
 export interface ApiResponse<T = any> {
@@ -30,10 +41,13 @@ class ApiClient {
     endpoint: string,
     options: RequestInit = {}
   ): Promise<ApiResponse<T>> {
-    const url = `${this.baseUrl}${endpoint}`;
+    // Remove leading slash from endpoint if present to avoid double slashes
+    const cleanEndpoint = endpoint.startsWith('/') ? endpoint : `/${endpoint}`;
+    const url = `${this.baseUrl}${cleanEndpoint}`;
     
     const config: RequestInit = {
       ...options,
+      credentials: 'include', // Equivalent to withCredentials: true
       headers: {
         'Content-Type': 'application/json',
         ...options.headers,
@@ -76,11 +90,34 @@ class ApiClient {
       return data;
     } catch (error: any) {
       console.error('API Error:', error);
-      // Handle network errors
-      if (error instanceof TypeError && error.message.includes('fetch')) {
-        throw new Error('Network error: Unable to connect to the server. Please check if the backend is running.');
+      console.error('Failed URL:', url);
+      console.error('Error details:', {
+        message: error.message,
+        name: error.name,
+        stack: error.stack
+      });
+      
+      // Handle network errors with more specific messages
+      if (error instanceof TypeError) {
+        if (error.message.includes('fetch') || error.message.includes('Failed to fetch')) {
+          const backendUrl = API_BASE;
+          throw new Error(
+            `Network error: Unable to connect to backend at ${backendUrl}. ` +
+            `Please check if the backend server is running and accessible. ` +
+            `If this is a production deployment, verify VITE_BACKEND_URL is set correctly.`
+          );
+        }
+        if (error.message.includes('CORS')) {
+          throw new Error('CORS error: The backend server is not allowing requests from this origin. Please check CORS configuration.');
+        }
       }
-      throw error;
+      
+      // Re-throw with original error message if it's already descriptive
+      if (error.message && !error.message.includes('Network error')) {
+        throw error;
+      }
+      
+      throw new Error(error.message || 'An unexpected error occurred. Please try again.');
     }
   }
 

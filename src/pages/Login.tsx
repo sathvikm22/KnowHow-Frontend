@@ -344,10 +344,17 @@ const Login = () => {
                   type="button"
                   className="w-full flex items-center justify-center px-4 py-2 border border-gray-300 rounded-xl hover:bg-gray-50 transition-colors"
                   onClick={() => {
-                    // Get API base URL (without /api suffix)
-                    const apiBase = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+                    // Get backend URL from environment variable (without /api suffix)
+                    const getBackendUrl = () => {
+                      const envUrl = import.meta.env.VITE_BACKEND_URL || import.meta.env.VITE_API_URL;
+                      if (envUrl) {
+                        return envUrl.replace(/\/+$/, ''); // Remove trailing slashes
+                      }
+                      return 'http://localhost:3000'; // Default for local development
+                    };
+                    const backendBase = getBackendUrl();
                     // Construct full Google OAuth URL: base + /api/auth/google
-                    const googleAuthUrl = `${apiBase}/api/auth/google`;
+                    const googleAuthUrl = `${backendBase}/api/auth/google`;
                     console.log('Redirecting to Google OAuth:', googleAuthUrl);
                     window.location.href = googleAuthUrl;
                   }}

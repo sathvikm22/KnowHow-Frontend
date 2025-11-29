@@ -26,7 +26,8 @@ React + Vite + TypeScript frontend application for Know How Cafe.
    Edit `.env.local`:
    ```env
    # For local development
-   VITE_API_URL=http://localhost:3000
+   VITE_BACKEND_URL=http://localhost:3000
+   # Note: VITE_API_URL is also supported for backward compatibility
    ```
 
 4. **Start development server:**
@@ -63,21 +64,27 @@ frontend/
 
 ### Required
 
-- `VITE_API_URL` - Backend API base URL (without `/api` suffix)
+- `VITE_BACKEND_URL` - Backend API base URL (without `/api` suffix)
+- Note: `VITE_API_URL` is also supported for backward compatibility, but `VITE_BACKEND_URL` is preferred
 
 ### Local Development
 
 Create `.env.local`:
 ```env
-VITE_API_URL=http://localhost:3000
+VITE_BACKEND_URL=http://localhost:3000
 ```
 
 ### Production (Vercel)
 
 Set in Vercel dashboard:
 ```env
-VITE_API_URL=https://knowhow-backend-d2gs.onrender.com
+VITE_BACKEND_URL=https://knowhow-backend-d2gs.onrender.com
 ```
+
+**Important:** 
+- Remove any trailing slashes from the URL
+- Use HTTPS for production URLs
+- The API client automatically appends `/api` to the base URL
 
 ## 📦 Available Scripts
 
@@ -88,7 +95,7 @@ VITE_API_URL=https://knowhow-backend-d2gs.onrender.com
 
 ## 🔗 Backend Connection
 
-The frontend connects to the backend API using the `VITE_API_URL` environment variable.
+The frontend connects to the backend API using the `VITE_BACKEND_URL` environment variable (or `VITE_API_URL` for backward compatibility).
 
 The API client automatically:
 - Appends `/api` to the base URL
@@ -102,14 +109,14 @@ See [VERCEL_DEPLOYMENT.md](../VERCEL_DEPLOYMENT.md) for complete deployment inst
 Quick steps:
 1. Push code to GitHub
 2. Import to Vercel
-3. Set `VITE_API_URL` environment variable
+3. Set `VITE_BACKEND_URL` environment variable in Vercel dashboard
 4. Deploy!
 
 ## 🐛 Troubleshooting
 
 ### API Connection Issues
 
-- Verify `VITE_API_URL` is set correctly
+- Verify `VITE_BACKEND_URL` is set correctly in Vercel environment variables
 - Check backend is running and accessible
 - Check browser console for CORS errors
 
