@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import { ArrowLeft, Calendar, Clock, CreditCard, Smartphone, QrCode, Check } from 'lucide-react';
 import Navigation from '../components/Navigation';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 const Booking = () => {
   const [selectedActivity, setSelectedActivity] = useState('');
@@ -15,6 +15,7 @@ const Booking = () => {
   const location = useLocation();
   const [selectedActivities, setSelectedActivities] = useState<string[]>([]);
   const [specialActivityPeople, setSpecialActivityPeople] = useState(1);
+  const navigate = useNavigate();
   
   // User details state
   const [userDetails, setUserDetails] = useState({
@@ -179,7 +180,7 @@ const allSelectedActivitiesDetailed = useMemo(() => {
       return;
     }
     
-    if (!selectedDate || !selectedTimeSlot || !selectedPayment) {
+    if (!selectedDate || !selectedTimeSlot) {
       alert('Please fill in all required fields');
       return;
     }
@@ -194,7 +195,71 @@ const allSelectedActivitiesDetailed = useMemo(() => {
         return;
     }
 
-    // setShowConfirmation(true);
+    // Prepare order items
+    const orderItems: Array<{
+      name: string;
+      quantity: number;
+      unitPrice: number;
+      total: number;
+    }> = [];
+
+    // Add combo if selected
+    if (selectedCombo) {
+      // Check if it's a special combo (Host Your Occasion, We Come To Your Place, etc.)
+      const isSpecialCombo = selectedCombo.id === 'host_occasion' || 
+                            selectedCombo.id === 'come_to_place' || 
+                            selectedCombo.id === 'corporate_workshops' ||
+                            selectedCombo.id === 'jewellery_lab' ||
+                            selectedCombo.id === 'tuft_kidding';
+      const comboQuantity = isSpecialCombo ? specialActivityPeople : 1;
+      orderItems.push({
+        name: selectedCombo.name,
+        quantity: comboQuantity,
+        unitPrice: selectedCombo.price,
+        total: selectedCombo.price * comboQuantity,
+      });
+    }
+
+    // Add individual activities that have a price (special activities not in combo)
+    allSelectedActivitiesDetailed.forEach(activity => {
+      const isCoveredBySpecificCombo = selectedCombo && 
+        selectedCombo.type === 'specific' && 
+        selectedCombo.activities?.includes(activity.name);
+      
+      if (activity.price > 0 && !isCoveredBySpecificCombo) {
+        orderItems.push({
+          name: activity.name,
+          quantity: 1,
+          unitPrice: activity.price,
+          total: activity.price,
+        });
+      }
+    });
+
+    // Calculate totals (no GST)
+    const subtotal = bookingTotal;
+    const totalAmount = subtotal;
+
+    // Get selected activity names
+    const selectedActivityNames = allSelectedActivitiesDetailed.map(a => a.name);
+
+    // Prepare order data for checkout
+    const orderData = {
+      customerName: userDetails.name,
+      customerEmail: userDetails.email,
+      customerPhone: `${userDetails.countryCode}${userDetails.phone}`,
+      customerAddress: userDetails.address || undefined,
+      items: orderItems,
+      subtotal,
+      totalAmount,
+      bookingDate: selectedDate,
+      bookingTimeSlot: selectedTimeSlot,
+      selectedActivities: selectedActivityNames,
+      notes: `Booking for ${selectedDate} at ${selectedTimeSlot}`,
+    };
+
+    // Navigate to checkout page
+    navigate('/checkout', { state: { orderData } });
   };
 
   const handleComboSelect = (combo) => {

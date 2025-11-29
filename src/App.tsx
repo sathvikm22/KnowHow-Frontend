@@ -12,6 +12,7 @@ import Login from "./pages/Login";
 import SignUp from "./pages/SignUp";
 import Buy from "./pages/Buy";
 import Cart from "./pages/Cart";
+import Checkout from "./pages/Checkout";
 import ForgotPassword from "./pages/ForgotPassword";
 import AdminBookings from './pages/AdminBookings';
 import AdminUsers from './pages/AdminUsers';
@@ -49,6 +50,7 @@ const App = () => {
               <Route path="/activities" element={<Activities />} />
               <Route path="/buy" element={<Buy />} />
               <Route path="/cart" element={<Cart />} />
+              <Route path="/checkout" element={<Checkout />} />
               <Route path="/forgot-password" element={<ForgotPassword />} />
               <Route path="/auth/google/callback" element={<GoogleAuthCallback />} />
               <Route path="/privacy-policy" element={<PrivacyPolicy />} />
