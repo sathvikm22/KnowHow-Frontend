@@ -184,7 +184,7 @@ const Checkout = () => {
               navigate('/failed', { 
                 state: { 
                   orderId: order_id,
-                  message: 'Payment verification failed.' 
+                  message: verifyResponse.message || 'Payment verification failed.' 
                 } 
               });
             }
@@ -209,6 +209,17 @@ const Checkout = () => {
             });
           }
         }
+      };
+
+      // Add error handler for Razorpay
+      (options as any).handler_error = function(error: any) {
+        console.error('Razorpay error:', error);
+        navigate('/failed', { 
+          state: { 
+            orderId: order_id,
+            message: error.description || error.error?.description || 'Payment failed. Please try again.' 
+          } 
+        });
       };
 
       const razorpay = new window.Razorpay(options);

@@ -193,6 +193,17 @@ const CartCheckout = () => {
         }
       };
 
+      // Add error handler for Razorpay
+      (options as any).handler_error = function(error: any) {
+        console.error('Razorpay error:', error);
+        navigate('/failed', { 
+          state: { 
+            orderId: order_id,
+            message: error.description || error.error?.description || 'Payment failed. Please try again.' 
+          } 
+        });
+      };
+
       console.log('Opening Razorpay checkout...');
       const razorpay = new window.Razorpay(options);
       razorpay.open();
