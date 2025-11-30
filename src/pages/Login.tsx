@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Eye, EyeOff, Mail, Lock, User } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { api } from '@/lib/api';
 
 const ADMIN_EMAIL = 'knowhowcafe2025@gmail.com';
@@ -24,6 +24,29 @@ const Login = () => {
   const [errorMessage, setErrorMessage] = useState('');
   const [countdown, setCountdown] = useState(0); // Countdown in seconds
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+
+  // Handle OAuth error messages from URL
+  useEffect(() => {
+    const error = searchParams.get('error');
+    if (error) {
+      const errorMessages: Record<string, string> = {
+        'oauth_failed': 'Google OAuth authentication failed. Please try again.',
+        'redirect_uri_mismatch': 'OAuth configuration error. Please contact support. The redirect URI in Google Cloud Console does not match the backend configuration.',
+        'no_code': 'Google OAuth did not return an authorization code. Please try again.',
+        'code_expired': 'The authorization code has expired. Please try signing in again.',
+        'token_exchange_failed': 'Failed to exchange authorization code for token. Please try again.',
+        'oauth_not_configured': 'Google OAuth is not properly configured. Please contact support.',
+        'missing_parameters': 'Missing authentication parameters. Please try signing in again.',
+        'callback_error': 'An error occurred during authentication. Please try again.',
+        'access_denied': 'You denied access to your Google account. Please try again and grant the necessary permissions.'
+      };
+      setErrorMessage(errorMessages[error] || 'An error occurred during Google sign-in. Please try again.');
+      
+      // Clear the error from URL
+      navigate('/login', { replace: true });
+    }
+  }, [searchParams, navigate]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
