@@ -375,10 +375,24 @@ const Login = () => {
                       }
                       return 'http://localhost:3000'; // Default for local development
                     };
+                    
+                    // Get current frontend URL (production domain)
+                    const getFrontendUrl = () => {
+                      // In production, use the actual domain
+                      if (window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
+                        return `${window.location.protocol}//${window.location.host}`;
+                      }
+                      // For local development
+                      return 'http://localhost:8080';
+                    };
+                    
                     const backendBase = getBackendUrl();
-                    // Construct full Google OAuth URL: base + /api/auth/google
-                    const googleAuthUrl = `${backendBase}/api/auth/google`;
+                    const frontendUrl = getFrontendUrl();
+                    
+                    // Pass frontend URL as query parameter so backend knows where to redirect
+                    const googleAuthUrl = `${backendBase}/api/auth/google?frontend_url=${encodeURIComponent(frontendUrl)}`;
                     console.log('Redirecting to Google OAuth:', googleAuthUrl);
+                    console.log('Frontend URL being sent:', frontendUrl);
                     window.location.href = googleAuthUrl;
                   }}
                 >
