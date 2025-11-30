@@ -131,6 +131,12 @@ export const diyKits: DIYKit[] = [
     price: 399, 
     image: null,
     description: "Create stunning mandala-patterned coasters for your home. Kit includes coaster blanks, paints, brushes, and mandala templates. Protect your furniture in style."
+  },
+  { 
+    name: "dummy-razor", 
+    price: 1, 
+    image: null,
+    description: "Dummy razor kit for testing purposes."
   }
 ];
 

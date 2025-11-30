@@ -22,6 +22,14 @@ import ShippingPolicy from './pages/ShippingPolicy';
 import TermsAndConditions from './pages/TermsAndConditions';
 import CancellationsAndRefunds from './pages/CancellationsAndRefunds';
 import ContactUs from './pages/ContactUs';
+import Orders from './pages/Orders';
+import MyOrders from './pages/MyOrders';
+import AllOrders from './pages/AllOrders';
+import CartCheckout from './pages/CartCheckout';
+import AdminDIYOrders from './pages/AdminDIYOrders';
+import PaymentProcessing from './pages/PaymentProcessing';
+import PaymentSuccess from './pages/PaymentSuccess';
+import PaymentFailed from './pages/PaymentFailed';
 import CookieConsent from './components/CookieConsent';
 import { initializeCookieConsent } from './utils/cookieConsent';
 import { CartProvider } from './contexts/CartContext';
@@ -69,7 +77,15 @@ const App = () => {
               <Route path="/returns" element={<CancellationsAndRefunds />} />
               <Route path="/contact-us" element={<ContactUs />} />
               <Route path="/contact" element={<ContactUs />} />
+              <Route path="/orders" element={<Orders />} />
+              <Route path="/my-orders" element={<MyOrders />} />
+              <Route path="/all-orders" element={<AllOrders />} />
+              <Route path="/cart-checkout" element={<CartCheckout />} />
+              <Route path="/payment-processing" element={<PaymentProcessing />} />
+              <Route path="/success" element={<PaymentSuccess />} />
+              <Route path="/failed" element={<PaymentFailed />} />
               <Route path="/admin/dashboard/bookings" element={<AdminRoute><AdminBookings /></AdminRoute>} />
+              <Route path="/admin/dashboard/diy-orders" element={<AdminRoute><AdminDIYOrders /></AdminRoute>} />
               <Route path="/admin/dashboard/users" element={<AdminRoute><AdminUsers /></AdminRoute>} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />

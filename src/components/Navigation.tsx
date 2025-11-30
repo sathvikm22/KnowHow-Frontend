@@ -90,6 +90,11 @@ const Navigation = () => {
     { name: 'Contact Us', action: () => scrollToSection('contact', '/home') }
   ];
 
+  const handleOrders = () => {
+    navigate('/all-orders');
+    setIsOpen(false);
+  };
+
   const handleBookNow = () => {
     navigate('/booking');
   };
@@ -118,95 +123,37 @@ const Navigation = () => {
 
   return (
     <nav className="fixed top-0 w-full bg-teal-500 dark:bg-gray-900 z-50 shadow-lg">
-      <div className="max-w-7xl mx-auto px-0 sm:px-2 lg:px-4">
-        <div className="flex items-center justify-between h-14 sm:h-16">
-          {/* Left side - Logo and Know How */}
-          <div className="flex items-center space-x-1 sm:space-x-2 flex-shrink-0 min-w-0">
+      <div className="w-full">
+        <div className="flex items-center h-14 sm:h-16">
+          {/* Left side - Logo and Know How - Absolute leftmost */}
+          <div className="flex items-center space-x-1.5 sm:space-x-2 flex-shrink-0 pl-2 sm:pl-3 lg:pl-4">
             <img 
               src="/lovable-uploads/70d53855-15d8-48b4-9670-ee7b769f185c.png" 
               alt="Know How Logo" 
               className="w-6 h-6 sm:w-8 sm:h-8 object-contain flex-shrink-0"
             />
-            <span className="text-sm sm:text-lg font-bold text-white truncate">
+            <span className="text-sm sm:text-lg font-bold text-white whitespace-nowrap">
               Know How
             </span>
           </div>
           
-          {/* Center - Navigation Items and Icons/Buttons */}
-          <div className="hidden lg:flex items-center justify-center flex-1 px-4">
-            <div className="flex items-center space-x-4 xl:space-x-6">
-              {/* Navigation Items */}
+          {/* Center - Navigation Items Only */}
+          <div className="hidden lg:flex items-center justify-center flex-1 min-w-0">
+            <div className="flex items-center justify-center gap-3 xl:gap-4">
               {navItems.map((item) => (
                 <button
                   key={item.name}
                   onClick={item.action}
-                  className="text-white hover:text-yellow-300 px-2 xl:px-3 py-2 rounded-lg text-sm font-medium transition-all duration-300 hover:bg-white/10 whitespace-nowrap"
+                  className="text-white hover:text-yellow-300 px-2 py-2 rounded-lg text-base xl:text-lg font-medium transition-all duration-300 hover:bg-white/10 whitespace-nowrap"
                 >
                   {item.name}
                 </button>
               ))}
-              
-              {/* Icons and Buttons - Center aligned */}
-              <div className="flex items-center space-x-2 xl:space-x-3 ml-4 xl:ml-6">
-                <button
-                  onClick={toggleDarkMode}
-                  className="text-white hover:text-yellow-300 p-1.5 sm:p-2 rounded-lg transition-colors duration-300"
-                >
-                  {isDarkMode ? <Sun size={18} className="sm:w-5 sm:h-5" /> : <Moon size={18} className="sm:w-5 sm:h-5" />}
-                </button>
-                <button
-                  onClick={() => navigate('/privacy-policy')}
-                  className="text-white hover:text-yellow-300 p-1.5 sm:p-2 rounded-lg transition-colors duration-300"
-                  title="Privacy & Cookies Policy"
-                  aria-label="Privacy & Cookies Policy"
-                >
-                  <Shield size={18} className="sm:w-5 sm:h-5" />
-                </button>
-                {userName && (
-                  <button
-                    onClick={() => navigate('/cart')}
-                    className="relative text-white hover:text-yellow-300 p-1.5 sm:p-2 rounded-lg transition-colors duration-300"
-                    title="Shopping Cart"
-                    aria-label="Shopping Cart"
-                  >
-                    <ShoppingCart size={18} className="sm:w-5 sm:h-5" />
-                    {cartCount > 0 && (
-                      <span className="absolute -top-1 -right-1 bg-orange-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
-                        {cartCount > 9 ? '9+' : cartCount}
-                      </span>
-                    )}
-                  </button>
-                )}
-                {userName ? (
-                  <>
-                    <button 
-                      onClick={handleBookNow}
-                      className="bg-orange-500 text-white px-2 sm:px-3 py-1 sm:py-1.5 rounded-lg text-xs sm:text-sm font-medium hover:bg-orange-600 transition-colors duration-300 whitespace-nowrap"
-                    >
-                      Book Now
-                    </button>
-                    <span className="text-white text-xs sm:text-sm font-medium px-2 sm:px-3 py-1 sm:py-1.5 bg-pink-500 rounded-lg max-w-20 sm:max-w-none truncate">{userName}</span>
-                    <button 
-                      onClick={handleLogout}
-                      className="bg-yellow-400 text-gray-800 p-1 sm:p-1.5 rounded-lg hover:bg-yellow-500 transition-colors duration-300"
-                    >
-                      <LogOut size={14} className="sm:w-4 sm:h-4" />
-                    </button>
-                  </>
-                ) : (
-                  <button 
-                    onClick={handleLogin}
-                    className="bg-pink-500 text-white px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg text-xs sm:text-sm font-medium hover:bg-pink-600 transition-colors duration-300 whitespace-nowrap"
-                  >
-                    Login
-                  </button>
-                )}
-              </div>
             </div>
           </div>
           
-          {/* Right side - Icons/Buttons for medium screens (md but not lg) */}
-          <div className="hidden md:flex lg:hidden items-center space-x-2 flex-shrink-0">
+          {/* Right side - Icons and Buttons */}
+          <div className="hidden lg:flex items-center gap-2 xl:gap-2.5 flex-shrink-0 pr-2 sm:pr-3 lg:pr-4">
             <button
               onClick={toggleDarkMode}
               className="text-white hover:text-yellow-300 p-1.5 sm:p-2 rounded-lg transition-colors duration-300"
@@ -239,23 +186,94 @@ const Navigation = () => {
             {userName ? (
               <>
                 <button 
+                  onClick={handleOrders}
+                  className="bg-blue-500 text-white px-2.5 xl:px-3 py-1.5 sm:py-1.5 rounded-lg text-xs sm:text-sm font-medium hover:bg-blue-600 transition-colors duration-300 whitespace-nowrap flex-shrink-0"
+                >
+                  Orders
+                </button>
+                <button 
                   onClick={handleBookNow}
-                  className="bg-orange-500 text-white px-2 sm:px-3 py-1 sm:py-1.5 rounded-lg text-xs sm:text-sm font-medium hover:bg-orange-600 transition-colors duration-300 whitespace-nowrap"
+                  className="bg-orange-500 text-white px-2.5 xl:px-3 py-1.5 sm:py-1.5 rounded-lg text-xs sm:text-sm font-medium hover:bg-orange-600 transition-colors duration-300 whitespace-nowrap flex-shrink-0"
                 >
                   Book Now
                 </button>
-                <span className="text-white text-xs sm:text-sm font-medium px-2 sm:px-3 py-1 sm:py-1.5 bg-pink-500 rounded-lg max-w-20 sm:max-w-none truncate">{userName}</span>
+                <span className="text-white text-xs sm:text-sm font-medium px-3 xl:px-4 py-1.5 sm:py-1.5 bg-pink-500 rounded-lg whitespace-nowrap flex-shrink-0">{userName}</span>
                 <button 
                   onClick={handleLogout}
-                  className="bg-yellow-400 text-gray-800 p-1 sm:p-1.5 rounded-lg hover:bg-yellow-500 transition-colors duration-300"
+                  className="bg-yellow-400 text-gray-800 px-2.5 xl:px-3 py-1.5 sm:py-1.5 rounded-lg hover:bg-yellow-500 transition-colors duration-300 flex-shrink-0"
+                  title="Sign Out"
                 >
-                  <LogOut size={14} className="sm:w-4 sm:h-4" />
+                  <LogOut size={16} className="sm:w-4 sm:h-4" />
                 </button>
               </>
             ) : (
               <button 
                 onClick={handleLogin}
-                className="bg-pink-500 text-white px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg text-xs sm:text-sm font-medium hover:bg-pink-600 transition-colors duration-300 whitespace-nowrap"
+                className="bg-pink-500 text-white px-3 xl:px-4 py-1.5 sm:py-2 rounded-lg text-xs sm:text-sm font-medium hover:bg-pink-600 transition-colors duration-300 whitespace-nowrap flex-shrink-0"
+              >
+                Login
+              </button>
+            )}
+          </div>
+          
+          {/* Right side - Icons/Buttons for medium screens (md but not lg) */}
+          <div className="hidden md:flex lg:hidden items-center gap-2 flex-shrink-0 pr-2 sm:pr-3 lg:pr-4">
+            <button
+              onClick={toggleDarkMode}
+              className="text-white hover:text-yellow-300 p-1.5 sm:p-2 rounded-lg transition-colors duration-300"
+            >
+              {isDarkMode ? <Sun size={18} className="sm:w-5 sm:h-5" /> : <Moon size={18} className="sm:w-5 sm:h-5" />}
+            </button>
+            <button
+              onClick={() => navigate('/privacy-policy')}
+              className="text-white hover:text-yellow-300 p-1.5 sm:p-2 rounded-lg transition-colors duration-300"
+              title="Privacy & Cookies Policy"
+              aria-label="Privacy & Cookies Policy"
+            >
+              <Shield size={18} className="sm:w-5 sm:h-5" />
+            </button>
+            {userName && (
+              <button
+                onClick={() => navigate('/cart')}
+                className="relative text-white hover:text-yellow-300 p-1.5 sm:p-2 rounded-lg transition-colors duration-300"
+                title="Shopping Cart"
+                aria-label="Shopping Cart"
+              >
+                <ShoppingCart size={18} className="sm:w-5 sm:h-5" />
+                {cartCount > 0 && (
+                  <span className="absolute -top-1 -right-1 bg-orange-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
+                    {cartCount > 9 ? '9+' : cartCount}
+                  </span>
+                )}
+              </button>
+            )}
+            {userName ? (
+              <>
+                <button 
+                  onClick={handleOrders}
+                  className="bg-blue-500 text-white px-2.5 sm:px-3 py-1.5 sm:py-1.5 rounded-lg text-xs sm:text-sm font-medium hover:bg-blue-600 transition-colors duration-300 whitespace-nowrap flex-shrink-0"
+                >
+                  Orders
+                </button>
+                <button 
+                  onClick={handleBookNow}
+                  className="bg-orange-500 text-white px-2.5 sm:px-3 py-1.5 sm:py-1.5 rounded-lg text-xs sm:text-sm font-medium hover:bg-orange-600 transition-colors duration-300 whitespace-nowrap flex-shrink-0"
+                >
+                  Book Now
+                </button>
+                <span className="text-white text-xs sm:text-sm font-medium px-3 sm:px-4 py-1.5 sm:py-1.5 bg-pink-500 rounded-lg whitespace-nowrap flex-shrink-0">{userName}</span>
+                <button 
+                  onClick={handleLogout}
+                  className="bg-yellow-400 text-gray-800 px-2.5 sm:px-3 py-1.5 sm:py-1.5 rounded-lg hover:bg-yellow-500 transition-colors duration-300 flex-shrink-0"
+                  title="Sign Out"
+                >
+                  <LogOut size={16} className="sm:w-4 sm:h-4" />
+                </button>
+              </>
+            ) : (
+              <button 
+                onClick={handleLogin}
+                className="bg-pink-500 text-white px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg text-xs sm:text-sm font-medium hover:bg-pink-600 transition-colors duration-300 whitespace-nowrap flex-shrink-0"
               >
                 Login
               </button>
@@ -263,7 +281,7 @@ const Navigation = () => {
           </div>
           
           {/* Mobile menu button */}
-          <div className="md:hidden flex items-center space-x-1 sm:space-x-2">
+          <div className="md:hidden flex items-center gap-1.5 sm:gap-2 flex-shrink-0 pr-2 sm:pr-3">
             <button
               onClick={toggleDarkMode}
               className="text-white hover:text-yellow-300 p-1.5 sm:p-2"
@@ -315,6 +333,15 @@ const Navigation = () => {
             ))}
             {userName ? (
               <div className="pt-4 border-t border-white/20 space-y-2">
+                <button 
+                  onClick={() => {
+                    handleOrders();
+                    setIsOpen(false);
+                  }}
+                  className="w-full bg-blue-500 text-white px-3 py-2 rounded-md font-medium text-sm sm:text-base hover:bg-blue-600"
+                >
+                  Orders
+                </button>
                 <button 
                   onClick={() => {
                     handleBookNow();

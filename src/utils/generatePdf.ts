@@ -37,6 +37,9 @@ export const generateReceiptPDF = async (receiptData: ReceiptData) => {
     }).format(date);
   };
 
+  // Set default font to helvetica (standard font in jsPDF)
+  doc.setFont('helvetica');
+
   // Header with Orange Background
   doc.setFillColor(249, 115, 22); // Orange-500
   doc.rect(0, 0, pageWidth, 40, 'F');
@@ -118,6 +121,12 @@ export const generateReceiptPDF = async (receiptData: ReceiptData) => {
   doc.text('Order ID:', pageWidth - 65, rightStartY + 10);
   doc.setFont('helvetica', 'normal');
   doc.text(receiptData.orderId, pageWidth - 20, rightStartY + 10, { align: 'right' });
+  if (receiptData.paymentId) {
+    doc.setFont('helvetica', 'bold');
+    doc.text('Payment ID:', pageWidth - 65, rightStartY + 15);
+    doc.setFont('helvetica', 'normal');
+    doc.text(receiptData.paymentId, pageWidth - 20, rightStartY + 15, { align: 'right' });
+  }
 
   // Calculate next Y position based on customer info height
   yPos = Math.max(addressY + 12, rightStartY + 18) + 5;
@@ -132,6 +141,9 @@ export const generateReceiptPDF = async (receiptData: ReceiptData) => {
   doc.text('Unit Price', pageWidth - 75, yPos - 1, { align: 'right' });
   doc.text('Qty', pageWidth - 45, yPos - 1, { align: 'center' });
   doc.text('Total', pageWidth - 20, yPos - 1, { align: 'right' });
+  
+  // Reset font after header
+  doc.setFont('helvetica', 'normal');
 
   yPos += 2;
 
@@ -140,6 +152,9 @@ export const generateReceiptPDF = async (receiptData: ReceiptData) => {
   doc.setFont('helvetica', 'normal');
   doc.setFontSize(9);
   yPos += 2;
+  
+  // Ensure font is set for all text
+  doc.setFont('helvetica');
 
   receiptData.items.forEach((item, index) => {
     if (index % 2 === 0) {
@@ -160,7 +175,7 @@ export const generateReceiptPDF = async (receiptData: ReceiptData) => {
   yPos += 10;
 
   // Summary Section
-  const summaryY = yPos;
+  let summaryY = yPos;
   const leftColumnX = 20;
   const rightColumnX = pageWidth - 80;
 
@@ -171,25 +186,32 @@ export const generateReceiptPDF = async (receiptData: ReceiptData) => {
   doc.text('Terms & Conditions:', leftColumnX, summaryY);
   doc.setFont('helvetica', 'normal');
   doc.setFontSize(8);
-  doc.setTextColor(100, 100, 100);
+  doc.setTextColor(0, 0, 0);
+  let currentY = summaryY + 6;
   if (receiptData.notes) {
-    doc.text(receiptData.notes, leftColumnX, summaryY + 6, { maxWidth: 80 });
+    const notesLines = doc.splitTextToSize(receiptData.notes, 80);
+    doc.text(notesLines, leftColumnX, currentY);
+    currentY += notesLines.length * 4;
   } else {
-    doc.text('Payment received via ' + receiptData.paymentMode + '. Booking confirmed.', leftColumnX, summaryY + 6, { maxWidth: 80 });
+    doc.text('Payment received via ' + receiptData.paymentMode + '. Booking confirmed.', leftColumnX, currentY, { maxWidth: 80 });
+    currentY += 6;
   }
 
   doc.setFont('helvetica', 'bold');
   doc.setTextColor(249, 115, 22);
-  doc.text('Payment Terms:', leftColumnX, summaryY + 18);
+  doc.text('Payment Terms:', leftColumnX, currentY);
   doc.setFont('helvetica', 'normal');
-  doc.setTextColor(100, 100, 100);
-  doc.text('Payment received via ' + receiptData.paymentMode + '.', leftColumnX, summaryY + 24, { maxWidth: 80 });
+  doc.setFontSize(8);
+  doc.setTextColor(0, 0, 0);
+  doc.text('Payment received via ' + receiptData.paymentMode + '.', leftColumnX, currentY + 6, { maxWidth: 80 });
 
   doc.setFontSize(8);
-  doc.text('🌐 knowhowcafe.com', leftColumnX, summaryY + 34);
-  doc.text('📧 knowhowcafe2025@gmail.com', leftColumnX, summaryY + 40);
-  doc.text('📞 95910 32562', leftColumnX, summaryY + 46);
-  doc.text('📍 No.716 17th Main, 38th Cross, 4th T Block, Jayanagar, Bangalore - 560041', leftColumnX, summaryY + 52, { maxWidth: 80 });
+  doc.setTextColor(0, 0, 0);
+  doc.text('knowhowcafe.com', leftColumnX, currentY + 16);
+  doc.text('knowhowcafe2025@gmail.com', leftColumnX, currentY + 22);
+  doc.text('95910 32562', leftColumnX, currentY + 28);
+  const addressLines = doc.splitTextToSize('No.716 17th Main, 38th Cross, 4th T Block, Jayanagar, Bangalore - 560041', 80);
+  doc.text(addressLines, leftColumnX, currentY + 34);
 
   // Right Column: Totals - Better alignment
   const totalBoxY = summaryY;
@@ -209,6 +231,9 @@ export const generateReceiptPDF = async (receiptData: ReceiptData) => {
   doc.setFont('helvetica', 'normal');
   doc.setFontSize(7);
   doc.text('Payment Mode: ' + receiptData.paymentMode, rightColumnX, totalBoxY + 18, { align: 'right' });
+  
+  // Reset font
+  doc.setFont('helvetica');
 
   // Footer with Orange Waves
   const footerY = pageHeight - 20;

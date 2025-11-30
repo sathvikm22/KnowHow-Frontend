@@ -1,4 +1,6 @@
 import { useEffect, useState } from 'react';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { X, ShoppingBag, CreditCard, ArrowLeft } from 'lucide-react';
@@ -45,9 +47,52 @@ const Cart = () => {
     await removeFromCart(kitName);
   };
 
-  const handleCheckout = () => {
-    // Navigate to checkout or payment page
-    navigate('/buy', { state: { checkout: true } });
+  const [customerAddress, setCustomerAddress] = useState('');
+  const [customerPhone, setCustomerPhone] = useState('');
+  const [showCheckoutForm, setShowCheckoutForm] = useState(false);
+
+  // Don't auto-fill from localStorage - let users enter their own values
+  // Values will still be saved to localStorage after checkout for future reference
+
+  const handleCheckout = async () => {
+    // Get user details from localStorage
+    const userName = localStorage.getItem('userName') || '';
+    const userEmail = localStorage.getItem('userEmail') || '';
+    
+    if (!customerAddress || !customerPhone) {
+      alert('Please enter delivery address and phone number');
+      return;
+    }
+
+    // Validate phone number
+    const phoneRegex = /^[6-9]\d{9}$/;
+    if (!phoneRegex.test(customerPhone.replace(/\D/g, ''))) {
+      alert('Please enter a valid 10-digit phone number');
+      return;
+    }
+
+    // Save to localStorage for future use
+    localStorage.setItem('deliveryAddress', customerAddress);
+    localStorage.setItem('deliveryPhone', customerPhone);
+
+    // Prepare cart data
+    const cartData = {
+      items: cartItems.map(item => ({
+        name: item.kit_name,
+        quantity: item.quantity,
+        unit_price: item.price,
+        total: item.price * item.quantity
+      })),
+      subtotal: totalPrice,
+      totalAmount: totalPrice,
+      customerName: userName,
+      customerEmail: userEmail,
+      customerPhone: customerPhone,
+      customerAddress: customerAddress
+    };
+
+    // Navigate to cart checkout
+    navigate('/cart-checkout', { state: { cartData } });
   };
 
   const handleBrowseDIYKits = () => {
@@ -261,13 +306,45 @@ const Cart = () => {
                     </div>
                   </div>
 
+                  {/* Delivery Details Form */}
+                  <div className="mb-6 p-4 bg-gray-50 dark:bg-gray-700 rounded-lg space-y-4">
+                    <h3 className="font-semibold text-gray-800 dark:text-white">Delivery Details</h3>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                        Delivery Address *
+                      </label>
+                      <textarea
+                        value={customerAddress}
+                        onChange={(e) => setCustomerAddress(e.target.value)}
+                        placeholder="Enter your complete delivery address"
+                        className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 dark:bg-gray-800 dark:text-white"
+                        rows={3}
+                        required
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                        Phone Number *
+                      </label>
+                      <input
+                        type="tel"
+                        value={customerPhone}
+                        onChange={(e) => setCustomerPhone(e.target.value.replace(/\D/g, '').slice(0, 10))}
+                        placeholder="Enter 10-digit phone number"
+                        className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 dark:bg-gray-800 dark:text-white"
+                        maxLength={10}
+                        required
+                      />
+                    </div>
+                  </div>
+
                   <Button
                     onClick={handleCheckout}
                     className="w-full bg-orange-500 hover:bg-orange-600 text-white py-6 text-lg font-semibold rounded-xl mb-4"
                     size="lg"
                   >
                     <CreditCard className="mr-2 h-5 w-5" />
-                    Proceed to Payment
+                    {showCheckoutForm ? 'Proceed to Payment' : 'Proceed to Payment'}
                   </Button>
 
                   <button

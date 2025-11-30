@@ -43,6 +43,7 @@ const Booking = () => {
     { id: 'jewellery_lab', name: 'Jewellery Lab', price: 2499, type: 'special' as const },
     { id: 'combo4', name: 'Any three activities', price: 1099, type: 'any' as const, limit: 3 },
     { id: 'tuft_kidding', name: 'Tufting Experience', price: 2499, type: 'special' as const },
+    { id: 'dummy_pay', name: 'dummy-pay', price: 1, type: 'special' as const },
     { id: 'host_occasion', name: 'Host Your Occasion', price: 499, type: 'special' as const },
     { id: 'come_to_place', name: 'We Come To Your Place', price: 399, type: 'special' as const },
     { id: 'corporate_workshops', name: 'Corporate Workshops', price: 299, type: 'special' as const },
@@ -331,8 +332,8 @@ const allSelectedActivitiesDetailed = useMemo(() => {
   ];
 
   // Split comboOptions into two arrays for rendering
-  const regularCombos = comboOptions.slice(0, 6);
-  const specialCombos = comboOptions.slice(6);
+  const regularCombos = comboOptions.slice(0, 7); // Include dummy-pay in regular combos
+  const specialCombos = comboOptions.slice(7);
 
   const bookingTotal = selectedCombo && specialCombos.some(c => c.id === selectedCombo.id)
     ? selectedCombo.price * specialActivityPeople

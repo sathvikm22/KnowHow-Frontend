@@ -45,6 +45,12 @@ class ApiClient {
     const cleanEndpoint = endpoint.startsWith('/') ? endpoint : `/${endpoint}`;
     const url = `${this.baseUrl}${cleanEndpoint}`;
     
+    // Validate URL
+    if (!url || url === 'undefined' || !url.startsWith('http')) {
+      console.error('Invalid API URL:', url, 'Base URL:', this.baseUrl);
+      throw new Error(`Invalid API URL: ${url}. Please check VITE_BACKEND_URL environment variable.`);
+    }
+    
     const config: RequestInit = {
       ...options,
       credentials: 'include', // Equivalent to withCredentials: true
@@ -64,6 +70,12 @@ class ApiClient {
     }
 
     try {
+      console.log('API Request:', { 
+        method: options.method || 'GET', 
+        url, 
+        baseUrl: this.baseUrl,
+        body: options.body ? JSON.parse(options.body) : undefined
+      });
       const response = await fetch(url, config);
       
       // Handle non-JSON responses
@@ -73,8 +85,18 @@ class ApiClient {
         data = await response.json();
       } else {
         const text = await response.text();
+        console.error('Non-JSON response:', text);
         throw new Error(text || `HTTP ${response.status}: ${response.statusText}`);
       }
+      
+      console.log('API Response:', { 
+        status: response.status, 
+        statusText: response.statusText,
+        success: data.success, 
+        message: data.message,
+        hasData: !!data.data,
+        fullResponse: JSON.stringify(data, null, 2)
+      });
       
       // For 400 errors, return the data so frontend can check response.success
       // This allows proper error handling for validation errors, duplicate emails, etc.
@@ -255,6 +277,124 @@ class ApiClient {
   async clearCart(): Promise<ApiResponse> {
     return this.request('/auth/cart/clear', {
       method: 'DELETE',
+    });
+  }
+
+  // Payment endpoints
+  async createOrder(amount: number, slotDetails: any): Promise<ApiResponse<{ order_id: string; amount: number; currency: string }>> {
+    return this.request('/create-order', {
+      method: 'POST',
+      body: JSON.stringify({ amount, slotDetails }),
+    });
+  }
+
+  async verifyPayment(orderId: string, paymentId: string, signature: string): Promise<ApiResponse> {
+    return this.request('/verify-payment', {
+      method: 'POST',
+      body: JSON.stringify({
+        razorpay_order_id: orderId,
+        razorpay_payment_id: paymentId,
+        razorpay_signature: signature,
+      }),
+    });
+  }
+
+  async checkPaymentStatus(orderId: string): Promise<ApiResponse<{ payment_status: string; booking_status: string; booking: any }>> {
+    return this.request(`/check-payment-status/${orderId}`, {
+      method: 'GET',
+    });
+  }
+
+  async getMyBookings(): Promise<ApiResponse<{ bookings: any[] }>> {
+    return this.request('/my-bookings', {
+      method: 'GET',
+    });
+  }
+
+  async cancelBooking(bookingId: string, reason?: string): Promise<ApiResponse> {
+    return this.request(`/cancel-booking/${bookingId}`, {
+      method: 'POST',
+      body: JSON.stringify({ reason }),
+    });
+  }
+
+  async updateBooking(
+    bookingId: string, 
+    bookingDate: string, 
+    bookingTimeSlot: string,
+    newActivityName?: string,
+    newActivityPrice?: string
+  ): Promise<ApiResponse> {
+    return this.request(`/update-booking/${bookingId}`, {
+      method: 'POST',
+      body: JSON.stringify({ 
+        booking_date: bookingDate, 
+        booking_time_slot: bookingTimeSlot,
+        new_activity_name: newActivityName,
+        new_activity_price: newActivityPrice
+      }),
+    });
+  }
+
+  async getAvailableSlots(activityName: string, bookingDate: string): Promise<ApiResponse<{ available_slots: string[]; all_slots: string[]; booked_slots: string[] }>> {
+    return this.request(`/available-slots?activity_name=${encodeURIComponent(activityName)}&booking_date=${encodeURIComponent(bookingDate)}`, {
+      method: 'GET',
+    });
+  }
+
+  // DIY Orders endpoints
+  async createDIYOrder(amount: number, orderData: any): Promise<ApiResponse<{ order_id: string; amount: number; currency: string }>> {
+    return this.request('/create-diy-order', {
+      method: 'POST',
+      body: JSON.stringify({ amount, orderData }),
+    });
+  }
+
+  async verifyDIYPayment(orderId: string, paymentId: string, signature: string): Promise<ApiResponse> {
+    return this.request('/verify-diy-payment', {
+      method: 'POST',
+      body: JSON.stringify({
+        razorpay_order_id: orderId,
+        razorpay_payment_id: paymentId,
+        razorpay_signature: signature,
+      }),
+    });
+  }
+
+  async getMyDIYOrders(): Promise<ApiResponse<{ orders: any[] }>> {
+    return this.request('/my-diy-orders', {
+      method: 'GET',
+    });
+  }
+
+  async getAllDIYOrders(): Promise<ApiResponse<{ orders: any[] }>> {
+    return this.request('/all-diy-orders', {
+      method: 'GET',
+    });
+  }
+
+  async updateDeliveryStatus(orderId: string, deliveryStatus: string, deliveryTime?: string): Promise<ApiResponse> {
+    return this.request(`/update-delivery-status/${orderId}`, {
+      method: 'POST',
+      body: JSON.stringify({ delivery_status: deliveryStatus, delivery_time: deliveryTime }),
+    });
+  }
+
+  async checkDIYPaymentStatus(orderId: string): Promise<ApiResponse<{ payment_status: string; order: any }>> {
+    return this.request(`/check-diy-payment-status/${orderId}`, {
+      method: 'GET',
+    });
+  }
+
+  async getAllUsers(): Promise<ApiResponse<{ users: any[] }>> {
+    return this.request('/auth/all-users', {
+      method: 'GET',
+    });
+  }
+
+  async getAllBookings(): Promise<ApiResponse<{ bookings: any[] }>> {
+    return this.request('/all-bookings', {
+      method: 'GET',
     });
   }
 }
