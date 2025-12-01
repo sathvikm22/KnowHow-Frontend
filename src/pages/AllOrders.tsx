@@ -350,8 +350,7 @@ const AllOrders = () => {
         // Refresh data
         await fetchData();
         
-        // Show success message
-        alert('Booking updated successfully!');
+        // Success - no alert popup, just refresh the data
       } else {
         alert(response.message || 'Failed to update booking');
       }

@@ -189,7 +189,7 @@ const Orders = () => {
       setUpdatingId(currentBooking.id);
       const response = await api.updateBooking(currentBooking.id, selectedDate, selectedTimeSlot);
       if (response.success) {
-        alert('Booking updated successfully!');
+        // Success - no alert popup, just refresh the data
         setUpdateDialogOpen(false);
         fetchBookings();
       } else {
