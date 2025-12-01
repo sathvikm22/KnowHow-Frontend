@@ -4,6 +4,7 @@ import { Calendar, Clock, X, Edit, Loader2, Package, ShoppingBag, Receipt as Rec
 import Navigation from '@/components/Navigation';
 import { api } from '@/lib/api';
 import { Button } from '@/components/ui/button';
+import { useToast } from '@/hooks/use-toast';
 import {
   Dialog,
   DialogContent,
@@ -104,6 +105,7 @@ const AllOrders = () => {
   const [receiptData, setReceiptData] = useState<ReceiptData | null>(null);
   const [cancelDialogOpen, setCancelDialogOpen] = useState(false);
   const [bookingToCancel, setBookingToCancel] = useState<Booking | null>(null);
+  const { toast } = useToast();
 
   useEffect(() => {
     fetchData();
@@ -188,11 +190,26 @@ const AllOrders = () => {
         // Show refund receipt
         showRefundReceipt(bookingToCancel);
         fetchData();
+        toast({
+          title: "Booking Cancelled",
+          description: response.message || "Refund initiated successfully. The refund will be processed within 5-7 business days.",
+          variant: "default",
+        });
       } else {
-        alert(response.message || 'Failed to cancel booking');
+        toast({
+          title: "Cancellation Failed",
+          description: response.message || 'Failed to cancel booking',
+          variant: "destructive",
+        });
       }
     } catch (err: any) {
-      alert(err.message || 'Failed to cancel booking');
+      // Don't show the error popup, just log it and show a generic message
+      console.error('Cancel booking error:', err);
+      toast({
+        title: "Cancellation Failed",
+        description: "Unable to cancel booking at this time. Please try again later or contact support.",
+        variant: "destructive",
+      });
     } finally {
       setCancellingId(null);
       setBookingToCancel(null);

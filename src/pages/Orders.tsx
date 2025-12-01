@@ -4,6 +4,7 @@ import { Calendar, Clock, DollarSign, X, Edit, Loader2 } from 'lucide-react';
 import Navigation from '@/components/Navigation';
 import { api } from '@/lib/api';
 import { Button } from '@/components/ui/button';
+import { useToast } from '@/hooks/use-toast';
 import {
   Dialog,
   DialogContent,
@@ -65,6 +66,7 @@ const Orders = () => {
   const [currentBooking, setCurrentBooking] = useState<Booking | null>(null);
   const [cancelDialogOpen, setCancelDialogOpen] = useState(false);
   const [bookingToCancel, setBookingToCancel] = useState<Booking | null>(null);
+  const { toast } = useToast();
 
   useEffect(() => {
     fetchBookings();
@@ -99,13 +101,27 @@ const Orders = () => {
       setCancelDialogOpen(false);
       const response = await api.cancelBooking(bookingToCancel.id, 'Customer requested cancellation');
       if (response.success) {
-        alert('Cancellation request submitted. Refund will be processed shortly.');
         fetchBookings();
+        toast({
+          title: "Booking Cancelled",
+          description: response.message || "Refund initiated successfully. The refund will be processed within 5-7 business days.",
+          variant: "default",
+        });
       } else {
-        alert(response.message || 'Failed to cancel booking');
+        toast({
+          title: "Cancellation Failed",
+          description: response.message || 'Failed to cancel booking',
+          variant: "destructive",
+        });
       }
     } catch (err: any) {
-      alert(err.message || 'Failed to cancel booking');
+      // Don't show the error popup, just log it and show a generic message
+      console.error('Cancel booking error:', err);
+      toast({
+        title: "Cancellation Failed",
+        description: "Unable to cancel booking at this time. Please try again later or contact support.",
+        variant: "destructive",
+      });
     } finally {
       setCancellingId(null);
       setBookingToCancel(null);
