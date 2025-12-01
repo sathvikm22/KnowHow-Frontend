@@ -231,11 +231,11 @@ const PaymentSuccess = () => {
             {message || 'Your booking has been confirmed successfully.'}
           </p>
           {orderId && (
-            <p className="text-sm text-gray-500 dark:text-gray-400 mb-6">
+            <p className="text-sm text-gray-500 dark:text-gray-400 mb-6 break-all">
               Order ID: {orderId}
             </p>
           )}
-          <div className="flex flex-col sm:flex-row gap-4">
+          <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 w-full">
             <Button
               onClick={() => {
                 if (receiptData) {
@@ -246,7 +246,7 @@ const PaymentSuccess = () => {
                   });
                 }
               }}
-              className="flex-1 bg-orange-500 hover:bg-orange-600"
+              className="w-full sm:flex-1 bg-orange-500 hover:bg-orange-600 text-white font-medium py-6 text-base"
             >
               View Receipt
             </Button>
@@ -254,7 +254,7 @@ const PaymentSuccess = () => {
               <Button
                 onClick={() => navigate('/all-orders')}
                 variant="outline"
-                className="flex-1"
+                className="w-full sm:flex-1 border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 font-medium py-6 text-base"
               >
                 View My Orders
               </Button>
@@ -262,7 +262,7 @@ const PaymentSuccess = () => {
               <Button
                 onClick={() => navigate('/all-orders')}
                 variant="outline"
-                className="flex-1"
+                className="w-full sm:flex-1 border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 font-medium py-6 text-base"
               >
                 View My Bookings
               </Button>
@@ -270,7 +270,7 @@ const PaymentSuccess = () => {
             <Button
               onClick={() => navigate('/home')}
               variant="outline"
-              className="flex-1"
+              className="w-full sm:flex-1 border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 font-medium py-6 text-base"
             >
               Back to Home
             </Button>

@@ -13,6 +13,16 @@ import {
   DialogTrigger,
 } from '@/components/ui/dialog';
 import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
+import {
   Select,
   SelectContent,
   SelectItem,
@@ -53,6 +63,8 @@ const Orders = () => {
   const [loadingSlots, setLoadingSlots] = useState(false);
   const [updateDialogOpen, setUpdateDialogOpen] = useState(false);
   const [currentBooking, setCurrentBooking] = useState<Booking | null>(null);
+  const [cancelDialogOpen, setCancelDialogOpen] = useState(false);
+  const [bookingToCancel, setBookingToCancel] = useState<Booking | null>(null);
 
   useEffect(() => {
     fetchBookings();
@@ -74,14 +86,18 @@ const Orders = () => {
     }
   };
 
-  const handleCancel = async (bookingId: string) => {
-    if (!confirm('Are you sure you want to cancel this booking? A refund will be initiated.')) {
-      return;
-    }
+  const handleCancelClick = (booking: Booking) => {
+    setBookingToCancel(booking);
+    setCancelDialogOpen(true);
+  };
+
+  const handleCancelConfirm = async () => {
+    if (!bookingToCancel) return;
 
     try {
-      setCancellingId(bookingId);
-      const response = await api.cancelBooking(bookingId, 'Customer requested cancellation');
+      setCancellingId(bookingToCancel.id);
+      setCancelDialogOpen(false);
+      const response = await api.cancelBooking(bookingToCancel.id, 'Customer requested cancellation');
       if (response.success) {
         alert('Cancellation request submitted. Refund will be processed shortly.');
         fetchBookings();
@@ -92,6 +108,7 @@ const Orders = () => {
       alert(err.message || 'Failed to cancel booking');
     } finally {
       setCancellingId(null);
+      setBookingToCancel(null);
     }
   };
 
@@ -106,22 +123,59 @@ const Orders = () => {
   const fetchAvailableSlots = async (activityName: string, date: string) => {
     try {
       setLoadingSlots(true);
-      const response = await api.getAvailableSlots(activityName, date);
-      if (response.success && response.data) {
-        setAvailableSlots(response.data.available_slots || []);
+      setAvailableSlots([]); // Clear previous slots while loading
+      
+      if (!activityName || !date) {
+        console.warn('Missing activity name or date for fetching slots');
+        setAvailableSlots([]);
+        return;
       }
-    } catch (err) {
+      
+      console.log('Fetching available slots for:', { activityName, date });
+      const response = await api.getAvailableSlots(activityName, date);
+      console.log('Available slots response:', response);
+      
+      if (response && response.success) {
+        const slots = response.data?.available_slots || response.available_slots || [];
+        console.log('Available slots:', slots);
+        setAvailableSlots(slots);
+        
+        if (slots.length === 0) {
+          console.warn('No available slots for this activity and date');
+        }
+      } else {
+        console.warn('No available slots returned from API:', response);
+        setAvailableSlots([]);
+      }
+    } catch (err: any) {
       console.error('Error fetching available slots:', err);
+      console.error('Error details:', err.message, err.stack);
+      setAvailableSlots([]);
     } finally {
       setLoadingSlots(false);
     }
   };
 
   const handleDateChange = async (date: string) => {
-    setSelectedDate(date);
-    if (currentBooking && date) {
-      await fetchAvailableSlots(currentBooking.activity_name, date);
+    try {
+      setSelectedDate(date);
       setSelectedTimeSlot(''); // Reset time slot when date changes
+      setLoadingSlots(true); // Show loading immediately
+      
+      if (currentBooking && date && currentBooking.activity_name) {
+        console.log('Date changed, fetching slots for:', { 
+          activity: currentBooking.activity_name, 
+          date 
+        });
+        await fetchAvailableSlots(currentBooking.activity_name, date);
+      } else {
+        setLoadingSlots(false);
+        setAvailableSlots([]);
+      }
+    } catch (err) {
+      console.error('Error changing date:', err);
+      setLoadingSlots(false);
+      setAvailableSlots([]);
     }
   };
 
@@ -378,7 +432,7 @@ const Orders = () => {
                         <Button
                           variant="destructive"
                           size="sm"
-                          onClick={() => handleCancel(booking.id)}
+                          onClick={() => handleCancelClick(booking)}
                           disabled={cancellingId === booking.id || booking.status === 'cancelled'}
                         >
                           {cancellingId === booking.id ? (
@@ -399,6 +453,61 @@ const Orders = () => {
           </div>
         )}
       </div>
+
+      {/* Cancel Confirmation Dialog */}
+      <AlertDialog open={cancelDialogOpen} onOpenChange={setCancelDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Cancel Booking</AlertDialogTitle>
+            <AlertDialogDescription className="space-y-2">
+              {bookingToCancel && (
+                <>
+                  <p className="font-medium text-gray-900 dark:text-white">
+                    Are you sure you want to cancel this booking?
+                  </p>
+                  <div className="bg-gray-50 dark:bg-gray-800 p-4 rounded-lg space-y-2">
+                    <p className="text-sm">
+                      <span className="font-semibold">Activity:</span>{' '}
+                      {bookingToCancel.combo_name || bookingToCancel.activity_name}
+                    </p>
+                    <p className="text-sm">
+                      <span className="font-semibold">Date:</span>{' '}
+                      {new Date(bookingToCancel.booking_date).toLocaleDateString('en-US', {
+                        weekday: 'long',
+                        year: 'numeric',
+                        month: 'long',
+                        day: 'numeric'
+                      })}
+                    </p>
+                    <p className="text-sm">
+                      <span className="font-semibold">Time Slot:</span>{' '}
+                      {bookingToCancel.is_updated && bookingToCancel.updated_booking_time_slot
+                        ? bookingToCancel.updated_booking_time_slot
+                        : bookingToCancel.booking_time_slot}
+                    </p>
+                    <p className="text-sm">
+                      <span className="font-semibold">Participants:</span>{' '}
+                      {bookingToCancel.participants}
+                    </p>
+                  </div>
+                  <p className="text-orange-600 dark:text-orange-400 font-medium mt-2">
+                    A refund will be initiated for this booking.
+                  </p>
+                </>
+              )}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Keep Booking</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleCancelConfirm}
+              className="bg-red-600 hover:bg-red-700"
+            >
+              Yes, Cancel Booking
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };
