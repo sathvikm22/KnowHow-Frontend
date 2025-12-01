@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { CheckCircle } from 'lucide-react';
 import Navigation from '@/components/Navigation';
@@ -17,6 +17,7 @@ const PaymentSuccess = () => {
   const [showReceipt, setShowReceipt] = useState(false);
   const [receiptData, setReceiptData] = useState<ReceiptData | null>(initialReceiptData || null);
   const [loading, setLoading] = useState(!initialReceiptData);
+  const hasShownReceiptRef = useRef(false); // Use ref to track if receipt has been shown (avoids closure issues)
   const { clearCart } = useCart();
 
   useEffect(() => {
@@ -27,14 +28,20 @@ const PaymentSuccess = () => {
       });
     }
     
-    // If receipt data not provided, fetch it
-    if (!initialReceiptData && orderId) {
-      fetchReceiptData();
-    } else if (initialReceiptData) {
-      setShowReceipt(true);
-      setLoading(false);
+    // Only show receipt automatically once on initial mount
+    if (!hasShownReceiptRef.current) {
+      if (initialReceiptData) {
+        // Receipt data already provided - show it once
+        setShowReceipt(true);
+        hasShownReceiptRef.current = true;
+        setLoading(false);
+      } else if (orderId) {
+        // Need to fetch receipt data
+        fetchReceiptData();
+      }
     }
-  }, [orderId, type, clearCart]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // Only run once on mount
 
   const fetchReceiptData = async () => {
     try {
@@ -104,7 +111,11 @@ const PaymentSuccess = () => {
             notes: `DIY Kit Order - ${Array.isArray(order.items) ? order.items.map((i: any) => `${i.name || 'DIY Kit'} (Qty: ${i.quantity || 1})`).join(', ') : 'DIY Kit'}`
           };
           setReceiptData(receipt);
-          setShowReceipt(true);
+          // Only auto-show receipt if it hasn't been shown before
+          if (!hasShownReceiptRef.current) {
+            setShowReceipt(true);
+            hasShownReceiptRef.current = true;
+          }
         }
       } else {
         response = await api.checkPaymentStatus(orderId);
@@ -166,7 +177,11 @@ const PaymentSuccess = () => {
             notes: `Activity: ${activityName}${selectedActivities.length > 0 ? ` (${selectedActivities.join(', ')})` : ''}\nDate: ${formatDate(bookingDate)}\nTime: ${bookingTime}\nParticipants: ${participants}`
           };
           setReceiptData(receipt);
-          setShowReceipt(true);
+          // Only auto-show receipt if it hasn't been shown before
+          if (!hasShownReceiptRef.current) {
+            setShowReceipt(true);
+            hasShownReceiptRef.current = true;
+          }
         }
       }
     } catch (error) {
@@ -226,7 +241,9 @@ const PaymentSuccess = () => {
                 if (receiptData) {
                   setShowReceipt(true);
                 } else {
-                  fetchReceiptData();
+                  fetchReceiptData().then(() => {
+                    setShowReceipt(true);
+                  });
                 }
               }}
               className="flex-1 bg-orange-500 hover:bg-orange-600"
