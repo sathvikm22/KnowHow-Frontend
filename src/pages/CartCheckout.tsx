@@ -171,13 +171,53 @@ const CartCheckout = () => {
         };
 
         console.log('Opening Cashfree checkout in modal with session:', payment_session_id);
-        cashfree.checkout(checkoutOptions);
+        
+        // When using _modal, checkout() returns a promise
+        cashfree.checkout(checkoutOptions).then((result: any) => {
+          console.log('Cashfree checkout result:', result);
+          
+          if (result.error) {
+            // Payment failed or was cancelled
+            console.error('Payment error:', result.error);
+            navigate('/failed', {
+              state: {
+                orderId: order_id,
+                message: result.error.message || 'Payment was cancelled or failed.'
+              }
+            });
+          } else {
+            // Payment successful - result contains order_id and payment_id
+            const paymentOrderId = result.order_id || order_id;
+            const paymentId = result.payment_id;
+            
+            console.log('Payment successful, redirecting to processing:', { paymentOrderId, paymentId });
+            
+            // Redirect to payment processing page to verify and show receipt
+            navigate('/payment-processing', {
+              state: {
+                orderId: paymentOrderId,
+                paymentId: paymentId,
+                type: 'diy'
+              }
+            });
+          }
+        }).catch((error: any) => {
+          console.error('Cashfree checkout error:', error);
+          navigate('/failed', {
+            state: {
+              orderId: order_id,
+              message: error.message || 'Payment processing failed. Please try again.'
+            }
+          });
+        });
+        
+        // Keep loading state until promise resolves
+        // The promise will handle navigation, so we don't set loading to false here
       } catch (sdkError: any) {
         console.error('Error loading Cashfree SDK:', sdkError);
+        setIsLoading(false);
         throw new Error('Failed to load payment gateway. Please try again.');
       }
-      
-      setIsLoading(false);
     } catch (err: any) {
       console.error('Payment initiation error:', err);
       console.error('Full error object:', err);

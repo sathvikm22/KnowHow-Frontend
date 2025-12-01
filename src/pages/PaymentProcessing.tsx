@@ -9,9 +9,9 @@ const PaymentProcessing = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const [status, setStatus] = useState('Payment received. Verifying transaction…');
-  // Cashfree redirects back with order_id in query params
+  // Cashfree redirects back with order_id in query params or location state
   const orderId = searchParams.get('order_id') || (location.state as any)?.orderId;
-  const paymentId = searchParams.get('payment_id'); // Cashfree payment ID
+  const paymentId = searchParams.get('payment_id') || (location.state as any)?.paymentId; // Cashfree payment ID
   const orderType = searchParams.get('type') || (location.state as any)?.type || 'booking'; // 'booking' or 'diy'
 
   const verifyPaymentDirectly = async (orderId: string, paymentId: string) => {
@@ -49,6 +49,8 @@ const PaymentProcessing = () => {
   };
 
   const checkPaymentStatus = async () => {
+    if (!orderId) return;
+    
     try {
       // Poll for payment status
       const maxAttempts = 30; // 30 attempts = 30 seconds
