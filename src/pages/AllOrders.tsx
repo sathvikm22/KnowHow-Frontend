@@ -187,8 +187,7 @@ const AllOrders = () => {
       setCancelDialogOpen(false);
       const response = await api.cancelBooking(bookingToCancel.id, 'Customer requested cancellation');
       if (response.success) {
-        // Show refund receipt
-        showRefundReceipt(bookingToCancel);
+        // Don't show refund receipt - only show receipt after payment or slot updation
         fetchData();
         toast({
           title: "Booking Cancelled",
@@ -236,6 +235,31 @@ const AllOrders = () => {
       paymentStatus: 'Refunded',
       date: new Date(),
       notes: 'Booking cancelled - Refund processed'
+    };
+    setReceiptData(receipt);
+    setShowReceipt(true);
+  };
+
+  const showUpdateReceipt = (booking: Booking, newDate: string, newTimeSlot: string) => {
+    const receipt: ReceiptData = {
+      orderId: booking.cashfree_order_id || booking.razorpay_order_id || booking.id,
+      internalBillId: booking.internal_bill_id || `BILL-${booking.id.slice(0, 8)}`,
+      customerName: booking.customer_name || 'Customer',
+      customerEmail: booking.customer_email || '',
+      customerPhone: booking.customer_phone || '',
+      items: [{
+        name: booking.combo_name || booking.activity_name,
+        quantity: booking.participants,
+        unitPrice: booking.amount / booking.participants,
+        total: booking.amount
+      }],
+      subtotal: booking.amount,
+      gst: 0,
+      totalAmount: booking.amount,
+      paymentMode: booking.payment_method || 'Online',
+      paymentStatus: booking.payment_status || 'Paid',
+      date: new Date(),
+      notes: `Booking updated - New date: ${newDate}, New time: ${newTimeSlot}`
     };
     setReceiptData(receipt);
     setShowReceipt(true);
@@ -359,6 +383,10 @@ const AllOrders = () => {
       
       if (response.success) {
         // Close dialog first
+        const updatedDate = selectedDate;
+        const updatedTimeSlot = selectedTimeSlot;
+        const bookingToShow = currentBooking; // Save booking before clearing state
+        
         setUpdateDialogOpen(false);
         setCurrentBooking(null);
         setSelectedDate('');
@@ -367,7 +395,10 @@ const AllOrders = () => {
         // Refresh data
         await fetchData();
         
-        // Success - no alert popup, just refresh the data
+        // Show receipt after slot updation
+        if (bookingToShow) {
+          showUpdateReceipt(bookingToShow, updatedDate, updatedTimeSlot);
+        }
       } else {
         alert(response.message || 'Failed to update booking');
       }

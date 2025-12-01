@@ -338,6 +338,13 @@ const Cart = () => {
                     </div>
                   </div>
 
+                  {/* No Return or Exchange Notice */}
+                  <div className="mb-4 p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
+                    <p className="text-sm text-red-600 dark:text-red-400 font-medium text-center">
+                      ⚠️ No Return or Exchange
+                    </p>
+                  </div>
+
                   <Button
                     onClick={handleCheckout}
                     className="w-full bg-orange-500 hover:bg-orange-600 text-white py-6 text-lg font-semibold rounded-xl mb-4"
