@@ -171,13 +171,13 @@ const Checkout = () => {
           mode: cashfreeMode
         });
 
-        // Open checkout
+        // Open checkout in modal (embedded in current page, like Razorpay)
         const checkoutOptions = {
           paymentSessionId: payment_session_id,
-          redirectTarget: "_self"
+          redirectTarget: "_modal" // Opens in a modal popup on the current page
         };
 
-        console.log('Opening Cashfree checkout with session:', payment_session_id);
+        console.log('Opening Cashfree checkout in modal with session:', payment_session_id);
         cashfree.checkout(checkoutOptions);
       } catch (sdkError: any) {
         console.error('Error loading Cashfree SDK:', sdkError);
