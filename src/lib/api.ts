@@ -104,9 +104,15 @@ class ApiClient {
         return data;
       }
       
-      // For other errors, throw
+      // For other errors, throw with detailed error info
       if (!response.ok) {
-        throw new Error(data.message || `Request failed with status ${response.status}`);
+        const errorMessage = data.message || data.error || `Request failed with status ${response.status}`;
+        const error = new Error(errorMessage);
+        // Attach error details for better debugging
+        (error as any).details = data.details;
+        (error as any).status = data.status || response.status;
+        (error as any).statusText = data.statusText || response.statusText;
+        throw error;
       }
       
       return data;
@@ -281,20 +287,19 @@ class ApiClient {
   }
 
   // Payment endpoints
-  async createOrder(amount: number, slotDetails: any): Promise<ApiResponse<{ order_id: string; amount: number; currency: string }>> {
+  async createOrder(amount: number, slotDetails: any): Promise<ApiResponse<{ order_id: string; payment_session_id: string; amount: number; currency: string }>> {
     return this.request('/create-order', {
       method: 'POST',
       body: JSON.stringify({ amount, slotDetails }),
     });
   }
 
-  async verifyPayment(orderId: string, paymentId: string, signature: string): Promise<ApiResponse> {
+  async verifyPayment(orderId: string, paymentId: string): Promise<ApiResponse> {
     return this.request('/verify-payment', {
       method: 'POST',
       body: JSON.stringify({
-        razorpay_order_id: orderId,
-        razorpay_payment_id: paymentId,
-        razorpay_signature: signature,
+        cashfree_order_id: orderId,
+        cashfree_payment_id: paymentId,
       }),
     });
   }
@@ -343,20 +348,19 @@ class ApiClient {
   }
 
   // DIY Orders endpoints
-  async createDIYOrder(amount: number, orderData: any): Promise<ApiResponse<{ order_id: string; amount: number; currency: string }>> {
+  async createDIYOrder(amount: number, orderData: any): Promise<ApiResponse<{ order_id: string; payment_session_id: string; amount: number; currency: string }>> {
     return this.request('/create-diy-order', {
       method: 'POST',
       body: JSON.stringify({ amount, orderData }),
     });
   }
 
-  async verifyDIYPayment(orderId: string, paymentId: string, signature: string): Promise<ApiResponse> {
+  async verifyDIYPayment(orderId: string, paymentId: string): Promise<ApiResponse> {
     return this.request('/verify-diy-payment', {
       method: 'POST',
       body: JSON.stringify({
-        razorpay_order_id: orderId,
-        razorpay_payment_id: paymentId,
-        razorpay_signature: signature,
+        cashfree_order_id: orderId,
+        cashfree_payment_id: paymentId,
       }),
     });
   }
@@ -385,6 +389,9 @@ class ApiClient {
       method: 'GET',
     });
   }
+
+  // Note: Cashfree doesn't use signature verification like Razorpay
+  // Payment verification is done server-side using payment_id
 
   async getAllUsers(): Promise<ApiResponse<{ users: any[] }>> {
     return this.request('/auth/all-users', {

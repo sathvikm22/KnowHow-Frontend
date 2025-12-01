@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { api } from '@/lib/api';
 import Navigation from '@/components/Navigation';
@@ -18,18 +18,11 @@ interface CartCheckoutLocationState {
   };
 }
 
-declare global {
-  interface Window {
-    Razorpay: any;
-  }
-}
-
 const CartCheckout = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const razorpayLoaded = useRef(false);
 
   useEffect(() => {
     const state = location.state as CartCheckoutLocationState;
@@ -38,23 +31,7 @@ const CartCheckout = () => {
       return;
     }
 
-    // Load Razorpay script
-    if (!razorpayLoaded.current) {
-      const script = document.createElement('script');
-      script.src = 'https://checkout.razorpay.com/v1/checkout.js';
-      script.async = true;
-      script.onload = () => {
-        razorpayLoaded.current = true;
-        initiatePayment(state.cartData);
-      };
-      script.onerror = () => {
-        setError('Failed to load payment gateway. Please refresh the page.');
-        setIsLoading(false);
-      };
-      document.body.appendChild(script);
-    } else {
-      initiatePayment(state.cartData);
-    }
+    initiatePayment(state.cartData);
   }, [location.state, navigate]);
 
   const initiatePayment = async (cartData: CartCheckoutLocationState['cartData']) => {
@@ -87,6 +64,7 @@ const CartCheckout = () => {
       });
       
       let order_id: string;
+      let payment_session_id: string;
       let amount: number;
       let currency: string;
       
@@ -109,143 +87,121 @@ const CartCheckout = () => {
           throw new Error('Server response missing order data. Please try again.');
         }
 
-        // Extract order details
-        order_id = response.data.order_id;
-        amount = response.data.amount;
-        currency = response.data.currency || 'INR';
+        // Extract order details - handle nested data structure
+        const responseData = response.data || {};
+        order_id = responseData.order_id;
+        payment_session_id = responseData.payment_session_id;
+        amount = responseData.amount;
+        currency = responseData.currency || 'INR';
         
-        console.log('Order details extracted:', { order_id, amount, currency });
+        console.log('Order details extracted:', { order_id, payment_session_id, amount, currency });
+        console.log('Full response structure:', JSON.stringify(response, null, 2));
+        
+        if (!payment_session_id) {
+          console.error('Missing payment_session_id in response:', JSON.stringify(response, null, 2));
+          throw new Error('Payment session ID not received from server. Please try again.');
+        }
+        
+        if (!order_id) {
+          console.error('Missing order_id in response:', JSON.stringify(response, null, 2));
+          throw new Error('Order ID not received from server. Please try again.');
+        }
       } catch (apiError: any) {
         console.error('API call error:', apiError);
+        console.error('Error details:', apiError.details);
+        console.error('Error status:', apiError.status);
+        
         // Check if it's a network error
         if (apiError.message?.includes('Network error') || apiError.message?.includes('Failed to fetch')) {
-          throw new Error('Cannot connect to server. Please make sure the backend is running on http://localhost:3000');
+          throw new Error('Cannot connect to server. Please make sure the backend is running.');
         }
+        
+        // Show detailed error message if available
+        if (apiError.details) {
+          const errorMsg = apiError.details?.message || apiError.details?.error || apiError.message;
+          throw new Error(errorMsg);
+        }
+        
         throw apiError;
       }
 
-      // Get Razorpay key from environment
-      const razorpayKey = import.meta.env.VITE_RAZORPAY_KEY_ID;
-      console.log('Razorpay key check:', { hasKey: !!razorpayKey, keyPrefix: razorpayKey ? razorpayKey.substring(0, 10) + '...' : 'none' });
+      // Get Cashfree mode (production or sandbox)
+      const cashfreeMode = import.meta.env.VITE_CASHFREE_MODE || 'production';
       
-      if (!razorpayKey) {
-        throw new Error('Razorpay key not configured. Please check your environment variables.');
-      }
+      // Load Cashfree SDK and open checkout
+      const loadCashfreeSDK = () => {
+        return new Promise((resolve, reject) => {
+          // Check if SDK is already loaded
+          if ((window as any).Cashfree) {
+            resolve((window as any).Cashfree);
+            return;
+          }
 
-      // Load Razorpay script if not already loaded
-      if (typeof window.Razorpay === 'undefined') {
-        console.log('Loading Razorpay script...');
-        await new Promise((resolve, reject) => {
+          // Load Cashfree SDK
           const script = document.createElement('script');
-          script.src = 'https://checkout.razorpay.com/v1/checkout.js';
+          script.src = 'https://sdk.cashfree.com/js/v3/cashfree.js';
           script.async = true;
           script.onload = () => {
-            console.log('Razorpay script loaded successfully');
-            resolve(true);
+            if ((window as any).Cashfree) {
+              resolve((window as any).Cashfree);
+            } else {
+              reject(new Error('Cashfree SDK failed to load'));
+            }
           };
           script.onerror = () => {
-            console.error('Failed to load Razorpay script');
-            reject(new Error('Failed to load Razorpay payment gateway'));
+            reject(new Error('Failed to load Cashfree SDK'));
           };
-          document.body.appendChild(script);
+          document.head.appendChild(script);
         });
-      } else {
-        console.log('Razorpay already loaded');
+      };
+
+      try {
+        // Load Cashfree SDK
+        await loadCashfreeSDK();
+        
+        // Initialize Cashfree
+        const cashfree = (window as any).Cashfree({
+          mode: cashfreeMode
+        });
+
+        // Open checkout
+        const checkoutOptions = {
+          paymentSessionId: payment_session_id,
+          redirectTarget: "_self"
+        };
+
+        console.log('Opening Cashfree checkout with session:', payment_session_id);
+        cashfree.checkout(checkoutOptions);
+      } catch (sdkError: any) {
+        console.error('Error loading Cashfree SDK:', sdkError);
+        throw new Error('Failed to load payment gateway. Please try again.');
       }
-
-      // Open Razorpay Checkout
-      console.log('Preparing Razorpay options:', {
-        amount: Math.round(amount * 100),
-        currency,
-        order_id,
-        hasKey: !!razorpayKey
-      });
-      
-      const options = {
-        key: razorpayKey,
-        amount: Math.round(amount * 100), // Convert to paise
-        currency: currency || 'INR',
-        order_id: order_id,
-        name: 'Know How Cafe',
-        description: 'DIY Kit Order',
-        theme: {
-          color: '#121212'
-        },
-        prefill: {
-          name: cartData.customerName,
-          email: cartData.customerEmail,
-          contact: cartData.customerPhone.replace(/[^0-9]/g, ''),
-        },
-        handler: function (paymentResponse: any) {
-          console.log('Payment successful, verifying...', paymentResponse);
-          // Payment successful, verify and redirect
-          verifyPayment(order_id, paymentResponse.razorpay_payment_id, paymentResponse.razorpay_signature);
-        },
-        modal: {
-          ondismiss: function() {
-            console.log('Razorpay modal dismissed by user');
-            navigate('/cart', { 
-              state: { 
-                message: 'Payment was cancelled. Please try again when ready.' 
-              } 
-            });
-          }
-        }
-      };
-
-      // Add error handler for Razorpay
-      (options as any).handler_error = function(error: any) {
-        console.error('Razorpay error:', error);
-        navigate('/failed', { 
-          state: { 
-            orderId: order_id,
-            message: error.description || error.error?.description || 'Payment failed. Please try again.' 
-          } 
-        });
-      };
-
-      console.log('Opening Razorpay checkout...');
-      const razorpay = new window.Razorpay(options);
-      razorpay.open();
-      console.log('Razorpay.open() called');
       
       setIsLoading(false);
     } catch (err: any) {
       console.error('Payment initiation error:', err);
+      console.error('Full error object:', err);
       console.error('Error stack:', err.stack);
-      setError(err.message || 'Failed to initiate payment. Please try again.');
+      
+      // Show more detailed error message
+      let errorMessage = err.message || 'Failed to initiate payment. Please try again.';
+      
+      // If there are error details from backend, show them
+      if (err.details) {
+        if (typeof err.details === 'string') {
+          errorMessage = err.details;
+        } else if (err.details.message) {
+          errorMessage = err.details.message;
+        } else if (err.details.error) {
+          errorMessage = err.details.error;
+        }
+      }
+      
+      setError(errorMessage);
       setIsLoading(false);
     }
   };
 
-  const verifyPayment = async (orderId: string, paymentId: string, signature: string) => {
-    try {
-      const response = await api.verifyDIYPayment(orderId, paymentId, signature);
-      if (response.success) {
-        navigate('/payment-processing', { 
-          state: { 
-            orderId,
-            type: 'diy',
-            message: 'Payment successful! Your order is confirmed.' 
-          } 
-        });
-      } else {
-        navigate('/failed', { 
-          state: { 
-            orderId,
-            message: 'Payment verification failed.' 
-          } 
-        });
-      }
-    } catch (err: any) {
-      console.error('Payment verification error:', err);
-      navigate('/failed', { 
-        state: { 
-          message: 'Payment verification failed.' 
-        } 
-      });
-    }
-  };
 
   const state = location.state as CartCheckoutLocationState;
   if (!state?.cartData) {

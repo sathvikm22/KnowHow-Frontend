@@ -45,8 +45,10 @@ interface Booking {
   customer_phone?: string;
   customer_address?: string;
   payment_method?: string;
-  razorpay_order_id?: string;
-  razorpay_payment_id?: string;
+  cashfree_order_id?: string;
+  cashfree_payment_id?: string;
+  razorpay_order_id?: string; // Legacy support
+  razorpay_payment_id?: string; // Legacy support
   internal_bill_id?: string;
 }
 
@@ -66,8 +68,10 @@ interface DIYOrder {
   delivery_status: string;
   delivery_time?: string;
   created_at: string;
-  razorpay_order_id?: string;
-  razorpay_payment_id?: string;
+  cashfree_order_id?: string;
+  cashfree_payment_id?: string;
+  razorpay_order_id?: string; // Legacy support
+  razorpay_payment_id?: string; // Legacy support
   payment_method?: string;
 }
 
@@ -183,7 +187,7 @@ const AllOrders = () => {
 
   const showRefundReceipt = (booking: Booking) => {
     const receipt: ReceiptData = {
-      orderId: booking.razorpay_order_id || booking.id,
+      orderId: booking.cashfree_order_id || booking.razorpay_order_id || booking.id,
       internalBillId: booking.internal_bill_id || `REF-${booking.id.slice(0, 8)}`,
       customerName: booking.customer_name || 'Customer',
       customerEmail: booking.customer_email || '',
@@ -323,7 +327,7 @@ const AllOrders = () => {
 
   const showUpdatedBookingReceipt = (booking: Booking, newDate: string, newTimeSlot: string) => {
     const receipt: ReceiptData = {
-      orderId: booking.razorpay_order_id || booking.id,
+      orderId: booking.cashfree_order_id || booking.razorpay_order_id || booking.id,
       internalBillId: booking.internal_bill_id || `UPD-${booking.id.slice(0, 8)}`,
       customerName: booking.customer_name || 'Customer',
       customerEmail: booking.customer_email || '',
@@ -508,7 +512,7 @@ const AllOrders = () => {
                             const activityName = booking.combo_name || booking.activity_name || 'Activity Booking';
                             const selectedActivities = booking.selected_activities || [];
                             const receipt: ReceiptData = {
-                              orderId: booking.razorpay_order_id || booking.id,
+                              orderId: booking.cashfree_order_id || booking.razorpay_order_id || booking.id,
                               internalBillId: booking.internal_bill_id || `BKG-${booking.id?.slice(0, 8) || 'N/A'}`,
                               customerName: booking.customer_name || 'Customer',
                               customerEmail: booking.customer_email || '',
@@ -525,7 +529,7 @@ const AllOrders = () => {
                               totalAmount: booking.amount,
                               paymentMode: booking.payment_method || 'Online',
                               paymentStatus: booking.payment_status === 'paid' ? 'Paid' : 'Pending',
-                              paymentId: booking.razorpay_payment_id,
+                              paymentId: booking.cashfree_payment_id || booking.razorpay_payment_id,
                               date: new Date(booking.created_at),
                               notes: `Activity: ${activityName}${selectedActivities.length > 0 ? ` (${selectedActivities.join(', ')})` : ''}\nDate: ${formatDate(bookingDate)}\nTime: ${bookingTime}\nParticipants: ${booking.participants || 1}`
                             };
@@ -771,7 +775,7 @@ const AllOrders = () => {
                           };
                           
                           const receipt: ReceiptData = {
-                            orderId: order.razorpay_order_id || order.id,
+                            orderId: order.cashfree_order_id || order.razorpay_order_id || order.id,
                             internalBillId: order.internal_bill_id,
                             customerName: order.customer_name,
                             customerEmail: order.customer_email,
@@ -812,7 +816,7 @@ const AllOrders = () => {
                             totalAmount: normalizeAmount(order.total_amount || 0),
                             paymentMode: order.payment_method || 'Online',
                             paymentStatus: 'Paid',
-                            paymentId: order.razorpay_payment_id,
+                            paymentId: order.cashfree_payment_id || order.razorpay_payment_id,
                             date: new Date(order.created_at),
                             notes: `DIY Kit Order - ${order.items.map((i: any) => `${i.name || 'DIY Kit'} (Qty: ${i.quantity || 1})`).join(', ')}`
                           };

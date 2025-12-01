@@ -46,11 +46,11 @@ const PaymentSuccess = () => {
         console.log('DIY payment status response:', response);
         const order = response.data?.order || response.order;
         if (response.success && order) {
-          const paymentId = order.razorpay_payment_id || '';
-          // Normalize amount - Razorpay stores amounts in paise (smallest currency unit)
-          // If amount is >= 100 and divisible by 100, it's likely in paise, so divide by 100
+          const paymentId = order.cashfree_payment_id || order.razorpay_payment_id || '';
+          // Normalize amount - Cashfree stores amounts in rupees (not paise)
           const normalizeAmount = (amt: number) => {
             if (!amt || typeof amt !== 'number') return 0;
+            // Cashfree uses rupees, but check if it's in paise (legacy data)
             if (amt >= 100 && amt % 100 === 0 && amt <= 100000) {
               return amt / 100;
             }
@@ -58,7 +58,7 @@ const PaymentSuccess = () => {
           };
           
           const receipt: ReceiptData = {
-            orderId: order.razorpay_order_id || order.id,
+            orderId: order.cashfree_order_id || order.razorpay_order_id || order.id,
             internalBillId: order.internal_bill_id || `ORD-${order.id?.slice(0, 8) || 'N/A'}`,
             customerName: order.customer_name || 'Customer',
             customerEmail: order.customer_email || '',
@@ -118,7 +118,7 @@ const PaymentSuccess = () => {
           
           const amount = normalizeAmount(booking.amount || 0);
           const participants = booking.participants || 1;
-          const paymentId = booking.razorpay_payment_id || '';
+          const paymentId = booking.cashfree_payment_id || booking.razorpay_payment_id || '';
           
           // Get booking date and time (use updated if available)
           const bookingDate = booking.is_updated && booking.updated_booking_date 
@@ -144,7 +144,7 @@ const PaymentSuccess = () => {
           const selectedActivities = booking.selected_activities || [];
           
           const receipt: ReceiptData = {
-            orderId: booking.razorpay_order_id || booking.id,
+            orderId: booking.cashfree_order_id || booking.razorpay_order_id || booking.id,
             internalBillId: booking.internal_bill_id || `BKG-${booking.id?.slice(0, 8) || 'N/A'}`,
             customerName: booking.customer_name || booking.user_name || 'Customer',
             customerEmail: booking.customer_email || booking.user_email || '',

@@ -20,8 +20,10 @@ interface Booking {
   payment_status: string;
   status: string;
   payment_method?: string;
-  razorpay_order_id?: string;
-  razorpay_payment_id?: string;
+  cashfree_order_id?: string;
+  cashfree_payment_id?: string;
+  razorpay_order_id?: string; // Legacy support
+  razorpay_payment_id?: string; // Legacy support
   participants: number;
   created_at: string;
 }
@@ -165,9 +167,9 @@ const AdminBookings = () => {
                 </span>
               </div>
 
-              {booking.razorpay_order_id && (
+              {(booking.cashfree_order_id || booking.razorpay_order_id) && (
                 <div className="text-xs text-gray-500 font-mono pt-2 border-t border-gray-200">
-                  Order: {booking.razorpay_order_id.slice(-8)}
+                  Order: {(booking.cashfree_order_id || booking.razorpay_order_id)?.slice(-8)}
                 </div>
               )}
 
