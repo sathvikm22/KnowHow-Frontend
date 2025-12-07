@@ -66,11 +66,25 @@ const GoogleAuthCallback = () => {
 
         // Store authentication data
         setStatus('Storing authentication data...');
-        localStorage.setItem('authToken', token);
-        localStorage.setItem('userEmail', email);
         
+        // Check cookie consent status
+        const cookieConsent = localStorage.getItem('cookieConsent');
+        const hasConsent = cookieConsent === 'accepted';
+        
+        // Store user data
+        localStorage.setItem('userEmail', email);
         if (name) {
           localStorage.setItem('userName', name);
+        }
+        
+        // Store token based on consent
+        if (hasConsent) {
+          // Cookies accepted - token should be in HttpOnly cookie from backend
+          // Don't store in localStorage
+          localStorage.removeItem('authToken');
+        } else {
+          // No consent - store token in localStorage (in-memory auth)
+          localStorage.setItem('authToken', token);
         }
 
         if (isAdmin) {

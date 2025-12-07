@@ -178,14 +178,27 @@ const SignUp = () => {
       );
       
       if (response.success) {
-        // Store user data and token
-        if (response.token) {
-          localStorage.setItem('authToken', response.token);
-        }
+        // Check cookie consent status
+        const cookieConsent = localStorage.getItem('cookieConsent');
+        const hasConsent = cookieConsent === 'accepted';
+        
+        // Store user data
         if (response.user) {
           localStorage.setItem('userName', response.user.name);
           localStorage.setItem('userEmail', response.user.email);
         }
+        
+        // Store token based on consent
+        if (hasConsent) {
+          // Cookies accepted - token is in HttpOnly cookie, don't store in localStorage
+          localStorage.removeItem('authToken');
+        } else {
+          // No consent - store token in localStorage (in-memory auth)
+          if (response.token) {
+            localStorage.setItem('authToken', response.token);
+          }
+        }
+        
         localStorage.removeItem('isAdmin');
         
         alert('Account created successfully!');
@@ -519,3 +532,4 @@ const SignUp = () => {
 };
 
 export default SignUp;
+

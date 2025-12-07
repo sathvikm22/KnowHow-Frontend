@@ -53,21 +53,29 @@ class ApiClient {
     
     const config: RequestInit = {
       ...options,
-      credentials: 'include', // Equivalent to withCredentials: true
+      credentials: 'include', // Always include credentials for cookies
       headers: {
         'Content-Type': 'application/json',
         ...options.headers,
       },
     };
 
-    // Add auth token if available
-    const token = localStorage.getItem('authToken');
-    if (token) {
-      config.headers = {
-        ...config.headers,
-        Authorization: `Bearer ${token}`,
-      };
+    // Check cookie consent status
+    const cookieConsent = localStorage.getItem('cookieConsent');
+    const hasConsent = cookieConsent === 'accepted';
+
+    // Add auth token to header only if cookies are NOT accepted (in-memory auth)
+    // If cookies are accepted, the token is in HttpOnly cookie and will be sent automatically
+    if (!hasConsent) {
+      const token = localStorage.getItem('authToken');
+      if (token) {
+        config.headers = {
+          ...config.headers,
+          Authorization: `Bearer ${token}`,
+        };
+      }
     }
+    // If hasConsent is true, we rely on the cookie being sent automatically via credentials: 'include'
 
     try {
       console.log('API Request:', { 

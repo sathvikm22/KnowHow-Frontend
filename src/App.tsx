@@ -33,6 +33,7 @@ import PaymentFailed from './pages/PaymentFailed';
 import CookieConsent from './components/CookieConsent';
 import { initializeCookieConsent } from './utils/cookieConsent';
 import { CartProvider } from './contexts/CartContext';
+import { restoreSessionFromCookies } from './utils/auth';
 
 const queryClient = new QueryClient();
 
@@ -45,6 +46,20 @@ const App = () => {
   useEffect(() => {
     // Initialize cookie consent on app load
     initializeCookieConsent();
+    
+    // Restore session from cookies if consent is given
+    const restoreSession = async () => {
+      const cookieConsent = localStorage.getItem('cookieConsent');
+      if (cookieConsent === 'accepted') {
+        // Try to restore session from cookies
+        const restored = await restoreSessionFromCookies();
+        if (restored) {
+          console.log('Session restored from cookies');
+        }
+      }
+    };
+    
+    restoreSession();
   }, []);
 
   return (

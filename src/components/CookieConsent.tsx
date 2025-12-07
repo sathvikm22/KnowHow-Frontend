@@ -192,16 +192,24 @@ const CookieConsent = () => {
 
   const handleAccept = async () => {
     try {
-      // Update consent in Supabase
+      // Update consent in Supabase (this will also set the auth cookie on backend)
       await api.updateCookieConsent('accepted');
       // Also update localStorage for immediate effect
       localStorage.setItem('cookieConsent', 'accepted');
       localStorage.setItem('cookieConsentDate', new Date().toISOString());
+      
+      // Remove token from localStorage since we're now using cookies
+      // The backend will set the HttpOnly cookie
+      localStorage.removeItem('authToken');
+      
       setShow(false);
       
       // Load non-essential scripts
       window.cookieConsentGiven = true;
       window.dispatchEvent(new CustomEvent('cookieConsentGiven', { detail: { accepted: true } }));
+      
+      // Dispatch event to notify auth system
+      window.dispatchEvent(new CustomEvent('cookieConsentChanged', { detail: { accepted: true } }));
     } catch (error) {
       console.error('Error updating cookie consent:', error);
       // Still update localStorage as fallback
@@ -212,15 +220,28 @@ const CookieConsent = () => {
 
   const handleDecline = async () => {
     try {
-      // Update consent in Supabase
+      // Update consent in Supabase (this will also clear the auth cookie on backend)
       await api.updateCookieConsent('declined');
       // Also update localStorage for immediate effect
       localStorage.setItem('cookieConsent', 'declined');
       localStorage.setItem('cookieConsentDate', new Date().toISOString());
+      
+      // Clear auth cookie by calling logout (clears HttpOnly cookie)
+      // Note: User will remain logged in via in-memory state until refresh
+      try {
+        await api.logout();
+      } catch (logoutError) {
+        // Ignore logout errors - cookie might not exist
+        console.log('Logout call completed (cookie may not have existed)');
+      }
+      
       setShow(false);
       
       // Don't load non-essential scripts
       window.cookieConsentGiven = false;
+      
+      // Dispatch event to notify auth system
+      window.dispatchEvent(new CustomEvent('cookieConsentChanged', { detail: { accepted: false } }));
     } catch (error) {
       console.error('Error updating cookie consent:', error);
       // Still update localStorage as fallback
