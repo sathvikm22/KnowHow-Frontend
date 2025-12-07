@@ -26,6 +26,58 @@ const Login = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
 
+  // Check if user is already logged in and redirect
+  useEffect(() => {
+    const checkExistingAuth = async () => {
+      const userName = localStorage.getItem('userName');
+      const userEmail = localStorage.getItem('userEmail');
+      
+      if (userName && userEmail) {
+        // User might be logged in, verify with backend
+        try {
+          const response = await api.getCurrentUser();
+          if (response.success && response.user) {
+            // User is authenticated, redirect to home
+            const isAdmin = localStorage.getItem('isAdmin') === 'true';
+            if (isAdmin) {
+              navigate('/admin/dashboard/bookings', { replace: true });
+            } else {
+              navigate('/home', { replace: true });
+            }
+          }
+        } catch (error) {
+          // Not authenticated or error, stay on login page
+          // Clear invalid data
+          const cookieConsent = localStorage.getItem('cookieConsent');
+          if (cookieConsent !== 'accepted') {
+            // Only clear if not using cookies (cookies might still be valid)
+            localStorage.removeItem('userName');
+            localStorage.removeItem('userEmail');
+            localStorage.removeItem('authToken');
+          }
+        }
+      }
+    };
+
+    checkExistingAuth();
+
+    // Listen for auth changes from other tabs
+    const handleStorageChange = (e: StorageEvent) => {
+      if (e.key === 'userName' && e.newValue) {
+        // User logged in from another tab, redirect
+        const isAdmin = localStorage.getItem('isAdmin') === 'true';
+        if (isAdmin) {
+          navigate('/admin/dashboard/bookings', { replace: true });
+        } else {
+          navigate('/home', { replace: true });
+        }
+      }
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+    return () => window.removeEventListener('storage', handleStorageChange);
+  }, [navigate]);
+
   // Handle OAuth error messages from URL
   useEffect(() => {
     const error = searchParams.get('error');
@@ -83,7 +135,16 @@ const Login = () => {
         }
         
         // Dispatch custom event to notify CookieConsent and Cart components
+        // This also helps with cross-tab synchronization
         window.dispatchEvent(new CustomEvent('authStateChanged'));
+        
+        // Trigger a storage event manually for cross-tab sync
+        // (storage events only fire in other tabs, not the current one)
+        window.dispatchEvent(new StorageEvent('storage', {
+          key: 'userName',
+          newValue: response.user?.name || '',
+          oldValue: null
+        }));
         
         // Check if user is admin (from backend response or email check)
         if (response.isAdmin || loginData.email.toLowerCase() === ADMIN_EMAIL.toLowerCase()) {
@@ -153,7 +214,15 @@ const Login = () => {
         localStorage.removeItem('isAdmin');
         
         // Dispatch custom event to notify CookieConsent component
+        // This also helps with cross-tab synchronization
         window.dispatchEvent(new CustomEvent('authStateChanged'));
+        
+        // Trigger a storage event manually for cross-tab sync
+        window.dispatchEvent(new StorageEvent('storage', {
+          key: 'userName',
+          newValue: response.user?.name || '',
+          oldValue: null
+        }));
         
         setUserName(response.user?.name || '');
         setIsLoggedIn(true);

@@ -34,12 +34,17 @@ import CookieConsent from './components/CookieConsent';
 import { initializeCookieConsent } from './utils/cookieConsent';
 import { CartProvider } from './contexts/CartContext';
 import { restoreSessionFromCookies } from './utils/auth';
+import ProtectedRoute from './components/ProtectedRoute';
+import { api } from './lib/api';
 
 const queryClient = new QueryClient();
 
 function AdminRoute({ children }: { children: JSX.Element }) {
-  const isAdmin = localStorage.getItem('isAdmin') === 'true';
-  return isAdmin ? children : <Navigate to="/" replace />;
+  return (
+    <ProtectedRoute requireAuth={true} requireAdmin={true}>
+      {children}
+    </ProtectedRoute>
+  );
 }
 
 const App = () => {
@@ -47,19 +52,53 @@ const App = () => {
     // Initialize cookie consent on app load
     initializeCookieConsent();
     
-    // Restore session from cookies if consent is given
+    // Restore session on app load
     const restoreSession = async () => {
       const cookieConsent = localStorage.getItem('cookieConsent');
-      if (cookieConsent === 'accepted') {
+      const userName = localStorage.getItem('userName');
+      const userEmail = localStorage.getItem('userEmail');
+      
+      // If we have user info but no consent, check if we can restore from localStorage
+      if (userName && userEmail && cookieConsent !== 'accepted') {
+        // Try to verify the token is still valid
+        try {
+          const response = await api.getCurrentUser();
+          if (response.success && response.user) {
+            // Session is valid
+            console.log('Session restored from localStorage');
+            window.dispatchEvent(new CustomEvent('authStateChanged'));
+          } else {
+            // Invalid session, clear it
+            localStorage.removeItem('userName');
+            localStorage.removeItem('userEmail');
+            localStorage.removeItem('authToken');
+          }
+        } catch (error) {
+          // API call failed, but keep localStorage for now
+          // It will be cleared on next failed API call
+        }
+      } else if (cookieConsent === 'accepted') {
         // Try to restore session from cookies
         const restored = await restoreSessionFromCookies();
         if (restored) {
           console.log('Session restored from cookies');
+          window.dispatchEvent(new CustomEvent('authStateChanged'));
         }
       }
     };
     
     restoreSession();
+
+    // Listen for storage changes (cross-tab synchronization)
+    const handleStorageChange = (e: StorageEvent) => {
+      if (e.key === 'userName' || e.key === 'authToken') {
+        // Auth state changed in another tab, dispatch event
+        window.dispatchEvent(new CustomEvent('authStateChanged'));
+      }
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+    return () => window.removeEventListener('storage', handleStorageChange);
   }, []);
 
   return (
@@ -72,12 +111,12 @@ const App = () => {
             <Routes>
               <Route path="/" element={<Login />} />
               <Route path="/signup" element={<SignUp />} />
-              <Route path="/home" element={<Index />} />
-              <Route path="/booking" element={<Booking />} />
-              <Route path="/activities" element={<Activities />} />
-              <Route path="/buy" element={<Buy />} />
-              <Route path="/cart" element={<Cart />} />
-              <Route path="/checkout" element={<Checkout />} />
+              <Route path="/home" element={<ProtectedRoute requireAuth={true}><Index /></ProtectedRoute>} />
+              <Route path="/booking" element={<ProtectedRoute requireAuth={true}><Booking /></ProtectedRoute>} />
+              <Route path="/activities" element={<ProtectedRoute requireAuth={true}><Activities /></ProtectedRoute>} />
+              <Route path="/buy" element={<ProtectedRoute requireAuth={true}><Buy /></ProtectedRoute>} />
+              <Route path="/cart" element={<ProtectedRoute requireAuth={true}><Cart /></ProtectedRoute>} />
+              <Route path="/checkout" element={<ProtectedRoute requireAuth={true}><Checkout /></ProtectedRoute>} />
               <Route path="/forgot-password" element={<ForgotPassword />} />
               <Route path="/auth/google/callback" element={<GoogleAuthCallback />} />
               <Route path="/privacy-policy" element={<PrivacyPolicy />} />
@@ -92,10 +131,10 @@ const App = () => {
               <Route path="/returns" element={<CancellationsAndRefunds />} />
               <Route path="/contact-us" element={<ContactUs />} />
               <Route path="/contact" element={<ContactUs />} />
-              <Route path="/orders" element={<Orders />} />
-              <Route path="/my-orders" element={<MyOrders />} />
-              <Route path="/all-orders" element={<AllOrders />} />
-              <Route path="/cart-checkout" element={<CartCheckout />} />
+              <Route path="/orders" element={<ProtectedRoute requireAuth={true}><Orders /></ProtectedRoute>} />
+              <Route path="/my-orders" element={<ProtectedRoute requireAuth={true}><MyOrders /></ProtectedRoute>} />
+              <Route path="/all-orders" element={<ProtectedRoute requireAuth={true}><AllOrders /></ProtectedRoute>} />
+              <Route path="/cart-checkout" element={<ProtectedRoute requireAuth={true}><CartCheckout /></ProtectedRoute>} />
               <Route path="/payment-processing" element={<PaymentProcessing />} />
               <Route path="/success" element={<PaymentSuccess />} />
               <Route path="/failed" element={<PaymentFailed />} />
