@@ -198,9 +198,9 @@ const CookieConsent = () => {
       localStorage.setItem('cookieConsent', 'accepted');
       localStorage.setItem('cookieConsentDate', new Date().toISOString());
       
-      // Remove token from localStorage since we're now using cookies
-      // The backend will set the HttpOnly cookie
-      localStorage.removeItem('authToken');
+      // Keep token in localStorage as fallback (even though we're using cookies)
+      // This ensures authentication works if cookies fail or aren't set properly
+      // The backend will prefer cookies over the Authorization header if both are present
       
       setShow(false);
       

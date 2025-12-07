@@ -77,15 +77,10 @@ const GoogleAuthCallback = () => {
           localStorage.setItem('userName', name);
         }
         
-        // Store token based on consent
-        if (hasConsent) {
-          // Cookies accepted - token should be in HttpOnly cookie from backend
-          // Don't store in localStorage
-          localStorage.removeItem('authToken');
-        } else {
-          // No consent - store token in localStorage (in-memory auth)
-          localStorage.setItem('authToken', token);
-        }
+        // Store token in localStorage as fallback (even when cookies are accepted)
+        // This ensures authentication works even if cookies fail or aren't set properly
+        // The backend will prefer cookies over the Authorization header if both are present
+        localStorage.setItem('authToken', token);
 
         if (isAdmin) {
           localStorage.setItem('isAdmin', 'true');

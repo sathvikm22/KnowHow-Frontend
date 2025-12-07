@@ -64,18 +64,21 @@ class ApiClient {
     const cookieConsent = localStorage.getItem('cookieConsent');
     const hasConsent = cookieConsent === 'accepted';
 
-    // Add auth token to header only if cookies are NOT accepted (in-memory auth)
-    // If cookies are accepted, the token is in HttpOnly cookie and will be sent automatically
-    if (!hasConsent) {
-      const token = localStorage.getItem('authToken');
-      if (token) {
-        config.headers = {
-          ...config.headers,
-          Authorization: `Bearer ${token}`,
-        };
-      }
+    // Get token from localStorage (if available)
+    const token = localStorage.getItem('authToken');
+
+    // Add auth token to header:
+    // 1. If cookies are NOT accepted, always send token in header (in-memory auth)
+    // 2. If cookies ARE accepted, still send token as fallback (in case cookie isn't set or fails)
+    // The backend will prefer cookies over headers if both are present
+    if (token) {
+      config.headers = {
+        ...config.headers,
+        Authorization: `Bearer ${token}`,
+      };
     }
-    // If hasConsent is true, we rely on the cookie being sent automatically via credentials: 'include'
+    // Note: Even with cookies accepted, we send the token in header as fallback
+    // The backend checks cookies first, then falls back to Authorization header
 
     try {
       console.log('API Request:', { 

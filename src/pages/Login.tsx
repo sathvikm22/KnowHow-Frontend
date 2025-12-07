@@ -53,7 +53,8 @@ const Login = () => {
             // Only clear if not using cookies (cookies might still be valid)
             localStorage.removeItem('userName');
             localStorage.removeItem('userEmail');
-            localStorage.removeItem('authToken');
+            // Keep authToken as it might be valid even if getCurrentUser failed
+            // It will be cleared on actual logout
           }
         }
       }
@@ -123,15 +124,11 @@ const Login = () => {
           localStorage.setItem('userEmail', response.user.email);
         }
         
-        // Store token based on consent
-        if (hasConsent) {
-          // Cookies accepted - token is in HttpOnly cookie, don't store in localStorage
-          localStorage.removeItem('authToken');
-        } else {
-          // No consent - store token in localStorage (in-memory auth)
-          if (response.token) {
-            localStorage.setItem('authToken', response.token);
-          }
+        // Store token in localStorage as fallback (even when cookies are accepted)
+        // This ensures authentication works even if cookies fail or aren't set properly
+        // The backend will prefer cookies over the Authorization header if both are present
+        if (response.token) {
+          localStorage.setItem('authToken', response.token);
         }
         
         // Dispatch custom event to notify CookieConsent and Cart components
@@ -200,15 +197,11 @@ const Login = () => {
           localStorage.setItem('userEmail', response.user.email);
         }
         
-        // Store token based on consent
-        if (hasConsent) {
-          // Cookies accepted - token is in HttpOnly cookie, don't store in localStorage
-          localStorage.removeItem('authToken');
-        } else {
-          // No consent - store token in localStorage (in-memory auth)
-          if (response.token) {
-            localStorage.setItem('authToken', response.token);
-          }
+        // Store token in localStorage as fallback (even when cookies are accepted)
+        // This ensures authentication works even if cookies fail or aren't set properly
+        // The backend will prefer cookies over the Authorization header if both are present
+        if (response.token) {
+          localStorage.setItem('authToken', response.token);
         }
         
         localStorage.removeItem('isAdmin');
