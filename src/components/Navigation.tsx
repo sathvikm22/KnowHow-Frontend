@@ -281,10 +281,11 @@ const Navigation = () => {
           </div>
           
           {/* Mobile menu button */}
-          <div className="md:hidden flex items-center gap-1.5 sm:gap-2 flex-shrink-0 pr-2 sm:pr-3">
+          <div className="md:hidden flex items-center justify-end gap-2 sm:gap-2.5 flex-shrink-0 pr-2 sm:pr-3 ml-auto">
             <button
               onClick={toggleDarkMode}
-              className="text-white hover:text-yellow-300 p-1.5 sm:p-2"
+              className="text-white hover:text-yellow-300 p-1.5 sm:p-2 rounded-lg transition-colors"
+              aria-label="Toggle dark mode"
             >
               {isDarkMode ? <Sun size={18} /> : <Moon size={18} />}
             </button>
@@ -294,8 +295,9 @@ const Navigation = () => {
                   navigate('/cart');
                   setIsOpen(false);
                 }}
-                className="relative text-white hover:text-yellow-300 p-1.5 sm:p-2"
+                className="relative text-white hover:text-yellow-300 p-1.5 sm:p-2 rounded-lg transition-colors"
                 title="Shopping Cart"
+                aria-label="Shopping Cart"
               >
                 <ShoppingCart size={18} />
                 {cartCount > 0 && (
@@ -307,7 +309,8 @@ const Navigation = () => {
             )}
             <button
               onClick={() => setIsOpen(!isOpen)}
-              className="text-white hover:text-yellow-300 p-1.5 sm:p-2"
+              className="text-white hover:text-yellow-300 p-1.5 sm:p-2 rounded-lg transition-colors"
+              aria-label="Toggle menu"
             >
               {isOpen ? <X size={20} className="sm:w-6 sm:h-6" /> : <Menu size={20} className="sm:w-6 sm:h-6" />}
             </button>
@@ -317,7 +320,7 @@ const Navigation = () => {
       
       {/* Mobile menu */}
       {isOpen && (
-        <div className="md:hidden bg-purple-700 dark:bg-gray-800 border-t border-white/20">
+        <div className="md:hidden bg-teal-600 dark:bg-gray-800 border-t border-white/20">
           <div className="px-3 sm:px-4 pt-2 pb-3 space-y-1">
             {navItems.map((item) => (
               <button
@@ -351,7 +354,7 @@ const Navigation = () => {
                 >
                   Book Now
                 </button>
-                <div className="text-white font-medium px-3 py-2 bg-pink-500 rounded-md text-sm sm:text-base">{userName}</div>
+                <div className="text-white font-medium px-3 py-2 bg-pink-500 rounded-md text-sm sm:text-base text-center">{userName}</div>
                 <button 
                   onClick={() => {
                     handleLogout();
