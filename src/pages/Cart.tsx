@@ -5,20 +5,67 @@ import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { X, ShoppingBag, CreditCard, ArrowLeft } from 'lucide-react';
 import Navigation from '@/components/Navigation';
-import { diyKits, getImagePath, type DIYKit } from '@/data/diyKits';
 import { useCart } from '@/contexts/CartContext';
+import { api } from '@/lib/api';
+
+interface DIYKit {
+  id: string;
+  name: string;
+  price: number;
+  image_url: string | null;
+  description: string;
+}
 
 const Cart = () => {
   const navigate = useNavigate();
   const { cart, updateCartItem, removeFromCart, clearCart } = useCart();
   const [showViewCart, setShowViewCart] = useState(false);
+  const [diyKits, setDiyKits] = useState<DIYKit[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const storedUser = localStorage.getItem('userName');
     if (!storedUser) {
       navigate('/');
     }
+    fetchDIYKits();
   }, [navigate]);
+
+  const fetchDIYKits = async () => {
+    try {
+      setLoading(true);
+      const response = await api.getDIYKits();
+      if (response.success && response.kits) {
+        setDiyKits(response.kits);
+      }
+    } catch (error) {
+      console.error('Error fetching DIY kits:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const getImagePath = (kit: DIYKit | null) => {
+    if (!kit) return '/placeholder.svg';
+    // Check if image_url exists and is not empty/null
+    if (kit.image_url && kit.image_url.trim() !== '') {
+      const url = kit.image_url.trim();
+      // If it's already a full URL (starts with http), use it directly
+      if (url.startsWith('http://') || url.startsWith('https://')) {
+        return url;
+      }
+      // If it's a Supabase Storage path, construct the full URL
+      if (url.startsWith('/storage/') || url.startsWith('storage/')) {
+        const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || '';
+        return `${supabaseUrl}${url.startsWith('/') ? '' : '/'}${url}`;
+      }
+      // Otherwise, assume it's a relative path
+      return url;
+    }
+    // Fallback to old path structure
+    const imageName = kit.name.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
+    return `/lovable-uploads/diy-kits/${imageName}.jpg`;
+  };
 
   // Get cart items with kit details
   const cartItems = cart.map(item => {
@@ -165,26 +212,32 @@ const Cart = () => {
                     <div className="flex gap-4">
                       {/* Product Image - Square */}
                       <div className="w-24 h-24 sm:w-32 sm:h-32 bg-gray-100 dark:bg-gray-700 rounded-lg overflow-hidden flex-shrink-0">
-                        <img 
-                          src={item.kit ? getImagePath(item.kit) : '/placeholder.svg'}
-                          alt={item.kit_name}
-                          className="w-full h-full object-cover"
-                          onError={(e) => {
-                            const target = e.target as HTMLImageElement;
-                            target.style.display = 'none';
-                            const parent = target.parentElement;
-                            if (parent && !parent.querySelector('.placeholder-icon')) {
-                              const placeholder = document.createElement('div');
-                              placeholder.className = 'placeholder-icon w-full h-full flex items-center justify-center text-gray-400';
-                              placeholder.innerHTML = `
-                                <svg class="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
-                                </svg>
-                              `;
-                              parent.appendChild(placeholder);
-                            }
-                          }}
-                        />
+                        {loading ? (
+                          <div className="w-full h-full flex items-center justify-center">
+                            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-orange-600"></div>
+                          </div>
+                        ) : (
+                          <img 
+                            src={getImagePath(item.kit)}
+                            alt={item.kit_name}
+                            className="w-full h-full object-cover"
+                            onError={(e) => {
+                              const target = e.target as HTMLImageElement;
+                              target.style.display = 'none';
+                              const parent = target.parentElement;
+                              if (parent && !parent.querySelector('.placeholder-icon')) {
+                                const placeholder = document.createElement('div');
+                                placeholder.className = 'placeholder-icon w-full h-full flex items-center justify-center text-gray-400';
+                                placeholder.innerHTML = `
+                                  <svg class="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                                  </svg>
+                                `;
+                                parent.appendChild(placeholder);
+                              }
+                            }}
+                          />
+                        )}
                       </div>
 
                       {/* Product Details - Long rectangle format */}

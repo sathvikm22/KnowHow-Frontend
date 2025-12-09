@@ -3,8 +3,16 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { ChevronLeft, ChevronRight, ShoppingCart, ArrowLeft } from 'lucide-react';
 import Navigation from '@/components/Navigation';
-import { diyKits, getImagePath, type DIYKit } from '@/data/diyKits';
+import { api } from '@/lib/api';
 import { useCart } from '@/contexts/CartContext';
+
+interface DIYKit {
+  id: string;
+  name: string;
+  price: number;
+  image_url: string | null;
+  description: string;
+}
 
 const Buy = () => {
   const location = useLocation();
@@ -13,6 +21,8 @@ const Buy = () => {
   const { cart, addToCart } = useCart();
 
   const [selectedKit, setSelectedKit] = useState<DIYKit | null>(null);
+  const [diyKits, setDiyKits] = useState<DIYKit[]>([]);
+  const [loading, setLoading] = useState(true);
   const [justAdded, setJustAdded] = useState(false);
 
   useEffect(() => {
@@ -22,17 +32,47 @@ const Buy = () => {
       return;
     }
     
-    // Get kit from navigation state or URL
-    if (location.state?.kitType) {
-      const kit = diyKits.find(k => k.name === location.state.kitType);
-      if (kit) {
-        setSelectedKit(kit);
+    fetchDIYKits();
+  }, [navigate]);
+
+  useEffect(() => {
+    if (diyKits.length > 0) {
+      // Get kit from navigation state or URL
+      if (location.state?.kitType) {
+        const kit = diyKits.find(k => k.name === location.state.kitType);
+        if (kit) {
+          setSelectedKit(kit);
+        } else {
+          setSelectedKit(diyKits[0]);
+        }
+      } else {
+        // If no kit selected, show first kit
+        setSelectedKit(diyKits[0]);
       }
-    } else {
-      // If no kit selected, show first kit
-      setSelectedKit(diyKits[0]);
     }
-  }, [navigate, location.state]);
+  }, [diyKits, location.state]);
+
+  const fetchDIYKits = async () => {
+    try {
+      setLoading(true);
+      const response = await api.getDIYKits();
+      if (response.success && response.kits) {
+        setDiyKits(response.kits);
+      }
+    } catch (error) {
+      console.error('Error fetching DIY kits:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const getImagePath = (kit: DIYKit) => {
+    if (kit.image_url) {
+      return kit.image_url;
+    }
+    const imageName = kit.name.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
+    return `/lovable-uploads/diy-kits/${imageName}.jpg`;
+  };
 
   const handleAddToCart = async () => {
     if (!selectedKit) return;
@@ -59,15 +99,12 @@ const Buy = () => {
     }
   };
 
-  // If no kit selected, show first kit or empty state
-  const displayKit = selectedKit || diyKits[0];
-
-  if (!selectedKit) {
+  if (loading || !selectedKit) {
     return (
       <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
         <Navigation />
         <div className="flex items-center justify-center h-screen">
-          <p className="text-gray-600 dark:text-gray-400">Loading...</p>
+          <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600"></div>
         </div>
       </div>
     );

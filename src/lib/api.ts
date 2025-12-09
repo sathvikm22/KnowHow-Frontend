@@ -427,6 +427,25 @@ class ApiClient {
       method: 'GET',
     });
   }
+
+  // Add Ons endpoints
+  async getActivities(): Promise<ApiResponse<{ activities: any[] }>> {
+    return this.request('/addons/activities', {
+      method: 'GET',
+    });
+  }
+
+  async getDIYKits(): Promise<ApiResponse<{ kits: any[] }>> {
+    return this.request('/addons/diy-kits', {
+      method: 'GET',
+    });
+  }
+
+  async getDIYKitByName(name: string): Promise<ApiResponse<{ kit: any }>> {
+    return this.request(`/addons/diy-kits/name/${encodeURIComponent(name)}`, {
+      method: 'GET',
+    });
+  }
 }
 
 export const api = new ApiClient(API_BASE_URL);

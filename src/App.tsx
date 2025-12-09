@@ -16,6 +16,7 @@ import Checkout from "./pages/Checkout";
 import ForgotPassword from "./pages/ForgotPassword";
 import AdminBookings from './pages/AdminBookings';
 import AdminUsers from './pages/AdminUsers';
+import AdminAddOns from './pages/AdminAddOns';
 import GoogleAuthCallback from './pages/GoogleAuthCallback';
 import PrivacyPolicy from './pages/PrivacyPolicy';
 import ShippingPolicy from './pages/ShippingPolicy';
@@ -141,6 +142,7 @@ const App = () => {
               <Route path="/admin/dashboard/bookings" element={<AdminRoute><AdminBookings /></AdminRoute>} />
               <Route path="/admin/dashboard/diy-orders" element={<AdminRoute><AdminDIYOrders /></AdminRoute>} />
               <Route path="/admin/dashboard/users" element={<AdminRoute><AdminUsers /></AdminRoute>} />
+              <Route path="/admin/dashboard/addons" element={<AdminRoute><AdminAddOns /></AdminRoute>} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
             </Routes>

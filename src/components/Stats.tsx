@@ -1,11 +1,21 @@
 import { useNavigate } from 'react-router-dom';
 import { useState, useRef, useEffect } from 'react';
-import { diyKits, getImagePath } from '@/data/diyKits';
+import { api } from '@/lib/api';
+
+interface DIYKit {
+  id: string;
+  name: string;
+  price: number;
+  image_url: string | null;
+  description: string;
+}
 
 const Stats = () => {
   const navigate = useNavigate();
   const [showAll, setShowAll] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
+  const [diyKits, setDiyKits] = useState<DIYKit[]>([]);
+  const [loading, setLoading] = useState(true);
   const sectionRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -18,8 +28,42 @@ const Stats = () => {
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
+  useEffect(() => {
+    fetchDIYKits();
+  }, []);
+
+  const fetchDIYKits = async () => {
+    try {
+      setLoading(true);
+      const response = await api.getDIYKits();
+      if (response.success && response.kits) {
+        setDiyKits(response.kits);
+      } else {
+        setDiyKits([]);
+      }
+    } catch (error) {
+      console.error('Error fetching DIY kits:', error);
+      setDiyKits([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleBuyNow = (kitType: string) => {
     navigate('/buy', { state: { kitType } });
+  };
+
+  const getImagePath = (kit: DIYKit) => {
+    // Check if image_url exists and is not empty/null
+    if (kit.image_url && kit.image_url.trim() !== '') {
+      const url = kit.image_url.trim();
+      console.log(`🖼️ Using image_url for ${kit.name}:`, url);
+      return url;
+    }
+    const imageName = kit.name.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
+    const fallbackUrl = `/lovable-uploads/diy-kits/${imageName}.jpg`;
+    console.log(`⚠️ No image_url for ${kit.name}, using fallback:`, fallbackUrl);
+    return fallbackUrl;
   };
 
   // Show 6 kits on mobile, 10 on larger screens when not showing all
@@ -45,8 +89,17 @@ const Stats = () => {
           <div className="w-16 sm:w-20 lg:w-24 h-1 bg-gradient-to-r from-pink-500 via-orange-500 to-blue-500 mx-auto mb-6 sm:mb-8"></div>
         </div>
         
-        <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 sm:gap-6 md:gap-8 lg:gap-10 xl:gap-12 justify-items-center">
-          {kitsToShow.map((kit, idx) => (
+        {loading ? (
+          <div className="text-center py-12">
+            <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600"></div>
+          </div>
+        ) : kitsToShow.length === 0 ? (
+          <div className="text-center py-12">
+            <p className="text-gray-600 dark:text-gray-400">No DIY kits available at the moment.</p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 sm:gap-6 md:gap-8 lg:gap-10 xl:gap-12 justify-items-center">
+            {kitsToShow.map((kit, idx) => (
             <div
               key={kit.name}
               className={
@@ -96,10 +149,11 @@ const Stats = () => {
                 </button>
               </div>
             </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        )}
         {/* Only show View All button if there are more kits to show */}
-        {(!showAll && diyKits.length > initialCount) && (
+        {!loading && !showAll && diyKits.length > initialCount && (
           <div className="flex justify-center mt-6 sm:mt-8">
             <button
               onClick={() => {
@@ -114,7 +168,7 @@ const Stats = () => {
             </button>
           </div>
         )}
-        {showAll && (
+        {!loading && showAll && (
           <div className="flex justify-center mt-6 sm:mt-8">
             <button
               onClick={() => {
