@@ -112,7 +112,10 @@ const Login = () => {
     setErrorMessage('');
 
     try {
+      console.log('🔵 Attempting login for:', loginData.email);
       const response = await api.login(loginData.email, loginData.password);
+      console.log('🔵 Login response:', { success: response.success, hasUser: !!response.user, hasToken: !!response.token });
+      
       if (response.success) {
         // Check cookie consent status
         const cookieConsent = localStorage.getItem('cookieConsent');
@@ -122,6 +125,7 @@ const Login = () => {
         if (response.user) {
           localStorage.setItem('userName', response.user.name);
           localStorage.setItem('userEmail', response.user.email);
+          console.log('✅ User data stored:', response.user.name);
         }
         
         // Store token in localStorage as fallback (even when cookies are accepted)
@@ -129,6 +133,9 @@ const Login = () => {
         // The backend will prefer cookies over the Authorization header if both are present
         if (response.token) {
           localStorage.setItem('authToken', response.token);
+          console.log('✅ Token stored in localStorage');
+        } else {
+          console.warn('⚠️  No token received in login response');
         }
         
         // Dispatch custom event to notify CookieConsent and Cart components
@@ -146,6 +153,7 @@ const Login = () => {
         // Check if user is admin (from backend response or email check)
         if (response.isAdmin || loginData.email.toLowerCase() === ADMIN_EMAIL.toLowerCase()) {
           localStorage.setItem('isAdmin', 'true');
+          console.log('✅ Admin user, redirecting to admin dashboard');
           navigate('/admin/dashboard/bookings', { replace: true });
           return;
         } else {
@@ -154,12 +162,29 @@ const Login = () => {
         
         setUserName(response.user?.name || '');
         setIsLoggedIn(true);
-        window.location.href = '/home';
+        
+        // Use React Router navigate instead of window.location.href for better mobile compatibility
+        console.log('✅ Login successful, redirecting to home');
+        navigate('/home', { replace: true });
       } else {
-        setErrorMessage(response.message || 'Invalid email or password');
+        const errorMsg = response.message || 'Invalid email or password';
+        console.error('❌ Login failed:', errorMsg);
+        setErrorMessage(errorMsg);
       }
     } catch (error: any) {
-      setErrorMessage(error.message || 'Login failed. Please try again.');
+      console.error('❌ Login error:', error);
+      const errorMsg = error.message || 'Login failed. Please check your connection and try again.';
+      console.error('❌ Error details:', {
+        message: error.message,
+        name: error.name,
+        stack: error.stack
+      });
+      setErrorMessage(errorMsg);
+      
+      // Show more detailed error on mobile for debugging
+      if (error.message?.includes('Network error') || error.message?.includes('Failed to fetch')) {
+        setErrorMessage('Network error: Please check your internet connection and try again.');
+      }
     } finally {
       setIsLoading(false);
     }
@@ -369,8 +394,9 @@ const Login = () => {
               </div>
 
               {errorMessage && (
-                <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded-xl text-sm">
-                  {errorMessage}
+                <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded-xl text-sm break-words">
+                  <div className="font-semibold mb-1">Login Failed</div>
+                  <div>{errorMessage}</div>
                 </div>
               )}
 
@@ -513,8 +539,9 @@ const Login = () => {
               </div>
 
               {errorMessage && (
-                <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded-xl text-sm">
-                  {errorMessage}
+                <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded-xl text-sm break-words">
+                  <div className="font-semibold mb-1">Error</div>
+                  <div>{errorMessage}</div>
                 </div>
               )}
 

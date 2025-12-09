@@ -87,7 +87,14 @@ class ApiClient {
         baseUrl: this.baseUrl,
         body: options.body ? JSON.parse(options.body) : undefined
       });
+      
+      // Add timeout for mobile browsers (30 seconds)
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 30000);
+      config.signal = controller.signal;
+      
       const response = await fetch(url, config);
+      clearTimeout(timeoutId);
       
       // Handle non-JSON responses
       let data;
@@ -137,18 +144,23 @@ class ApiClient {
       });
       
       // Handle network errors with more specific messages
-      if (error instanceof TypeError) {
-        if (error.message.includes('fetch') || error.message.includes('Failed to fetch')) {
+      if (error instanceof TypeError || error.name === 'TypeError') {
+        if (error.message.includes('fetch') || error.message.includes('Failed to fetch') || error.message.includes('aborted')) {
           const backendUrl = API_BASE;
           throw new Error(
-            `Network error: Unable to connect to backend at ${backendUrl}. ` +
-            `Please check if the backend server is running and accessible. ` +
-            `If this is a production deployment, verify VITE_BACKEND_URL is set correctly.`
+            `Network error: Unable to connect to backend. ` +
+            `Please check your internet connection and try again. ` +
+            `If the problem persists, the server may be temporarily unavailable.`
           );
         }
         if (error.message.includes('CORS')) {
           throw new Error('CORS error: The backend server is not allowing requests from this origin. Please check CORS configuration.');
         }
+      }
+      
+      // Handle AbortError (timeout)
+      if (error.name === 'AbortError') {
+        throw new Error('Request timeout: The server took too long to respond. Please check your connection and try again.');
       }
       
       // Re-throw with original error message if it's already descriptive
