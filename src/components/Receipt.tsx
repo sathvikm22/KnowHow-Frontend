@@ -57,7 +57,7 @@ const Receipt = ({ receiptData, open = true, onOpenChange, showAsDialog = true }
   };
 
   const receiptContent = (
-    <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl overflow-hidden h-full flex flex-col min-h-full">
+    <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl overflow-hidden flex flex-col h-full">
       {/* Header with Orange Waves */}
       <div className="relative bg-gradient-to-r from-orange-500 to-orange-600 h-20 overflow-hidden">
         <div className="absolute inset-0">
@@ -70,7 +70,7 @@ const Receipt = ({ receiptData, open = true, onOpenChange, showAsDialog = true }
         </div>
         <div className="relative h-full flex items-center justify-between px-6">
           <div className="flex items-center space-x-3">
-            <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center overflow-hidden p-1">
+            <div className="w-12 h-12 bg-white rounded-lg flex items-center justify-center overflow-hidden p-1">
               <img 
                 src="/lovable-uploads/know-how-logo.png" 
                 alt="Know How Logo" 
@@ -100,7 +100,7 @@ const Receipt = ({ receiptData, open = true, onOpenChange, showAsDialog = true }
       </div>
 
       {/* Invoice Details */}
-      <div className="p-6 flex-1 overflow-y-auto">
+      <div className="p-6 flex-1 overflow-y-auto min-h-0">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
           <div>
             <h3 className="text-sm font-semibold text-gray-600 dark:text-gray-400 mb-2">

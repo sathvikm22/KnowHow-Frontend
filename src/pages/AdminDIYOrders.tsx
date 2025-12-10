@@ -183,15 +183,37 @@ const AdminDIYOrders = () => {
               <div className="border-t border-gray-200 pt-3">
                 <p className="font-semibold text-sm text-gray-700 mb-2">Items:</p>
                 <div className="space-y-1 text-sm text-gray-600">
-                  {order.items.map((item, index) => (
-                    <div key={index}>
-                      {item.name} × {item.quantity} = ₹{(item.total / 100).toFixed(2)}
-                    </div>
-                  ))}
+                  {order.items.map((item, index) => {
+                    // Get the actual DIY kit name from the item
+                    // Items are stored with 'name' field containing the kit name from cart (CartCheckout.tsx line 44: name: item.kit_name)
+                    const itemAny = item as any;
+                    
+                    // Primary field is 'name' which should contain the actual DIY kit name
+                    // Fallback to other possible field names for backward compatibility
+                    const kitName = item.name || itemAny.name || itemAny.kit_name || itemAny.kitName || '';
+                    
+                    // Use the kit name if available and not empty, otherwise show fallback
+                    const displayName = kitName.trim() || 'DIY Kit';
+                    
+                    return (
+                      <div key={index}>
+                        {displayName} × {item.quantity || 1}
+                      </div>
+                    );
+                  })}
                 </div>
                 <div className="mt-2 pt-2 border-t border-gray-200">
                   <p className="font-bold text-lg text-green-700">
-                    Total: ₹{(order.total_amount / 100).toFixed(2)}
+                    Total: ₹{(() => {
+                      const normalizeAmount = (amt: number) => {
+                        if (!amt || typeof amt !== 'number') return 0;
+                        if (amt >= 100 && amt % 100 === 0 && amt <= 100000) {
+                          return amt / 100;
+                        }
+                        return amt;
+                      };
+                      return normalizeAmount(order.total_amount || 0).toFixed(2);
+                    })()}
                   </p>
                 </div>
               </div>

@@ -326,9 +326,6 @@ const Orders = () => {
                                 : booking.booking_time_slot}
                             </span>
                           </div>
-                          <div className="flex items-center gap-2">
-                            <span>Participants: {booking.participants}</span>
-                          </div>
                         </div>
                         <div className="flex gap-2 mt-3">
                           <span

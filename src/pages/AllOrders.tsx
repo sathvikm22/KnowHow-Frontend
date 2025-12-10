@@ -562,7 +562,6 @@ const AllOrders = () => {
                               : booking.booking_time_slot}
                           </span>
                         </div>
-                        <span>Participants: {booking.participants || 1}</span>
                       </div>
                       <div className="flex gap-2 mt-3">
                         <span className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(booking.status)}`}>
@@ -835,7 +834,7 @@ const AllOrders = () => {
                             const displayTotal = normalizeAmount(item.total || 0);
                             return (
                               <div key={index} className="text-sm text-gray-600 dark:text-gray-400">
-                                {displayName} × {item.quantity || 1} = ₹{displayTotal.toFixed(2)}
+                                {displayName} × {item.quantity || 1}
                               </div>
                             );
                           })}
