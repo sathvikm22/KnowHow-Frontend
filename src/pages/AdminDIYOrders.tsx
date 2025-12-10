@@ -183,24 +183,34 @@ const AdminDIYOrders = () => {
               <div className="border-t border-gray-200 pt-3">
                 <p className="font-semibold text-sm text-gray-700 mb-2">Items:</p>
                 <div className="space-y-1 text-sm text-gray-600">
-                  {order.items.map((item, index) => {
-                    // Get the actual DIY kit name from the item
-                    // Items are stored with 'name' field containing the kit name from cart (CartCheckout.tsx line 44: name: item.kit_name)
-                    const itemAny = item as any;
+                  {(() => {
+                    // Handle items - they might be a string (JSON) or already parsed array
+                    let itemsArray = order.items;
+                    if (typeof order.items === 'string') {
+                      try {
+                        itemsArray = JSON.parse(order.items);
+                      } catch (e) {
+                        console.error('Failed to parse items JSON:', e);
+                        itemsArray = [];
+                      }
+                    }
                     
-                    // Primary field is 'name' which should contain the actual DIY kit name
-                    // Fallback to other possible field names for backward compatibility
-                    const kitName = item.name || itemAny.name || itemAny.kit_name || itemAny.kitName || '';
-                    
-                    // Use the kit name if available and not empty, otherwise show fallback
-                    const displayName = kitName.trim() || 'DIY Kit';
-                    
-                    return (
-                      <div key={index}>
-                        {displayName} × {item.quantity || 1}
-                      </div>
-                    );
-                  })}
+                    return Array.isArray(itemsArray) ? itemsArray.map((item: any, index: number) => {
+                      // Get the actual DIY kit name from the item
+                      // Items are stored with 'name' field containing the kit name from cart (CartCheckout.tsx line 44: name: item.kit_name)
+                      // Primary field is 'name' which should contain the actual DIY kit name
+                      const kitName = item?.name || item?.kit_name || item?.kitName || '';
+                      
+                      // Use the kit name if available and not empty, otherwise show fallback
+                      const displayName = kitName.trim() || 'DIY Kit';
+                      
+                      return (
+                        <div key={index}>
+                          {displayName} × {item?.quantity || 1}
+                        </div>
+                      );
+                    }) : null;
+                  })()}
                 </div>
                 <div className="mt-2 pt-2 border-t border-gray-200">
                   <p className="font-bold text-lg text-green-700">

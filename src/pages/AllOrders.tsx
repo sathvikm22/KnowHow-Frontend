@@ -812,32 +812,33 @@ const AllOrders = () => {
                       <div className="mt-4">
                         <h4 className="font-semibold text-gray-900 dark:text-white mb-2">Items:</h4>
                         <div className="space-y-1">
-                          {order.items.map((item, index) => {
-                            // Normalize amount for display
-                            const normalizeAmount = (amt: number) => {
-                              if (!amt || typeof amt !== 'number') return 0;
-                              if (amt >= 100 && amt % 100 === 0 && amt <= 100000) {
-                                return amt / 100;
+                          {(() => {
+                            // Handle items - they might be a string (JSON) or already parsed array
+                            let itemsArray = order.items;
+                            if (typeof order.items === 'string') {
+                              try {
+                                itemsArray = JSON.parse(order.items);
+                              } catch (e) {
+                                console.error('Failed to parse items JSON:', e);
+                                itemsArray = [];
                               }
-                              return amt;
-                            };
-                            // Find the actual DIY kit name
-                            const itemAny = item as any;
-                            const kitName = item.name || itemAny.kit_name || '';
-                            const actualKit = diyKits.find(kit => 
-                              kit.name === kitName || 
-                              kit.name.toLowerCase() === kitName.toLowerCase() ||
-                              kitName.toLowerCase().includes(kit.name.toLowerCase()) ||
-                              kit.name.toLowerCase().includes(kitName.toLowerCase())
-                            );
-                            const displayName = actualKit ? actualKit.name : (kitName || 'DIY Kit');
-                            const displayTotal = normalizeAmount(item.total || 0);
-                            return (
-                              <div key={index} className="text-sm text-gray-600 dark:text-gray-400">
-                                {displayName} × {item.quantity || 1}
-                              </div>
-                            );
-                          })}
+                            }
+                            
+                            return Array.isArray(itemsArray) ? itemsArray.map((item: any, index: number) => {
+                              // Get the actual DIY kit name from the order item
+                              // Items are stored with 'name' field containing the kit name from cart
+                              const kitName = item?.name || item?.kit_name || item?.kitName || '';
+                              
+                              // Use the kit name directly from the order (this is what the user actually ordered)
+                              const displayName = kitName.trim() || 'DIY Kit';
+                              
+                              return (
+                                <div key={index} className="text-sm text-gray-600 dark:text-gray-400">
+                                  {displayName} × {item?.quantity || 1}
+                                </div>
+                              );
+                            }) : null;
+                          })()}
                         </div>
                       </div>
                       <Button
@@ -858,6 +859,17 @@ const AllOrders = () => {
                             return amt;
                           };
                           
+                          // Handle items - they might be a string (JSON) or already parsed array
+                          let itemsArray = order.items;
+                          if (typeof order.items === 'string') {
+                            try {
+                              itemsArray = JSON.parse(order.items);
+                            } catch (e) {
+                              console.error('Failed to parse items JSON:', e);
+                              itemsArray = [];
+                            }
+                          }
+                          
                           const receipt: ReceiptData = {
                             orderId: order.cashfree_order_id || order.razorpay_order_id || order.id,
                             internalBillId: order.internal_bill_id,
@@ -865,21 +877,21 @@ const AllOrders = () => {
                             customerEmail: order.customer_email,
                             customerPhone: '',
                             customerAddress: order.customer_address,
-                            items: order.items.map((item: any) => {
+                            items: Array.isArray(itemsArray) ? itemsArray.map((item: any) => {
                               // Use the EXACT name from the order - this is what the user actually ordered
-                              // Don't try to match or replace it with diyKits data
-                              const displayName = item.name || item.kit_name || item.kitName || 'DIY Kit';
+                              // Items are stored with 'name' field containing the kit name from cart (CartCheckout.tsx line 44)
+                              const displayName = item?.name || item?.kit_name || item?.kitName || 'DIY Kit';
                               
                               // Calculate prices - use the actual prices from the order
-                              let unitPrice = normalizeAmount(item.unit_price || 0);
-                              const quantity = item.quantity || 1;
-                              let total = normalizeAmount(item.total || 0);
+                              let unitPrice = normalizeAmount(item?.unit_price || 0);
+                              const quantity = item?.quantity || 1;
+                              let total = normalizeAmount(item?.total || 0);
                               
                               // If prices are 0 or missing, calculate from total_amount
                               if (unitPrice === 0 && total === 0) {
                                 const orderTotal = normalizeAmount(order.total_amount || 0);
-                                if (orderTotal > 0 && order.items.length > 0) {
-                                  total = orderTotal / order.items.length;
+                                if (orderTotal > 0 && itemsArray.length > 0) {
+                                  total = orderTotal / itemsArray.length;
                                   unitPrice = total / quantity;
                                 }
                               } else if (total === 0 && unitPrice > 0) {
@@ -894,7 +906,7 @@ const AllOrders = () => {
                                 unitPrice: unitPrice,
                                 total: total
                               };
-                            }),
+                            }) : [],
                             subtotal: normalizeAmount(order.total_amount || 0),
                             gst: 0,
                             totalAmount: normalizeAmount(order.total_amount || 0),
@@ -902,7 +914,7 @@ const AllOrders = () => {
                             paymentStatus: 'Paid',
                             paymentId: order.cashfree_payment_id || order.razorpay_payment_id,
                             date: new Date(order.created_at),
-                            notes: `DIY Kit Order - ${order.items.map((i: any) => `${i.name || 'DIY Kit'} (Qty: ${i.quantity || 1})`).join(', ')}`
+                            notes: `DIY Kit Order - ${Array.isArray(itemsArray) ? itemsArray.map((i: any) => `${i?.name || 'DIY Kit'} (Qty: ${i?.quantity || 1})`).join(', ') : 'DIY Kit'}`
                           };
                           setReceiptData(receipt);
                           setShowReceipt(true);
