@@ -381,13 +381,11 @@ const Login = () => {
           <div className="absolute inset-0 w-full h-full backface-hidden">
             <div className="bg-white/95 backdrop-blur-sm rounded-3xl shadow-2xl p-6 sm:p-8 h-full flex flex-col overflow-y-auto">
               <div className="text-center mb-3 mt-4 sm:mt-0">
-                <div className="w-16 h-16 bg-black rounded-full flex items-center justify-center mx-auto mb-4">
-                  <img 
-                    src="/lovable-uploads/70d53855-15d8-48b4-9670-ee7b769f185c.png" 
-                    alt="Know How Logo" 
-                    className="w-10 h-10 object-contain"
-                  />
-                </div>
+                <img 
+                  src="/lovable-uploads/70d53855-15d8-48b4-9670-ee7b769f185c.png" 
+                  alt="Know How Logo" 
+                  className="w-16 h-16 mx-auto mb-4 object-contain"
+                />
                 <h1 className="text-2xl sm:text-3xl font-bold text-gray-800 mb-2">
                   Welcome Back
                 </h1>
@@ -531,13 +529,11 @@ const Login = () => {
           <div className="absolute inset-0 w-full h-full backface-hidden rotate-y-180">
             <div className="bg-white/95 backdrop-blur-sm rounded-3xl shadow-2xl p-6 sm:p-8 h-full flex flex-col overflow-y-auto">
               <div className="text-center mb-4 sm:mb-6 mt-4 sm:mt-0">
-                <div className="w-16 h-16 bg-black rounded-full flex items-center justify-center mx-auto mb-4">
-                  <img 
-                    src="/lovable-uploads/70d53855-15d8-48b4-9670-ee7b769f185c.png" 
-                    alt="Know How Logo" 
-                    className="w-10 h-10 object-contain"
-                  />
-                </div>
+                <img 
+                  src="/lovable-uploads/70d53855-15d8-48b4-9670-ee7b769f185c.png" 
+                  alt="Know How Logo" 
+                  className="w-16 h-16 mx-auto mb-4 object-contain"
+                />
                 <h1 className="text-2xl sm:text-3xl font-bold text-gray-800 mb-2">
                   Join Know How
                 </h1>
