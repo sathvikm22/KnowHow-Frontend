@@ -129,10 +129,10 @@ const Hero = () => {
             <div className="flex justify-center mb-16 animate-fade-in" style={{animationDelay: '0.6s'}}>
               <button 
                 onClick={handleStartCreating}
-                className="group bg-orange-500 text-white px-12 py-6 rounded-full font-semibold text-xl hover:shadow-xl transition-all duration-300 transform hover:scale-105 flex items-center justify-center space-x-3"
+                className="group bg-orange-500 text-white px-10 py-5 rounded-full font-semibold text-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 flex items-center justify-center space-x-3"
               >
                 <span>Start Creating</span>
-                <ArrowRight className="w-6 h-6 group-hover:translate-x-1 transition-transform" />
+                <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
               </button>
             </div>
 
