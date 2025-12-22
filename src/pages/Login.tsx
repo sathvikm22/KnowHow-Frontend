@@ -21,7 +21,8 @@ const Login = () => {
   const [showOtpModal, setShowOtpModal] = useState(false);
   const [otp, setOtp] = useState('');
   const [otpStatus, setOtpStatus] = useState<'idle' | 'sending' | 'verified' | 'wrong' | 'not-verified'>('idle');
-  const [errorMessage, setErrorMessage] = useState('');
+  const [loginError, setLoginError] = useState('');
+  const [signupError, setSignupError] = useState('');
   const [countdown, setCountdown] = useState(0); // Countdown in seconds
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
@@ -94,7 +95,7 @@ const Login = () => {
         'callback_error': 'An error occurred during authentication. Please try again.',
         'access_denied': 'You denied access to your Google account. Please try again and grant the necessary permissions.'
       };
-      setErrorMessage(errorMessages[error] || 'An error occurred during Google sign-in. Please try again.');
+      setLoginError(errorMessages[error] || 'An error occurred during Google sign-in. Please try again.');
       
       // Clear the error from URL
       navigate('/login', { replace: true });
@@ -104,12 +105,12 @@ const Login = () => {
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!loginData.email || !loginData.password) {
-      setErrorMessage('Please enter email and password');
+      setLoginError('Please enter email and password');
       return;
     }
 
     setIsLoading(true);
-    setErrorMessage('');
+    setLoginError('');
 
     try {
       console.log('🔵 Attempting login for:', loginData.email);
@@ -169,7 +170,7 @@ const Login = () => {
       } else {
         const errorMsg = response.message || 'Invalid email or password';
         console.error('❌ Login failed:', errorMsg);
-        setErrorMessage(errorMsg);
+        setLoginError(errorMsg);
       }
     } catch (error: any) {
       console.error('❌ Login error:', error);
@@ -179,11 +180,11 @@ const Login = () => {
         name: error.name,
         stack: error.stack
       });
-      setErrorMessage(errorMsg);
+      setLoginError(errorMsg);
       
       // Show more detailed error on mobile for debugging
       if (error.message?.includes('Network error') || error.message?.includes('Failed to fetch')) {
-        setErrorMessage('Network error: Please check your internet connection and try again.');
+        setLoginError('Network error: Please check your internet connection and try again.');
       }
     } finally {
       setIsLoading(false);
@@ -193,16 +194,16 @@ const Login = () => {
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!signupData.name || !signupData.email || !signupData.password || !signupData.confirmPassword) {
-      setErrorMessage('Please fill in all fields');
+      setSignupError('Please fill in all fields');
       return;
     }
     if (signupData.password !== signupData.confirmPassword) {
-      setErrorMessage('Passwords do not match');
+      setSignupError('Passwords do not match');
       return;
     }
     
     setIsLoading(true);
-    setErrorMessage('');
+    setSignupError('');
 
     try {
       const response = await api.completeSignup(
@@ -246,10 +247,10 @@ const Login = () => {
         setIsLoggedIn(true);
         window.location.href = '/home';
       } else {
-        setErrorMessage(response.message || 'Failed to create account');
+        setSignupError(response.message || 'Failed to create account');
       }
     } catch (error: any) {
-      setErrorMessage(error.message || 'Failed to create account. Please try again.');
+      setSignupError(error.message || 'Failed to create account. Please try again.');
     } finally {
       setIsLoading(false);
     }
@@ -257,22 +258,22 @@ const Login = () => {
 
   const handleLoginInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setLoginData({ ...loginData, [e.target.name]: e.target.value });
-    setErrorMessage('');
+    setLoginError('');
   };
 
   const handleSignupInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSignupData({ ...signupData, [e.target.name]: e.target.value });
-    setErrorMessage('');
+    setSignupError('');
   };
 
   const handleSendOtp = async () => {
     if (!signupData.email || !signupData.name) {
-      setErrorMessage('Please enter your name and email first');
+      setSignupError('Please enter your name and email first');
       return;
     }
     
     setOtpStatus('sending');
-    setErrorMessage('');
+    setSignupError('');
     
     try {
       const response = await api.sendSignupOTP(signupData.email, signupData.name);
@@ -286,12 +287,12 @@ const Login = () => {
         // Email exists or other error - don't show modal, just show error message
         setOtpStatus('idle');
         setShowOtpModal(false);
-        setErrorMessage(response.message || 'Email exists already');
+        setSignupError(response.message || 'Email exists already');
       }
     } catch (error: any) {
       setOtpStatus('idle');
       setShowOtpModal(false);
-      setErrorMessage(error.message || 'Failed to send OTP. Please try again.');
+      setSignupError(error.message || 'Failed to send OTP. Please try again.');
     }
   };
 
@@ -378,8 +379,8 @@ const Login = () => {
           
           {/* Login Card - Front */}
           <div className="absolute inset-0 w-full h-full backface-hidden">
-            <div className="bg-white/95 backdrop-blur-sm rounded-3xl shadow-2xl p-8 h-full flex flex-col justify-center">
-              <div className="text-center mb-8">
+            <div className="bg-white/95 backdrop-blur-sm rounded-3xl shadow-2xl p-6 sm:p-8 h-full flex flex-col overflow-y-auto">
+              <div className="text-center mb-3 mt-4 sm:mt-0">
                 <div className="w-16 h-16 bg-black rounded-full flex items-center justify-center mx-auto mb-4">
                   <img 
                     src="/lovable-uploads/70d53855-15d8-48b4-9670-ee7b769f185c.png" 
@@ -387,20 +388,22 @@ const Login = () => {
                     className="w-10 h-10 object-contain"
                   />
                 </div>
-                <h1 className="text-3xl font-bold text-gray-800 mb-2">
+                <h1 className="text-2xl sm:text-3xl font-bold text-gray-800 mb-2">
                   Welcome Back
                 </h1>
-                <p className="text-gray-600">Sign in to continue your creative journey</p>
+                <p className="text-sm sm:text-base text-gray-600">Sign in to continue your creative journey</p>
               </div>
 
-              {errorMessage && (
-                <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded-xl text-sm break-words">
-                  <div className="font-semibold mb-1">Login Failed</div>
-                  <div>{errorMessage}</div>
-                </div>
-              )}
+              <div className={`mb-3 flex items-start ${loginError ? 'min-h-[60px]' : ''}`}>
+                {loginError && (
+                  <div className="w-full p-3 bg-red-100 border border-red-400 text-red-700 rounded-xl text-sm break-words">
+                    <div className="font-semibold mb-1">Login Failed</div>
+                    <div>{loginError}</div>
+                  </div>
+                )}
+              </div>
 
-              <div className="mb-6">
+              <div className="mb-4 sm:mb-6">
                 <button 
                   type="button"
                   className="w-full flex items-center justify-center px-4 py-2 border border-gray-300 rounded-xl hover:bg-gray-50 transition-colors"
@@ -444,7 +447,7 @@ const Login = () => {
                 </button>
               </div>
 
-              <div className="mb-6 relative">
+              <div className="mb-4 sm:mb-6 relative">
                 <div className="absolute inset-0 flex items-center">
                   <div className="w-full border-t border-gray-300"></div>
                 </div>
@@ -453,7 +456,7 @@ const Login = () => {
                 </div>
               </div>
 
-              <form onSubmit={handleLogin} className="space-y-6">
+              <form onSubmit={handleLogin} className="space-y-4 sm:space-y-6">
                 <div className="relative">
                   <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
                   <input
@@ -509,10 +512,13 @@ const Login = () => {
                 </button>
               </form>
 
-              <div className="mt-6 text-center">
+              <div className="mt-4 sm:mt-6 mb-4 sm:mb-0 text-center">
                 <span className="text-gray-600">Don't have an account? </span>
                 <button
-                  onClick={() => setIsFlipped(true)}
+                  onClick={() => {
+                    setLoginError('');
+                    setIsFlipped(true);
+                  }}
                   className="text-black hover:text-gray-800 font-semibold"
                 >
                   Sign up
@@ -523,8 +529,8 @@ const Login = () => {
 
           {/* Signup Card - Back */}
           <div className="absolute inset-0 w-full h-full backface-hidden rotate-y-180">
-            <div className="bg-white/95 backdrop-blur-sm rounded-3xl shadow-2xl p-6 h-full flex flex-col justify-center">
-              <div className="text-center mb-6">
+            <div className="bg-white/95 backdrop-blur-sm rounded-3xl shadow-2xl p-6 sm:p-8 h-full flex flex-col overflow-y-auto">
+              <div className="text-center mb-4 sm:mb-6 mt-4 sm:mt-0">
                 <div className="w-16 h-16 bg-black rounded-full flex items-center justify-center mx-auto mb-4">
                   <img 
                     src="/lovable-uploads/70d53855-15d8-48b4-9670-ee7b769f185c.png" 
@@ -532,18 +538,20 @@ const Login = () => {
                     className="w-10 h-10 object-contain"
                   />
                 </div>
-                <h1 className="text-3xl font-bold text-gray-800 mb-2">
+                <h1 className="text-2xl sm:text-3xl font-bold text-gray-800 mb-2">
                   Join Know How
                 </h1>
-                <p className="text-gray-600">Start your creative journey today</p>
+                <p className="text-sm sm:text-base text-gray-600">Start your creative journey today</p>
               </div>
 
-              {errorMessage && (
-                <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded-xl text-sm break-words">
-                  <div className="font-semibold mb-1">Error</div>
-                  <div>{errorMessage}</div>
-                </div>
-              )}
+              <div className="mb-3 sm:mb-4 min-h-[60px] flex items-start">
+                {signupError && (
+                  <div className="w-full p-3 bg-red-100 border border-red-400 text-red-700 rounded-xl text-sm break-words">
+                    <div className="font-semibold mb-1">Error</div>
+                    <div>{signupError}</div>
+                  </div>
+                )}
+              </div>
 
               <form onSubmit={handleSignUp} className="space-y-4">
                 <div className="relative">
@@ -659,10 +667,13 @@ const Login = () => {
                 )}
               </form>
 
-              <div className="mt-4 text-center">
+              <div className="mt-4 sm:mt-6 mb-4 sm:mb-0 text-center">
                 <span className="text-gray-600">Already have an account? </span>
                 <button
-                  onClick={() => setIsFlipped(false)}
+                  onClick={() => {
+                    setSignupError('');
+                    setIsFlipped(false);
+                  }}
                   className="text-black hover:text-gray-800 font-semibold"
                 >
                   Sign in
