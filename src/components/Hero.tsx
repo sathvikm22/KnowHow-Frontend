@@ -111,7 +111,7 @@ const Hero = () => {
         <div className="flex flex-col items-center justify-center min-h-screen text-center">
           {/* Main Content */}
           <div className="max-w-5xl">
-            <h1 className="text-6xl md:text-7xl lg:text-8xl xl:text-9xl font-bold text-gray-800 dark:text-white mb-8 leading-tight animate-fade-in" style={{ fontFamily: "'Anton', sans-serif" }}>
+            <h1 className="text-7xl md:text-7xl lg:text-8xl xl:text-9xl font-bold text-gray-800 dark:text-white mb-8 leading-tight animate-fade-in tracking-wide" style={{ fontFamily: "'Anton', sans-serif" }}>
               CREATE
               <br />
               <span className="text-orange-600">
@@ -121,7 +121,7 @@ const Hero = () => {
               THAT LAST
             </h1>
             
-            <p className="text-2xl md:text-3xl text-gray-700 dark:text-gray-300 mb-12 max-w-3xl mx-auto animate-fade-in leading-relaxed" style={{animationDelay: '0.3s'}}>
+            <p className="text-xl md:text-3xl text-gray-700 dark:text-gray-300 mb-12 max-w-3xl mx-auto animate-fade-in leading-normal md:leading-relaxed" style={{animationDelay: '0.3s'}}>
               Discover the joy of hands-on creativity in our vibrant studio 
               From art to craft, every experience tells a story
             </p>
