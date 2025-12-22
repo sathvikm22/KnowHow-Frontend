@@ -19,12 +19,11 @@ const EventsSection = () => {
   return (
     <div id="events-section" className="max-w-5xl mx-auto py-12 px-4 scroll-mt-28">
       {/* Gradient Heading */}
-      <h2 className="text-4xl sm:text-5xl font-extrabold text-center mb-2">
+      <h2 className="text-4xl md:text-5xl font-bold text-center mb-2 tracking-wide" style={{ fontFamily: "'Anton', sans-serif" }}>
         <span className="block text-black">DISCOVER OUR</span>
-        <span className="block bg-gradient-to-r from-yellow-300 via-orange-400 via-red-400 via-green-400 to-blue-400 bg-clip-text text-transparent">CREATIVE EVENTS</span>
-
+        <span className="block text-black">CREATIVE EVENTS</span>
       </h2>
-      <div className="mx-auto mb-8 mt-2 w-40 h-1 rounded-full bg-gradient-to-r from-pink-400 via-orange-300 via-yellow-300 via-green-400 to-blue-400"></div>
+      <div className="mx-auto mb-8 mt-2 w-40 h-1 rounded-full bg-black"></div>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
         {/* Host Your Occasion */}
         <button

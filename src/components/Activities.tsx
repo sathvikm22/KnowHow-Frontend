@@ -159,7 +159,7 @@ const Activities = () => {
                   <p className="text-gray-600 dark:text-gray-300 text-sm mb-4">{activity.description}</p>
                   <button 
                     onClick={() => handleBookWorkshop(activity.name)}
-                    className="w-full bg-gradient-to-r from-pink-500 via-orange-500 to-blue-500 text-white py-3 rounded-full font-medium hover:shadow-lg transition-all duration-300 transform hover:scale-105"
+                    className="w-full bg-orange-500 text-white py-3 rounded-full font-medium hover:bg-orange-600 hover:shadow-lg transition-all duration-300 transform hover:scale-105"
                   >
                     Book Workshop
                   </button>

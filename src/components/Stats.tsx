@@ -83,10 +83,10 @@ const Stats = () => {
     <section id="shop-diy-kits" ref={sectionRef} className="py-12 sm:py-16 lg:py-20 bg-gradient-to-br from-blue-100 via-green-100 to-pink-100 dark:from-gray-800 dark:via-gray-900 dark:to-gray-800">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-8 sm:mb-12 lg:mb-16">
-          <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-gray-800 dark:text-white mb-4 sm:mb-6 px-2">
+          <h2 className="text-4xl md:text-5xl font-bold text-black mb-4 sm:mb-6 px-2 tracking-wide" style={{ fontFamily: "'Anton', sans-serif" }}>
             Shop DIY Kits
           </h2>
-          <div className="w-16 sm:w-20 lg:w-24 h-1 bg-gradient-to-r from-pink-500 via-orange-500 to-blue-500 mx-auto mb-6 sm:mb-8"></div>
+          <div className="w-16 sm:w-20 lg:w-24 h-1 bg-black mx-auto mb-6 sm:mb-8"></div>
         </div>
         
         {loading ? (
@@ -134,7 +134,7 @@ const Stats = () => {
               </div>
               
               {/* Product Name */}
-              <h4 className="font-semibold text-gray-800 dark:text-white mb-2 sm:mb-4 text-xs sm:text-base md:text-lg text-center line-clamp-2 min-h-[2.5rem] sm:min-h-[3rem] tracking-tight drop-shadow-sm px-1">
+              <h4 className="font-semibold text-gray-800 dark:text-white mb-2 sm:mb-4 text-sm sm:text-lg md:text-xl text-center line-clamp-2 min-h-[2.5rem] sm:min-h-[3rem] tracking-tight drop-shadow-sm px-1">
                 {kit.name}
               </h4>
               
@@ -143,7 +143,7 @@ const Stats = () => {
                 <span className="text-lg sm:text-xl md:text-2xl font-bold text-orange-600 mb-2 sm:mb-4 drop-shadow">₹{kit.price}</span>
                 <button
                   onClick={() => handleBuyNow(kit.name)}
-                  className="w-full bg-orange-500 text-white px-2 sm:px-4 py-1.5 sm:py-2 md:py-3 rounded-full hover:bg-orange-600 transition-colors text-xs sm:text-sm md:text-base font-medium shadow-md"
+                  className="w-full bg-orange-500 text-white px-2 sm:px-4 py-1.5 sm:py-2 md:py-3 rounded-full hover:bg-orange-600 transition-colors text-sm sm:text-base md:text-lg font-medium shadow-md"
                 >
                   Buy Now
                 </button>

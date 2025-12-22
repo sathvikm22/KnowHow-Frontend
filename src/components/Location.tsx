@@ -12,10 +12,10 @@ const Location = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
           <div>
-            <h2 className="text-4xl md:text-5xl font-bold text-gray-800 dark:text-white mb-6">
+            <h2 className="text-5xl md:text-6xl font-bold text-black mb-6 tracking-wide" style={{ fontFamily: "'Anton', sans-serif" }}>
               FIND YOUR
               <br />
-              <span className="text-pink-600">
+              <span className="text-black">
                 CREATIVE
               </span>
               <br />
@@ -35,12 +35,14 @@ const Location = () => {
               </div>
             </div>
             
-            <button 
-              onClick={handleMapClick}
-              className="bg-pink-500 text-white px-8 py-4 rounded-full font-medium text-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 hover:bg-pink-600"
-            >
-              GET DIRECTIONS
-            </button>
+            <div className="flex justify-center lg:justify-start">
+              <button 
+                onClick={handleMapClick}
+                className="bg-orange-500 text-white px-6 py-3 rounded-full font-medium text-base hover:shadow-xl transition-all duration-300 transform hover:scale-105 hover:bg-orange-600"
+              >
+                GET DIRECTIONS
+              </button>
+            </div>
           </div>
           
           <div className="relative">

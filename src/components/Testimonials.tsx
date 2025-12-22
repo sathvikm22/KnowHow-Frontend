@@ -43,10 +43,10 @@ const Testimonials = () => {
     <section id="testimonials" className="py-20 bg-green-100">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-16">
-          <h2 className="text-4xl md:text-5xl font-bold text-gray-800 mb-6">
+          <h2 className="text-4xl md:text-5xl font-bold text-black mb-6 tracking-wide" style={{ fontFamily: "'Anton', sans-serif" }}>
             Our Studio Gallery
           </h2>
-          <div className="w-20 h-1 bg-pink-500 mx-auto mb-4"></div>
+          <div className="w-20 h-1 bg-black mx-auto mb-4"></div>
           <p className="text-xl text-gray-600 max-w-3xl mx-auto">
             Take a glimpse into our vibrant creative spaces where artistry comes to life
           </p>

@@ -17,7 +17,7 @@ const Contact = () => {
       <div className="relative z-10 py-12 sm:py-16 lg:py-20">
         {/* Top Section - Heading, Text, and Button */}
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center mb-12 sm:mb-16 lg:mb-20">
-          <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-white dark:text-pink-700 mb-4 sm:mb-6 px-2">
+          <h2 className="text-4xl md:text-5xl font-bold text-black mb-6 tracking-wide px-2" style={{ fontFamily: "'Anton', sans-serif" }}>
             WHERE EVERY EXPERIENCE
             <br />
             TELLS A STORY
@@ -31,7 +31,7 @@ const Contact = () => {
           <div className="flex justify-center px-4">
             <button 
               onClick={handleBookWorkshop}
-              className="bg-white dark:bg-pink-100 text-pink-600 dark:text-pink-700 px-6 sm:px-8 py-3 sm:py-4 rounded-full font-medium text-base sm:text-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 w-full sm:w-auto max-w-xs sm:max-w-none"
+              className="bg-orange-500 text-white px-6 sm:px-8 py-3 sm:py-4 rounded-full font-medium text-base sm:text-lg hover:bg-orange-600 hover:shadow-xl transition-all duration-300 transform hover:scale-105 w-full sm:w-auto max-w-xs sm:max-w-none"
             >
               BOOK A WORKSHOP
             </button>

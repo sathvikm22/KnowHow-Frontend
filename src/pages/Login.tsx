@@ -367,7 +367,7 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen bg-blue-500 flex items-center justify-center p-4 relative overflow-hidden">
+    <div className="min-h-screen bg-teal-500 flex items-center justify-center p-4 relative overflow-hidden">
       {/* Floating elements */}
       <div className="absolute top-20 left-20 w-20 h-20 bg-white rounded-full opacity-20 animate-bounce"></div>
       <div className="absolute bottom-20 right-20 w-16 h-16 bg-white rounded-full opacity-20 animate-pulse"></div>
@@ -380,7 +380,7 @@ const Login = () => {
           <div className="absolute inset-0 w-full h-full backface-hidden">
             <div className="bg-white/95 backdrop-blur-sm rounded-3xl shadow-2xl p-8 h-full flex flex-col justify-center">
               <div className="text-center mb-8">
-                <div className="w-16 h-16 bg-purple-500 rounded-full flex items-center justify-center mx-auto mb-4">
+                <div className="w-16 h-16 bg-black rounded-full flex items-center justify-center mx-auto mb-4">
                   <img 
                     src="/lovable-uploads/70d53855-15d8-48b4-9670-ee7b769f185c.png" 
                     alt="Know How Logo" 
@@ -462,7 +462,7 @@ const Login = () => {
                     placeholder="Email address"
                     value={loginData.email}
                     onChange={handleLoginInputChange}
-                    className="w-full pl-10 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:border-purple-500 focus:outline-none transition-colors"
+                    className="w-full pl-10 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:border-orange-500 focus:outline-none transition-colors"
                     required
                   />
                 </div>
@@ -475,7 +475,7 @@ const Login = () => {
                     placeholder="Password"
                     value={loginData.password}
                     onChange={handleLoginInputChange}
-                    className="w-full pl-10 pr-12 py-3 border-2 border-gray-200 rounded-xl focus:border-purple-500 focus:outline-none transition-colors"
+                    className="w-full pl-10 pr-12 py-3 border-2 border-gray-200 rounded-xl focus:border-orange-500 focus:outline-none transition-colors"
                     required
                   />
                   <button
@@ -488,7 +488,7 @@ const Login = () => {
                 </div>
 
                 <div className="flex items-center justify-end">
-                  <a href="/forgot-password" className="text-sm text-purple-600 hover:text-purple-700 font-medium">
+                  <a href="/forgot-password" className="text-sm text-black hover:text-gray-800 font-medium">
                     Forgot password?
                   </a>
                 </div>
@@ -496,7 +496,7 @@ const Login = () => {
                 <button
                   type="submit"
                   disabled={isLoading}
-                  className="w-full bg-purple-500 text-white py-3 rounded-xl font-semibold hover:bg-purple-600 transition-all duration-300 transform hover:scale-105 disabled:opacity-50 disabled:transform-none"
+                  className="w-full bg-orange-500 text-white py-3 rounded-xl font-semibold hover:bg-orange-600 transition-all duration-300 transform hover:scale-105 disabled:opacity-50 disabled:transform-none"
                 >
                   {isLoading ? (
                     <div className="flex items-center justify-center space-x-2">
@@ -513,7 +513,7 @@ const Login = () => {
                 <span className="text-gray-600">Don't have an account? </span>
                 <button
                   onClick={() => setIsFlipped(true)}
-                  className="text-purple-600 hover:text-purple-700 font-semibold"
+                  className="text-black hover:text-gray-800 font-semibold"
                 >
                   Sign up
                 </button>
@@ -525,7 +525,7 @@ const Login = () => {
           <div className="absolute inset-0 w-full h-full backface-hidden rotate-y-180">
             <div className="bg-white/95 backdrop-blur-sm rounded-3xl shadow-2xl p-6 h-full flex flex-col justify-center">
               <div className="text-center mb-6">
-                <div className="w-16 h-16 bg-blue-500 rounded-full flex items-center justify-center mx-auto mb-4">
+                <div className="w-16 h-16 bg-black rounded-full flex items-center justify-center mx-auto mb-4">
                   <img 
                     src="/lovable-uploads/70d53855-15d8-48b4-9670-ee7b769f185c.png" 
                     alt="Know How Logo" 
@@ -554,7 +554,7 @@ const Login = () => {
                     placeholder="Full name"
                     value={signupData.name}
                     onChange={handleSignupInputChange}
-                    className="w-full pl-10 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:outline-none transition-colors"
+                    className="w-full pl-10 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:border-orange-500 focus:outline-none transition-colors"
                     required
                   />
                 </div>
@@ -570,7 +570,7 @@ const Login = () => {
                     className={`w-full pl-10 pr-24 py-3 border-2 rounded-xl focus:outline-none transition-colors ${
                       isEmailVerified 
                         ? 'border-green-500 bg-green-50' 
-                        : 'border-gray-200 focus:border-blue-500'
+                        : 'border-gray-200 focus:border-orange-500'
                     }`}
                     required
                     disabled={isEmailVerified}
@@ -583,7 +583,7 @@ const Login = () => {
                       isEmailVerified
                         ? 'bg-green-500 text-white cursor-default'
                         : signupData.email
-                        ? 'bg-blue-500 text-white hover:bg-blue-600'
+                        ? 'bg-orange-500 text-white hover:bg-orange-600'
                         : 'bg-gray-300 text-gray-500 cursor-not-allowed'
                     }`}
                   >
@@ -601,7 +601,7 @@ const Login = () => {
                         placeholder="Password"
                         value={signupData.password}
                         onChange={handleSignupInputChange}
-                        className="w-full pl-10 pr-12 py-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:outline-none transition-colors"
+                        className="w-full pl-10 pr-12 py-3 border-2 border-gray-200 rounded-xl focus:border-orange-500 focus:outline-none transition-colors"
                         required
                       />
                       <button
@@ -621,7 +621,7 @@ const Login = () => {
                         placeholder="Confirm password"
                         value={signupData.confirmPassword}
                         onChange={handleSignupInputChange}
-                        className="w-full pl-10 pr-12 py-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:outline-none transition-colors"
+                        className="w-full pl-10 pr-12 py-3 border-2 border-gray-200 rounded-xl focus:border-orange-500 focus:outline-none transition-colors"
                         required
                       />
                       <button
@@ -636,7 +636,7 @@ const Login = () => {
                     <button
                       type="submit"
                       disabled={isLoading}
-                      className="w-full bg-blue-500 text-white py-3 rounded-xl font-semibold hover:bg-blue-600 transition-all duration-300 transform hover:scale-105 disabled:opacity-50 disabled:transform-none"
+                      className="w-full bg-orange-500 text-white py-3 rounded-xl font-semibold hover:bg-orange-600 transition-all duration-300 transform hover:scale-105 disabled:opacity-50 disabled:transform-none"
                     >
                       {isLoading ? (
                         <div className="flex items-center justify-center space-x-2">
@@ -663,7 +663,7 @@ const Login = () => {
                 <span className="text-gray-600">Already have an account? </span>
                 <button
                   onClick={() => setIsFlipped(false)}
-                  className="text-blue-600 hover:text-blue-700 font-semibold"
+                  className="text-black hover:text-gray-800 font-semibold"
                 >
                   Sign in
                 </button>
@@ -678,7 +678,7 @@ const Login = () => {
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
           <div className="bg-white/95 backdrop-blur-sm rounded-3xl shadow-2xl p-8 w-full max-w-md">
             <div className="text-center mb-6">
-              <div className="w-16 h-16 bg-blue-500 rounded-full flex items-center justify-center mx-auto mb-4">
+              <div className="w-16 h-16 bg-black rounded-full flex items-center justify-center mx-auto mb-4">
                 <Mail className="w-8 h-8 text-white" />
               </div>
               <h2 className="text-2xl font-bold text-gray-800 mb-2">
@@ -686,7 +686,7 @@ const Login = () => {
               </h2>
               <p className="text-gray-600">
                 We've sent a 6-digit code to <br />
-                <span className="font-semibold text-blue-600">{signupData.email}</span>
+                <span className="font-semibold text-black">{signupData.email}</span>
               </p>
             </div>
 
@@ -702,7 +702,7 @@ const Login = () => {
                       ? 'border-green-500 bg-green-50 text-green-700'
                       : otpStatus === 'wrong' 
                       ? 'border-red-500 bg-red-50 text-red-700'
-                      : 'border-gray-200 focus:border-blue-500'
+                      : 'border-gray-200 focus:border-orange-500'
                   }`}
                   maxLength={6}
                 />
@@ -711,8 +711,8 @@ const Login = () => {
               {/* Status Messages */}
               {otpStatus === 'sending' && (
                 <div className="text-center">
-                  <div className="flex items-center justify-center space-x-2 text-blue-600">
-                    <div className="w-4 h-4 border-2 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+                  <div className="flex items-center justify-center space-x-2 text-black">
+                    <div className="w-4 h-4 border-2 border-black border-t-transparent rounded-full animate-spin"></div>
                     <span className="text-sm">Sending OTP...</span>
                   </div>
                 </div>
@@ -742,7 +742,7 @@ const Login = () => {
 
               {otpStatus === 'not-verified' && (
                 <div className="text-center">
-                  <div className="flex items-center justify-center space-x-2 text-orange-600">
+                  <div className="flex items-center justify-center space-x-2 text-black">
                     <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
                       <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
                     </svg>
@@ -761,7 +761,7 @@ const Login = () => {
                 <button
                   onClick={handleVerifyOtp}
                   disabled={otpStatus === 'sending' || otpStatus === 'verified'}
-                  className="flex-1 bg-blue-500 text-white py-3 rounded-xl font-medium hover:bg-blue-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="flex-1 bg-orange-500 text-white py-3 rounded-xl font-medium hover:bg-orange-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {otpStatus === 'sending' ? 'Sending...' : 'Verify'}
                 </button>
@@ -776,7 +776,7 @@ const Login = () => {
                     className={`ml-1 font-medium ${
                       countdown > 0 
                         ? 'text-gray-400 cursor-not-allowed' 
-                        : 'text-blue-600 hover:text-blue-700'
+                        : 'text-black hover:text-gray-800'
                     }`}
                   >
                     {countdown > 0 ? `Resend in ${formatCountdown(countdown)}` : 'Resend'}
