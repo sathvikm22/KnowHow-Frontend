@@ -96,14 +96,14 @@ const Activities = () => {
     <section id="activities" className="py-20 bg-gradient-to-br from-blue-100 via-green-100 to-pink-100 dark:from-gray-800 dark:via-gray-900 dark:to-gray-800">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-16">
-          <h2 className="text-4xl md:text-5xl font-bold text-gray-800 dark:text-white mb-6">
+          <h2 className="text-4xl md:text-5xl font-bold text-black mb-6 tracking-wide" style={{ fontFamily: "'Anton', sans-serif" }}>
             DISCOVER OUR
             <br />
-            <span className="bg-gradient-to-r from-pink-600 via-orange-600 via-blue-600 to-green-600 bg-clip-text text-transparent">
+            <span className="text-black">
               CREATIVE ACTIVITIES
             </span>
           </h2>
-          <div className="w-24 h-1 bg-gradient-to-r from-pink-500 via-orange-500 to-blue-500 mx-auto"></div>
+          <div className="w-24 h-1 bg-black mx-auto"></div>
         </div>
 
         {activities.length === 0 ? (

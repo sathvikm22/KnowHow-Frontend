@@ -175,10 +175,10 @@ const Navigation = () => {
                 >
                   Book Now
                 </button>
-                <span className="text-white text-xs sm:text-sm font-medium px-3 xl:px-4 py-1.5 sm:py-1.5 bg-pink-500 rounded-lg whitespace-nowrap flex-shrink-0">{userName}</span>
+                <span className="text-gray-800 text-xs sm:text-sm font-medium px-3 xl:px-4 py-1.5 sm:py-1.5 rounded-lg whitespace-nowrap flex-shrink-0" style={{ backgroundColor: '#fffd74' }}>{userName}</span>
                 <button 
                   onClick={handleLogout}
-                  className="bg-yellow-400 text-gray-800 px-2.5 xl:px-3 py-1.5 sm:py-1.5 rounded-lg hover:bg-yellow-500 transition-colors duration-300 flex-shrink-0"
+                  className="bg-orange-500 text-white px-2.5 xl:px-3 py-1.5 sm:py-1.5 rounded-lg hover:bg-orange-600 transition-colors duration-300 flex-shrink-0"
                   title="Sign Out"
                 >
                   <LogOut size={16} className="sm:w-4 sm:h-4" />
@@ -223,7 +223,7 @@ const Navigation = () => {
               <>
                 <button 
                   onClick={handleOrders}
-                  className="bg-blue-500 text-white px-2.5 sm:px-3 py-1.5 sm:py-1.5 rounded-lg text-xs sm:text-sm font-medium hover:bg-blue-600 transition-colors duration-300 whitespace-nowrap flex-shrink-0"
+                  className="bg-orange-500 text-white px-2.5 sm:px-3 py-1.5 sm:py-1.5 rounded-lg text-xs sm:text-sm font-medium hover:bg-orange-600 transition-colors duration-300 whitespace-nowrap flex-shrink-0"
                 >
                   Orders
                 </button>
@@ -233,10 +233,10 @@ const Navigation = () => {
                 >
                   Book Now
                 </button>
-                <span className="text-white text-xs sm:text-sm font-medium px-3 sm:px-4 py-1.5 sm:py-1.5 bg-pink-500 rounded-lg whitespace-nowrap flex-shrink-0">{userName}</span>
+                <span className="text-gray-800 text-xs sm:text-sm font-medium px-3 sm:px-4 py-1.5 sm:py-1.5 rounded-lg whitespace-nowrap flex-shrink-0" style={{ backgroundColor: '#fffd74' }}>{userName}</span>
                 <button 
                   onClick={handleLogout}
-                  className="bg-yellow-400 text-gray-800 px-2.5 sm:px-3 py-1.5 sm:py-1.5 rounded-lg hover:bg-yellow-500 transition-colors duration-300 flex-shrink-0"
+                  className="bg-orange-500 text-white px-2.5 sm:px-3 py-1.5 sm:py-1.5 rounded-lg hover:bg-orange-600 transition-colors duration-300 flex-shrink-0"
                   title="Sign Out"
                 >
                   <LogOut size={16} className="sm:w-4 sm:h-4" />
@@ -306,7 +306,7 @@ const Navigation = () => {
                     handleOrders();
                     setIsOpen(false);
                   }}
-                  className="w-full bg-blue-500 text-white px-3 py-2 rounded-md font-medium text-sm sm:text-base hover:bg-blue-600"
+                  className="w-full bg-orange-500 text-white px-3 py-2 rounded-md font-medium text-sm sm:text-base hover:bg-orange-600"
                 >
                   Orders
                 </button>
@@ -319,13 +319,13 @@ const Navigation = () => {
                 >
                   Book Now
                 </button>
-                <div className="text-white font-medium px-3 py-2 bg-pink-500 rounded-md text-sm sm:text-base text-center">{userName}</div>
+                <div className="text-gray-800 font-medium px-3 py-2 rounded-md text-sm sm:text-base text-center" style={{ backgroundColor: '#fffd74' }}>{userName}</div>
                 <button 
                   onClick={() => {
                     handleLogout();
                     setIsOpen(false);
                   }}
-                  className="w-full bg-yellow-400 text-gray-800 px-3 py-2 rounded-md font-medium flex items-center justify-center text-sm sm:text-base hover:bg-yellow-500"
+                  className="w-full bg-orange-500 text-white px-3 py-2 rounded-md font-medium flex items-center justify-center text-sm sm:text-base hover:bg-orange-600"
                 >
                   <LogOut size={16} className="mr-2" />
                   Logout
