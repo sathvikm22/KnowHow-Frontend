@@ -8,6 +8,8 @@ interface Activity {
   name: string;
   description: string;
   image_url: string | null;
+  category?: 'group' | 'individual';
+  price?: number;
   created_at: string;
   updated_at: string;
 }
@@ -35,7 +37,9 @@ const AdminAddOns = () => {
   const [activityForm, setActivityForm] = useState({
     name: '',
     description: '',
-    image_url: ''
+    image_url: '',
+    category: 'group' as 'group' | 'individual',
+    price: ''
   });
 
   const [diyKitForm, setDiyKitForm] = useState({
@@ -253,7 +257,9 @@ const AdminAddOns = () => {
     setActivityForm({
       name: '',
       description: '',
-      image_url: ''
+      image_url: '',
+      category: 'group',
+      price: ''
     });
     setImagePreview(null);
     setSelectedImageFile(null);
@@ -269,7 +275,9 @@ const AdminAddOns = () => {
     setActivityForm({
       name: activity.name,
       description: activity.description,
-      image_url: imageUrl
+      image_url: imageUrl,
+      category: activity.category || 'group',
+      price: activity.price?.toString() || ''
     });
     // Set image preview to show existing image
     setImagePreview(imageUrl || null);
@@ -311,7 +319,9 @@ const AdminAddOns = () => {
       const payload = {
         name: activityForm.name,
         description: activityForm.description,
-        image_url: imageUrl
+        image_url: imageUrl,
+        category: activityForm.category,
+        price: activityForm.price ? parseFloat(activityForm.price) : 0
       };
       
       console.log('💾 Saving activity with payload:', payload);
@@ -356,7 +366,9 @@ const AdminAddOns = () => {
         setActivityForm({
           name: '',
           description: '',
-          image_url: ''
+          image_url: '',
+          category: 'group',
+          price: ''
         });
         setImagePreview(null);
         setSelectedImageFile(null);
@@ -552,7 +564,9 @@ const AdminAddOns = () => {
     setActivityForm({
       name: '',
       description: '',
-      image_url: ''
+      image_url: '',
+      category: 'group',
+      price: ''
     });
     setDiyKitForm({
       name: '',
@@ -650,6 +664,61 @@ const AdminAddOns = () => {
                       className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
                       placeholder="Activity name"
                     />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                      Price (₹) *
+                    </label>
+                    <input
+                      type="number"
+                      value={activityForm.price}
+                      onChange={(e) => setActivityForm({ ...activityForm, price: e.target.value })}
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
+                      placeholder="0"
+                      min="0"
+                      step="0.01"
+                    />
+                  </div>
+                  <div className="md:col-span-2">
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                      Category * (Select one)
+                    </label>
+                    <div className="flex items-center space-x-6">
+                      <label className="flex items-center space-x-2 cursor-pointer p-3 border-2 rounded-lg transition-all hover:bg-gray-50 dark:hover:bg-gray-700"
+                        style={{
+                          borderColor: activityForm.category === 'group' ? '#9333ea' : '#e5e7eb',
+                          backgroundColor: activityForm.category === 'group' ? '#f3e8ff' : 'transparent'
+                        }}
+                      >
+                        <input
+                          type="radio"
+                          name="category"
+                          value="group"
+                          checked={activityForm.category === 'group'}
+                          onChange={(e) => setActivityForm({ ...activityForm, category: e.target.value as 'group' | 'individual' })}
+                          className="w-4 h-4 text-purple-600 focus:ring-purple-500"
+                        />
+                        <span className="text-gray-700 dark:text-gray-300 font-medium">Group</span>
+                        <span className="text-xs text-gray-500 dark:text-gray-400 ml-2">(comes under Any 1/2/3 activities)</span>
+                      </label>
+                      <label className="flex items-center space-x-2 cursor-pointer p-3 border-2 rounded-lg transition-all hover:bg-gray-50 dark:hover:bg-gray-700"
+                        style={{
+                          borderColor: activityForm.category === 'individual' ? '#9333ea' : '#e5e7eb',
+                          backgroundColor: activityForm.category === 'individual' ? '#f3e8ff' : 'transparent'
+                        }}
+                      >
+                        <input
+                          type="radio"
+                          name="category"
+                          value="individual"
+                          checked={activityForm.category === 'individual'}
+                          onChange={(e) => setActivityForm({ ...activityForm, category: e.target.value as 'group' | 'individual' })}
+                          className="w-4 h-4 text-purple-600 focus:ring-purple-500"
+                        />
+                        <span className="text-gray-700 dark:text-gray-300 font-medium">Individual</span>
+                        <span className="text-xs text-gray-500 dark:text-gray-400 ml-2">(like Jewelry, Tufting)</span>
+                      </label>
+                    </div>
                   </div>
                   <div className="md:col-span-2">
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
@@ -876,6 +945,14 @@ const AdminAddOns = () => {
                     <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">
                       {activity.description}
                     </p>
+                    <div className="flex items-center justify-between mt-2">
+                      <span className="text-xs px-2 py-1 rounded-full bg-purple-100 dark:bg-purple-900 text-purple-700 dark:text-purple-300">
+                        {activity.category === 'individual' ? 'Individual' : 'Group'}
+                      </span>
+                      {activity.price !== undefined && activity.price > 0 && (
+                        <span className="text-sm font-semibold text-orange-600">₹{activity.price}</span>
+                      )}
+                    </div>
                   </div>
                 </div>
               ))}

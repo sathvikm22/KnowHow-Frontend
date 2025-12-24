@@ -7,6 +7,8 @@ interface Activity {
   name: string;
   description: string;
   image_url: string | null;
+  category?: 'group' | 'individual';
+  price?: number;
 }
 
 const Activities = () => {

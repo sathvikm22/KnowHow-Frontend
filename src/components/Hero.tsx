@@ -111,7 +111,7 @@ const Hero = () => {
         <div className="flex flex-col items-center justify-center min-h-screen text-center">
           {/* Main Content */}
           <div className="w-full max-w-full px-2 sm:px-6">
-            <h1 className="text-6xl sm:text-7xl md:text-8xl lg:text-8xl xl:text-9xl font-bold text-gray-800 dark:text-white mb-6 md:mb-8 leading-tight animate-fade-in" style={{ fontFamily: "'Bowlby One SC', sans-serif", letterSpacing: '0.05em', textAlign: 'center', width: '100%' }}>
+            <h1 className="text-5xl sm:text-7xl md:text-8xl lg:text-8xl xl:text-9xl font-bold text-gray-800 dark:text-white mb-6 md:mb-8 leading-tight animate-fade-in" style={{ fontFamily: "'Bowlby One SC', sans-serif", letterSpacing: '0.05em', textAlign: 'center', width: '100%' }}>
               <div className="block" style={{ textAlign: 'center' }}>CREATE</div>
               <div className="block text-orange-600" style={{ textAlign: 'center' }}>MEMORIES</div>
               <div className="block whitespace-nowrap" style={{ textAlign: 'center' }}>THAT LAST</div>
