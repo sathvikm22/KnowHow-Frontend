@@ -110,19 +110,16 @@ const Hero = () => {
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-20">
         <div className="flex flex-col items-center justify-center min-h-screen text-center">
           {/* Main Content */}
-          <div className="max-w-5xl">
-            <h1 className="text-7xl md:text-7xl lg:text-8xl xl:text-9xl font-bold text-gray-800 dark:text-white mb-8 leading-tight animate-fade-in tracking-wide" style={{ fontFamily: "'Anton', sans-serif" }}>
-              CREATE
-              <br />
-              <span className="text-orange-600">
-                MEMORIES
-              </span>
-              <br />
-              THAT LAST
+          <div className="w-full max-w-full px-2 sm:px-6">
+            <h1 className="text-6xl sm:text-7xl md:text-8xl lg:text-8xl xl:text-9xl font-bold text-gray-800 dark:text-white mb-6 md:mb-8 leading-tight animate-fade-in" style={{ fontFamily: "'Bowlby One SC', sans-serif", letterSpacing: '0.05em', textAlign: 'center', width: '100%' }}>
+              <div className="block" style={{ textAlign: 'center' }}>CREATE</div>
+              <div className="block text-orange-600" style={{ textAlign: 'center' }}>MEMORIES</div>
+              <div className="block whitespace-nowrap" style={{ textAlign: 'center' }}>THAT LAST</div>
             </h1>
             
-            <p className="text-xl md:text-3xl text-gray-700 dark:text-gray-300 mb-12 max-w-3xl mx-auto animate-fade-in leading-normal md:leading-relaxed" style={{animationDelay: '0.3s'}}>
+            <p className="text-base sm:text-lg md:text-2xl lg:text-3xl text-gray-700 dark:text-gray-300 mb-8 md:mb-12 max-w-3xl mx-auto animate-fade-in leading-relaxed text-center px-2 sm:px-4" style={{animationDelay: '0.3s'}}>
               Discover the joy of hands-on creativity in our vibrant studio 
+              <br className="hidden sm:block" />
               From art to craft, every experience tells a story
             </p>
             
