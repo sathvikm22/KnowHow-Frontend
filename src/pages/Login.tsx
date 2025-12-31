@@ -1,10 +1,34 @@
 import { useState, useEffect } from 'react';
 import { Eye, EyeOff, Mail, Lock, User } from 'lucide-react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useNavigate, useSearchParams, useLocation } from 'react-router-dom';
 import { api } from '@/lib/api';
 
 const ADMIN_EMAIL = 'knowhowcafe2025@gmail.com';
 const ADMIN_PASSWORD = 'password';
+
+// Email domain validation - only allow specific domains
+const isValidEmailDomain = (email: string): boolean => {
+  const allowedDomains = ['gmail.com', 'yahoo.com', 'rediff.com', 'outlook.com'];
+  const emailLower = email.toLowerCase().trim();
+  const domain = emailLower.split('@')[1];
+  return domain && allowedDomains.includes(domain);
+};
+
+// Password validation - minimum 8 characters with numbers, letters, and symbols
+const isValidPassword = (password: string): boolean => {
+  // Minimum 8 characters
+  if (password.length < 8) {
+    return false;
+  }
+  // Must contain at least one letter (a-z or A-Z)
+  const hasLetter = /[a-zA-Z]/.test(password);
+  // Must contain at least one number
+  const hasNumber = /[0-9]/.test(password);
+  // Must contain at least one symbol (special character)
+  const hasSymbol = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password);
+  
+  return hasLetter && hasNumber && hasSymbol;
+};
 
 const Login = () => {
   const [isFlipped, setIsFlipped] = useState(false);
@@ -25,6 +49,7 @@ const Login = () => {
   const [signupError, setSignupError] = useState('');
   const [countdown, setCountdown] = useState(0); // Countdown in seconds
   const navigate = useNavigate();
+  const location = useLocation();
   const [searchParams] = useSearchParams();
 
   // Check if user is already logged in and redirect
@@ -43,7 +68,7 @@ const Login = () => {
             if (isAdmin) {
               navigate('/admin/dashboard/bookings', { replace: true });
             } else {
-              navigate('/home', { replace: true });
+              navigate('/', { replace: true });
             }
           }
         } catch (error) {
@@ -71,7 +96,7 @@ const Login = () => {
         if (isAdmin) {
           navigate('/admin/dashboard/bookings', { replace: true });
         } else {
-          navigate('/home', { replace: true });
+          navigate('/', { replace: true });
         }
       }
     };
@@ -106,6 +131,12 @@ const Login = () => {
     e.preventDefault();
     if (!loginData.email || !loginData.password) {
       setLoginError('Please enter email and password');
+      return;
+    }
+
+    // Validate email domain
+    if (!isValidEmailDomain(loginData.email)) {
+      setLoginError('Please use a Gmail, Yahoo, Rediff, or Outlook email address');
       return;
     }
 
@@ -165,8 +196,10 @@ const Login = () => {
         setIsLoggedIn(true);
         
         // Use React Router navigate instead of window.location.href for better mobile compatibility
-        console.log('✅ Login successful, redirecting to home');
-        navigate('/home', { replace: true });
+        // Redirect to the original destination if available, otherwise go to home
+        const from = (location.state as any)?.from?.pathname || '/';
+        console.log('✅ Login successful, redirecting to:', from);
+        navigate(from, { replace: true });
       } else {
         const errorMsg = response.message || 'Invalid email or password';
         console.error('❌ Login failed:', errorMsg);
@@ -197,8 +230,21 @@ const Login = () => {
       setSignupError('Please fill in all fields');
       return;
     }
+
+    // Validate email domain
+    if (!isValidEmailDomain(signupData.email)) {
+      setSignupError('Please use a Gmail, Yahoo, Rediff, or Outlook email address');
+      return;
+    }
+
     if (signupData.password !== signupData.confirmPassword) {
       setSignupError('Passwords do not match');
+      return;
+    }
+
+    // Validate password
+    if (!isValidPassword(signupData.password)) {
+      setSignupError('Password must be at least 8 characters with letters, numbers, and symbols');
       return;
     }
     
@@ -245,7 +291,8 @@ const Login = () => {
         
         setUserName(response.user?.name || '');
         setIsLoggedIn(true);
-        window.location.href = '/home';
+        // Redirect to home after successful signup
+        navigate('/', { replace: true });
       } else {
         setSignupError(response.message || 'Failed to create account');
       }
@@ -269,6 +316,12 @@ const Login = () => {
   const handleSendOtp = async () => {
     if (!signupData.email || !signupData.name) {
       setSignupError('Please enter your name and email first');
+      return;
+    }
+
+    // Validate email domain
+    if (!isValidEmailDomain(signupData.email)) {
+      setSignupError('Please use a Gmail, Yahoo, Rediff, or Outlook email address');
       return;
     }
     

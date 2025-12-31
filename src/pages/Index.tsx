@@ -1,5 +1,3 @@
-import { useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
 import Hero from '../components/Hero';
 import About from '../components/About';
 import Activities from '../components/Activities';
@@ -8,7 +6,6 @@ import Testimonials from '../components/Testimonials';
 import Location from '../components/Location';
 import Contact from '../components/Contact';
 import Navigation from '../components/Navigation';
-import { api } from '../lib/api';
 import React from 'react';
 
 const EventsSection = () => {
@@ -91,55 +88,6 @@ const EventsSection = () => {
 };
 
 const Index = () => {
-  const navigate = useNavigate();
-
-  useEffect(() => {
-    const checkAuth = async () => {
-      const storedUser = localStorage.getItem('userName');
-      const storedEmail = localStorage.getItem('userEmail');
-      
-      if (!storedUser || !storedEmail) {
-        navigate('/', { replace: true });
-        return;
-      }
-
-      // Verify the session is still valid
-      try {
-        const response = await api.getCurrentUser();
-        if (!response.success || !response.user) {
-          // Invalid session, redirect to login
-          localStorage.removeItem('userName');
-          localStorage.removeItem('userEmail');
-          localStorage.removeItem('authToken');
-          navigate('/', { replace: true });
-        }
-      } catch (error) {
-        // Check if we're using cookies
-        const cookieConsent = localStorage.getItem('cookieConsent');
-        if (cookieConsent !== 'accepted') {
-          // Not using cookies and API failed, redirect to login
-          localStorage.removeItem('userName');
-          localStorage.removeItem('userEmail');
-          localStorage.removeItem('authToken');
-          navigate('/', { replace: true });
-        }
-        // If using cookies, the cookie might still be valid, so don't redirect
-      }
-    };
-
-    checkAuth();
-
-    // Listen for auth changes from other tabs
-    const handleStorageChange = (e: StorageEvent) => {
-      if (e.key === 'userName' && !e.newValue) {
-        // User logged out in another tab
-        navigate('/', { replace: true });
-      }
-    };
-
-    window.addEventListener('storage', handleStorageChange);
-    return () => window.removeEventListener('storage', handleStorageChange);
-  }, [navigate]);
 
   return (
     <div className="min-h-screen bg-purple-50 dark:bg-purple-100 transition-colors duration-300">

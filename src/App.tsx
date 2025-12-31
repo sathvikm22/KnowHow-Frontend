@@ -110,9 +110,10 @@ const App = () => {
           <Sonner />
           <Router>
             <Routes>
-              <Route path="/" element={<Login />} />
+              <Route path="/" element={<Index />} />
+              <Route path="/home" element={<Index />} />
+              <Route path="/login" element={<Login />} />
               <Route path="/signup" element={<SignUp />} />
-              <Route path="/home" element={<ProtectedRoute requireAuth={true}><Index /></ProtectedRoute>} />
               <Route path="/booking" element={<ProtectedRoute requireAuth={true}><Booking /></ProtectedRoute>} />
               <Route path="/activities" element={<ProtectedRoute requireAuth={true}><Activities /></ProtectedRoute>} />
               <Route path="/buy" element={<ProtectedRoute requireAuth={true}><Buy /></ProtectedRoute>} />

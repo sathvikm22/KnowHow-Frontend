@@ -26,14 +26,8 @@ const Buy = () => {
   const [justAdded, setJustAdded] = useState(false);
 
   useEffect(() => {
-    const storedUser = localStorage.getItem('userName');
-    if (!storedUser) {
-      navigate('/');
-      return;
-    }
-    
     fetchDIYKits();
-  }, [navigate]);
+  }, []);
 
   useEffect(() => {
     if (diyKits.length > 0) {

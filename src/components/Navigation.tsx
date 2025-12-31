@@ -43,7 +43,7 @@ const Navigation = () => {
     fetchUser();
   }, [userName]);
 
-  const scrollToSection = (sectionId: string, targetPath: string = '/home') => {
+  const scrollToSection = (sectionId: string, targetPath: string = '/') => {
     const currentPath = window.location.pathname;
 
     if (currentPath !== targetPath) {
@@ -64,14 +64,14 @@ const Navigation = () => {
   };
 
   const navItems = [
-    { name: 'Home', action: () => scrollToSection('home', '/home') },
-    { name: 'About', action: () => scrollToSection('about', '/home') },
-    { name: 'Activities', action: () => scrollToSection('activities', '/home') },
-    { name: 'Events', action: () => scrollToSection('events-section', '/home') },
-    { name: 'DIY Kits', action: () => scrollToSection('shop-diy-kits', '/home') },
-    { name: 'Gallery', action: () => scrollToSection('testimonials', '/home') },
-    { name: 'Location', action: () => scrollToSection('location', '/home') },
-    { name: 'Contact Us', action: () => scrollToSection('contact', '/home') }
+    { name: 'Home', action: () => scrollToSection('home', '/') },
+    { name: 'About', action: () => scrollToSection('about', '/') },
+    { name: 'Activities', action: () => scrollToSection('activities', '/') },
+    { name: 'Events', action: () => scrollToSection('events-section', '/') },
+    { name: 'DIY Kits', action: () => scrollToSection('shop-diy-kits', '/') },
+    { name: 'Gallery', action: () => scrollToSection('testimonials', '/') },
+    { name: 'Location', action: () => scrollToSection('location', '/') },
+    { name: 'Contact Us', action: () => scrollToSection('contact', '/') }
   ];
 
   const handleOrders = () => {
@@ -84,7 +84,7 @@ const Navigation = () => {
   };
 
   const handleLogin = () => {
-    navigate('/');
+    navigate('/login');
   };
 
   const handleLogout = async () => {

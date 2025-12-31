@@ -108,12 +108,12 @@ const ProtectedRoute = ({
 
   // If route requires authentication and user is not authenticated
   if (requireAuth && !isAuthenticated) {
-    return <Navigate to="/" state={{ from: location }} replace />;
+    return <Navigate to="/login" state={{ from: location }} replace />;
   }
 
   // If route requires admin and user is not admin
   if (requireAdmin && !isAdmin) {
-    return <Navigate to="/home" replace />;
+    return <Navigate to="/" replace />;
   }
 
   return children;

@@ -217,11 +217,11 @@ const Cart = () => {
     const cartData = {
       items: [
         ...cartItems.map(item => ({
-          name: item.kit_name,
-          quantity: item.quantity,
-          unit_price: item.price,
-          total: item.price * item.quantity
-        })),
+        name: item.kit_name,
+        quantity: item.quantity,
+        unit_price: item.price,
+        total: item.price * item.quantity
+      })),
         ...selectedAddOns.map(addOn => ({
           name: addOn.name,
           quantity: addOn.quantity,
@@ -242,9 +242,9 @@ const Cart = () => {
   };
 
   const handleBrowseDIYKits = () => {
-    navigate('/home');
+      navigate('/home');
     // Wait for page to load and then scroll to DIY kits section
-    setTimeout(() => {
+      setTimeout(() => {
       const element = document.getElementById('shop-diy-kits');
       if (element) {
         element.scrollIntoView({ behavior: 'smooth' });
@@ -412,7 +412,7 @@ const Cart = () => {
 
                 {/* Add Ons Section */}
                 {activities.length > 0 && (
-                  <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-4 sm:p-6">
+                <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-4 sm:p-6">
                     <h3 className="text-xl font-bold text-gray-800 dark:text-white mb-4">
                       Add Ons
                     </h3>
@@ -464,7 +464,7 @@ const Cart = () => {
                                     </Button>
                                     <span className="w-8 text-center text-sm font-medium">
                                       {selectedAddOn.quantity}
-                                    </span>
+                    </span>
                                     <Button
                                       variant="outline"
                                       size="sm"
@@ -475,7 +475,7 @@ const Cart = () => {
                                     </Button>
                                     <span className="text-sm font-semibold text-orange-600 ml-2">
                                       ₹{selectedAddOn.price * selectedAddOn.quantity}
-                                    </span>
+                    </span>
                                   </div>
                                 )}
                               </div>

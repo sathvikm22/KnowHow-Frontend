@@ -31,6 +31,23 @@ const Booking = () => {
   const [addOns, setAddOns] = useState<Array<{activity: Activity; date: string; timeSlot: string}>>([]);
   const [availableSlotsForAddOn, setAvailableSlotsForAddOn] = useState<Record<string, string[]>>({});
   const [loadingAddOnSlots, setLoadingAddOnSlots] = useState<Record<string, boolean>>({});
+
+  // Calculate add-on price based on activity category
+  const getAddOnPrice = (activity: Activity): number => {
+    // For group activities: return 2499 (or use activity price if set and > 0)
+    if (activity.category === 'group') {
+      return activity.price && activity.price > 0 ? activity.price : 2499;
+    }
+    
+    // For individual activities: return 499
+    if (activity.category === 'individual') {
+      return 499;
+    }
+    
+    // Fallback: if no category is set, default to 2499 (most activities like Plushie heaven are group activities)
+    // This ensures activities without category set are treated as group activities
+    return 2499;
+  };
   
   // User details state
   const [userDetails, setUserDetails] = useState({
@@ -114,10 +131,7 @@ const Booking = () => {
       }
     };
     fetchActivities();
-    
-    // Refresh activities periodically to catch new additions
-    const interval = setInterval(fetchActivities, 30000); // Every 30 seconds
-    return () => clearInterval(interval);
+    // Removed automatic refresh interval to prevent page reloads
   }, []);
 
   // Handle URL params for activity pre-selection
@@ -233,6 +247,16 @@ const allSelectedActivitiesDetailed = useMemo(() => {
     return currentTotal;
 }, [getActivitiesInCurrentSelection.basePrice, allSelectedActivitiesDetailed, selectedCombo]);
 
+  // Calculate add-ons total separately for reactive updates
+  const addOnsTotal = useMemo(() => {
+    return addOns.reduce((sum, addOn) => {
+      if (addOn.timeSlot && addOn.date) {
+        return sum + getAddOnPrice(addOn.activity);
+      }
+      return sum;
+    }, 0);
+  }, [addOns]);
+
   // Time slot configuration based on selected combo/activity
   const getTimeSlots = () => {
     if (selectedCombo?.id === 'jewellery_lab') {
@@ -314,17 +338,13 @@ const allSelectedActivitiesDetailed = useMemo(() => {
       }
     });
 
-    // Calculate totals (no GST)
-    const subtotal = bookingTotal;
-    const totalAmount = subtotal;
-
     // Get selected activity names
     const selectedActivityNames = allSelectedActivitiesDetailed.map(a => a.name);
 
     // Add add-ons to order items
     addOns.forEach((addOn) => {
       if (addOn.timeSlot && addOn.date) {
-        const addOnPrice = addOn.activity.price || 0;
+        const addOnPrice = getAddOnPrice(addOn.activity);
         if (addOnPrice > 0) {
           orderItems.push({
             name: `${addOn.activity.name} (Add-on)`,
@@ -338,15 +358,15 @@ const allSelectedActivitiesDetailed = useMemo(() => {
       }
     });
 
-    // Recalculate total with add-ons
-    const addOnsTotal = addOns.reduce((sum, addOn) => {
+    // Calculate add-ons total for booking
+    const bookingAddOnsTotal = addOns.reduce((sum, addOn) => {
       if (addOn.timeSlot && addOn.date) {
-        return sum + (addOn.activity.price || 0);
+        return sum + getAddOnPrice(addOn.activity);
       }
       return sum;
     }, 0);
     
-    const finalTotal = totalAmount + addOnsTotal;
+    const finalTotal = bookingTotal + bookingAddOnsTotal;
 
     // Prepare order data for checkout
     const orderData = {
@@ -355,7 +375,7 @@ const allSelectedActivitiesDetailed = useMemo(() => {
       customerPhone: `${userDetails.countryCode}${userDetails.phone}`,
       customerAddress: userDetails.address || undefined,
       items: orderItems,
-      subtotal: subtotal + addOnsTotal,
+      subtotal: bookingTotal + bookingAddOnsTotal,
       totalAmount: finalTotal,
       bookingDate: selectedDate,
       bookingTimeSlot: selectedTimeSlot,
@@ -364,7 +384,7 @@ const allSelectedActivitiesDetailed = useMemo(() => {
         activityName: a.activity.name,
         date: a.date,
         timeSlot: a.timeSlot,
-        price: a.activity.price || 0
+        price: getAddOnPrice(a.activity)
       })),
       notes: `Booking for ${selectedDate} at ${selectedTimeSlot}${addOns.length > 0 ? ` with ${addOns.length} add-on(s)` : ''}`,
     };
@@ -474,25 +494,26 @@ const allSelectedActivitiesDetailed = useMemo(() => {
     }
   };
 
-  // Handle adding an add-on activity
+  // Handle adding an add-on activity - only allow one add-on
   const handleAddAddOn = (activity: Activity) => {
-    // Add to add-ons list with default date (use selected date if available, otherwise today)
+    // Only allow one add-on, so replace any existing one
     const defaultDate = selectedDate || new Date().toISOString().split('T')[0];
-    setAddOns(prev => [...prev, {
-      activity,
+    // Store the full activity object to preserve category and price information
+    setAddOns([{
+      activity: { ...activity }, // Create a copy to ensure reactivity
       date: defaultDate,
       timeSlot: ''
     }]);
     
-    // Fetch slots for the default date
+    // Fetch slots for the default date (this is async and won't cause page reload)
     if (defaultDate) {
       fetchAddOnSlots(activity.name, defaultDate);
     }
   };
 
-  // Handle removing an add-on
-  const handleRemoveAddOn = (index: number) => {
-    setAddOns(prev => prev.filter((_, i) => i !== index));
+  // Handle removing an add-on (only one add-on allowed, so just clear the array)
+  const handleRemoveAddOn = () => {
+    setAddOns([]);
   };
 
   // Get activities that are not already selected
@@ -520,9 +541,12 @@ const allSelectedActivitiesDetailed = useMemo(() => {
   const regularCombos = comboOptions.filter(c => c.type !== 'special' || ['jewellery_lab', 'tuft_kidding'].includes(c.id));
   const specialCombos = comboOptions.filter(c => c.type === 'special' && !['jewellery_lab', 'tuft_kidding'].includes(c.id));
 
-  const bookingTotal = selectedCombo && specialCombos.some(c => c.id === selectedCombo.id)
-    ? selectedCombo.price * specialActivityPeople
-    : totalAmount;
+  const bookingTotal = useMemo(() => {
+    const baseTotal = selectedCombo && specialCombos.some(c => c.id === selectedCombo.id)
+      ? selectedCombo.price * specialActivityPeople
+      : totalAmount;
+    return baseTotal;
+  }, [selectedCombo, specialCombos, specialActivityPeople, totalAmount]);
 
   // Show loading state while activities are being fetched
   if (loadingActivities) {
@@ -844,9 +868,7 @@ const allSelectedActivitiesDetailed = useMemo(() => {
                         >
                           <div className="flex items-center justify-between mb-2">
                             <h4 className="font-semibold text-gray-800 dark:text-white">{activity.name}</h4>
-                            {activity.price !== undefined && activity.price > 0 && (
-                              <span className="text-sm font-bold text-orange-600">₹{activity.price}</span>
-                            )}
+                            <span className="text-sm font-bold text-orange-600">₹{getAddOnPrice(activity)}</span>
                           </div>
                           <button
                             onClick={() => handleAddAddOn(activity)}
@@ -874,12 +896,10 @@ const allSelectedActivitiesDetailed = useMemo(() => {
                           <div className="flex items-center justify-between mb-3">
                             <div>
                               <h4 className="font-semibold text-gray-800 dark:text-white">{addOn.activity.name}</h4>
-                              {addOn.activity.price !== undefined && addOn.activity.price > 0 && (
-                                <p className="text-sm text-orange-600 font-semibold">₹{addOn.activity.price}</p>
-                              )}
+                              <p className="text-sm text-orange-600 font-semibold">₹{getAddOnPrice(addOn.activity)}</p>
                             </div>
                             <button
-                              onClick={() => handleRemoveAddOn(index)}
+                              onClick={handleRemoveAddOn}
                               className="px-3 py-1 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors text-sm"
                             >
                               Remove
@@ -981,7 +1001,7 @@ const allSelectedActivitiesDetailed = useMemo(() => {
                 {addOns.filter(a => a.timeSlot && a.date).map((addOn, index) => (
                   <div key={index} className="flex justify-between text-gray-700 dark:text-gray-300">
                     <span>{addOn.activity.name} (Add-on - {addOn.date} {addOn.timeSlot})</span>
-                    <span>₹{addOn.activity.price || 0}</span>
+                    <span>₹{getAddOnPrice(addOn.activity)}</span>
                   </div>
                 ))}
                 {selectedDate && (
@@ -1003,14 +1023,14 @@ const allSelectedActivitiesDetailed = useMemo(() => {
                 )}
                   <div className="border-t border-orange-200 dark:border-orange-600 pt-3 flex justify-between font-bold text-xl text-gray-800 dark:text-white">
                     <span>Total</span>
-                    <span>₹{bookingTotal + addOns.reduce((sum, a) => sum + (a.timeSlot && a.date ? (a.activity.price || 0) : 0), 0)}</span>
+                    <span>₹{bookingTotal + addOnsTotal}</span>
                   </div>
                 </div>
                 <button
                   onClick={handleBooking}
                   className="w-full bg-gradient-to-r from-yellow-500 to-orange-500 text-white py-4 rounded-full font-semibold text-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
                 >
-                  Complete Booking - ₹{bookingTotal + addOns.reduce((sum, a) => sum + (a.timeSlot && a.date ? (a.activity.price || 0) : 0), 0)}
+                  Complete Booking - ₹{bookingTotal + addOnsTotal}
                 </button>
               </div>
           </div>

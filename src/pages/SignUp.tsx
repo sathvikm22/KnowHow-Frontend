@@ -2,6 +2,30 @@ import { useState, useEffect } from 'react';
 import { ArrowLeft, Eye, EyeOff, Mail, Lock, User } from 'lucide-react';
 import { api } from '@/lib/api';
 
+// Email domain validation - only allow specific domains
+const isValidEmailDomain = (email: string): boolean => {
+  const allowedDomains = ['gmail.com', 'yahoo.com', 'rediff.com', 'outlook.com'];
+  const emailLower = email.toLowerCase().trim();
+  const domain = emailLower.split('@')[1];
+  return domain && allowedDomains.includes(domain);
+};
+
+// Password validation - minimum 8 characters with numbers, letters, and symbols
+const isValidPassword = (password: string): boolean => {
+  // Minimum 8 characters
+  if (password.length < 8) {
+    return false;
+  }
+  // Must contain at least one letter (a-z or A-Z)
+  const hasLetter = /[a-zA-Z]/.test(password);
+  // Must contain at least one number
+  const hasNumber = /[0-9]/.test(password);
+  // Must contain at least one symbol (special character)
+  const hasSymbol = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password);
+  
+  return hasLetter && hasNumber && hasSymbol;
+};
+
 const SignUp = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -62,6 +86,12 @@ const SignUp = () => {
   const handleSendOTP = async () => {
     if (!formData.name || !formData.email) {
       setErrorMessage('Please enter your name and email');
+      return;
+    }
+
+    // Validate email domain
+    if (!isValidEmailDomain(formData.email)) {
+      setErrorMessage('Please use a Gmail, Yahoo, Rediff, or Outlook email address');
       return;
     }
 
@@ -162,8 +192,9 @@ const SignUp = () => {
       return;
     }
 
-    if (formData.password.length < 6) {
-      setErrorMessage('Password must be at least 6 characters long');
+    // Validate password
+    if (!isValidPassword(formData.password)) {
+      setErrorMessage('Password must be at least 8 characters with letters, numbers, and symbols');
       return;
     }
 

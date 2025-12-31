@@ -777,78 +777,78 @@ const AdminAddOns = () => {
                           </div>
                           
                           {/* Image Container with Improved Scrollbar */}
-                          <div 
-                            ref={(el) => {
-                              scrollContainerRef.current = el;
-                            }}
+                        <div 
+                          ref={(el) => {
+                            scrollContainerRef.current = el;
+                          }}
                             className="relative w-full h-64 border-2 border-gray-300 dark:border-gray-600 rounded-lg overflow-auto bg-gray-100 dark:bg-gray-700 custom-image-scrollbar shadow-inner"
+                        >
+                          <div
+                            className="relative"
+                            style={{
+                              cursor: isDragging ? 'grabbing' : 'grab',
+                              userSelect: 'none',
+                              width: 'max-content',
+                              height: 'max-content',
+                              minWidth: '100%',
+                              minHeight: '100%'
+                            }}
+                            onMouseDown={(e) => {
+                              const container = e.currentTarget.closest('.overflow-auto') as HTMLElement;
+                              handleMouseDown(e, container);
+                            }}
+                            onMouseMove={(e) => {
+                              const container = e.currentTarget.closest('.overflow-auto') as HTMLElement;
+                              handleMouseMove(e, container);
+                            }}
+                            onMouseUp={handleMouseUp}
+                            onMouseLeave={handleMouseUp}
                           >
-                            <div
-                              className="relative"
+                            <img
+                              key={imagePreview || activityForm.image_url}
+                              src={imagePreview || activityForm.image_url || ''}
+                              alt="Preview"
+                              className="block"
                               style={{
-                                cursor: isDragging ? 'grabbing' : 'grab',
-                                userSelect: 'none',
-                                width: 'max-content',
-                                height: 'max-content',
-                                minWidth: '100%',
-                                minHeight: '100%'
+                                pointerEvents: 'none',
+                                maxWidth: 'none',
+                                height: 'auto',
+                                display: 'block'
                               }}
-                              onMouseDown={(e) => {
-                                const container = e.currentTarget.closest('.overflow-auto') as HTMLElement;
-                                handleMouseDown(e, container);
+                              onError={(e) => {
+                                const target = e.target as HTMLImageElement;
+                                console.error('❌ Preview image failed to load:', imagePreview || activityForm.image_url);
+                                target.style.display = 'none';
                               }}
-                              onMouseMove={(e) => {
-                                const container = e.currentTarget.closest('.overflow-auto') as HTMLElement;
-                                handleMouseMove(e, container);
-                              }}
-                              onMouseUp={handleMouseUp}
-                              onMouseLeave={handleMouseUp}
-                            >
-                              <img
-                                key={imagePreview || activityForm.image_url}
-                                src={imagePreview || activityForm.image_url || ''}
-                                alt="Preview"
-                                className="block"
-                                style={{
-                                  pointerEvents: 'none',
-                                  maxWidth: 'none',
-                                  height: 'auto',
-                                  display: 'block'
-                                }}
-                                onError={(e) => {
-                                  const target = e.target as HTMLImageElement;
-                                  console.error('❌ Preview image failed to load:', imagePreview || activityForm.image_url);
-                                  target.style.display = 'none';
-                                }}
-                                onLoad={(e) => {
-                                  console.log('✅ Preview image loaded:', imagePreview || activityForm.image_url);
-                                  const img = e.target as HTMLImageElement;
-                                  // Make image larger to enable scrolling - scale to 1.5x container size minimum
-                                  const container = img.closest('.overflow-auto') as HTMLElement;
-                                  if (container) {
-                                    const containerWidth = container.clientWidth;
-                                    const containerHeight = container.clientHeight;
-                                    const scale = 1.5; // Scale factor to ensure scrolling is possible
-                                    // Ensure image is at least scale times the container size
-                                    if (img.naturalWidth > 0 && img.naturalHeight > 0) {
-                                      const aspectRatio = img.naturalWidth / img.naturalHeight;
-                                      if (containerWidth / containerHeight > aspectRatio) {
-                                        // Container is wider, scale based on height
-                                        img.style.height = `${containerHeight * scale}px`;
-                                        img.style.width = 'auto';
-                                      } else {
-                                        // Container is taller, scale based on width
-                                        img.style.width = `${containerWidth * scale}px`;
-                                        img.style.height = 'auto';
-                                      }
+                              onLoad={(e) => {
+                                console.log('✅ Preview image loaded:', imagePreview || activityForm.image_url);
+                                const img = e.target as HTMLImageElement;
+                                // Make image larger to enable scrolling - scale to 1.5x container size minimum
+                                const container = img.closest('.overflow-auto') as HTMLElement;
+                                if (container) {
+                                  const containerWidth = container.clientWidth;
+                                  const containerHeight = container.clientHeight;
+                                  const scale = 1.5; // Scale factor to ensure scrolling is possible
+                                  // Ensure image is at least scale times the container size
+                                  if (img.naturalWidth > 0 && img.naturalHeight > 0) {
+                                    const aspectRatio = img.naturalWidth / img.naturalHeight;
+                                    if (containerWidth / containerHeight > aspectRatio) {
+                                      // Container is wider, scale based on height
+                                      img.style.height = `${containerHeight * scale}px`;
+                                      img.style.width = 'auto';
+                                    } else {
+                                      // Container is taller, scale based on width
+                                      img.style.width = `${containerWidth * scale}px`;
+                                      img.style.height = 'auto';
                                     }
                                   }
-                                  // Reset position when image loads
-                                  resetImagePosition();
-                                }}
-                                draggable={false}
-                              />
-                            </div>
+                                }
+                                // Reset position when image loads
+                                resetImagePosition();
+                              }}
+                              draggable={false}
+                            />
+                          </div>
                           </div>
                         </>
                       )}
@@ -1062,78 +1062,78 @@ const AdminAddOns = () => {
                           </div>
                           
                           {/* Image Container with Improved Scrollbar */}
-                          <div 
-                            ref={(el) => {
-                              scrollContainerRef.current = el;
-                            }}
+                        <div 
+                          ref={(el) => {
+                            scrollContainerRef.current = el;
+                          }}
                             className="relative w-full h-64 border-2 border-gray-300 dark:border-gray-600 rounded-lg overflow-auto bg-gray-100 dark:bg-gray-700 custom-image-scrollbar shadow-inner"
+                        >
+                          <div
+                            className="relative"
+                            style={{
+                              cursor: isDragging ? 'grabbing' : 'grab',
+                              userSelect: 'none',
+                              width: 'max-content',
+                              height: 'max-content',
+                              minWidth: '100%',
+                              minHeight: '100%'
+                            }}
+                            onMouseDown={(e) => {
+                              const container = e.currentTarget.closest('.overflow-auto') as HTMLElement;
+                              handleMouseDown(e, container);
+                            }}
+                            onMouseMove={(e) => {
+                              const container = e.currentTarget.closest('.overflow-auto') as HTMLElement;
+                              handleMouseMove(e, container);
+                            }}
+                            onMouseUp={handleMouseUp}
+                            onMouseLeave={handleMouseUp}
                           >
-                            <div
-                              className="relative"
+                            <img
+                              key={imagePreview || diyKitForm.image_url}
+                              src={imagePreview || diyKitForm.image_url || ''}
+                              alt="Preview"
+                              className="block"
                               style={{
-                                cursor: isDragging ? 'grabbing' : 'grab',
-                                userSelect: 'none',
-                                width: 'max-content',
-                                height: 'max-content',
-                                minWidth: '100%',
-                                minHeight: '100%'
+                                pointerEvents: 'none',
+                                maxWidth: 'none',
+                                height: 'auto',
+                                display: 'block'
                               }}
-                              onMouseDown={(e) => {
-                                const container = e.currentTarget.closest('.overflow-auto') as HTMLElement;
-                                handleMouseDown(e, container);
+                              onError={(e) => {
+                                const target = e.target as HTMLImageElement;
+                                console.error('❌ Preview image failed to load:', imagePreview || diyKitForm.image_url);
+                                target.style.display = 'none';
                               }}
-                              onMouseMove={(e) => {
-                                const container = e.currentTarget.closest('.overflow-auto') as HTMLElement;
-                                handleMouseMove(e, container);
-                              }}
-                              onMouseUp={handleMouseUp}
-                              onMouseLeave={handleMouseUp}
-                            >
-                              <img
-                                key={imagePreview || diyKitForm.image_url}
-                                src={imagePreview || diyKitForm.image_url || ''}
-                                alt="Preview"
-                                className="block"
-                                style={{
-                                  pointerEvents: 'none',
-                                  maxWidth: 'none',
-                                  height: 'auto',
-                                  display: 'block'
-                                }}
-                                onError={(e) => {
-                                  const target = e.target as HTMLImageElement;
-                                  console.error('❌ Preview image failed to load:', imagePreview || diyKitForm.image_url);
-                                  target.style.display = 'none';
-                                }}
-                                onLoad={(e) => {
-                                  console.log('✅ Preview image loaded:', imagePreview || diyKitForm.image_url);
-                                  const img = e.target as HTMLImageElement;
-                                  // Make image larger to enable scrolling - scale to 1.5x container size minimum
-                                  const container = img.closest('.overflow-auto') as HTMLElement;
-                                  if (container) {
-                                    const containerWidth = container.clientWidth;
-                                    const containerHeight = container.clientHeight;
-                                    const scale = 1.5; // Scale factor to ensure scrolling is possible
-                                    // Ensure image is at least scale times the container size
-                                    if (img.naturalWidth > 0 && img.naturalHeight > 0) {
-                                      const aspectRatio = img.naturalWidth / img.naturalHeight;
-                                      if (containerWidth / containerHeight > aspectRatio) {
-                                        // Container is wider, scale based on height
-                                        img.style.height = `${containerHeight * scale}px`;
-                                        img.style.width = 'auto';
-                                      } else {
-                                        // Container is taller, scale based on width
-                                        img.style.width = `${containerWidth * scale}px`;
-                                        img.style.height = 'auto';
-                                      }
+                              onLoad={(e) => {
+                                console.log('✅ Preview image loaded:', imagePreview || diyKitForm.image_url);
+                                const img = e.target as HTMLImageElement;
+                                // Make image larger to enable scrolling - scale to 1.5x container size minimum
+                                const container = img.closest('.overflow-auto') as HTMLElement;
+                                if (container) {
+                                  const containerWidth = container.clientWidth;
+                                  const containerHeight = container.clientHeight;
+                                  const scale = 1.5; // Scale factor to ensure scrolling is possible
+                                  // Ensure image is at least scale times the container size
+                                  if (img.naturalWidth > 0 && img.naturalHeight > 0) {
+                                    const aspectRatio = img.naturalWidth / img.naturalHeight;
+                                    if (containerWidth / containerHeight > aspectRatio) {
+                                      // Container is wider, scale based on height
+                                      img.style.height = `${containerHeight * scale}px`;
+                                      img.style.width = 'auto';
+                                    } else {
+                                      // Container is taller, scale based on width
+                                      img.style.width = `${containerWidth * scale}px`;
+                                      img.style.height = 'auto';
                                     }
                                   }
-                                  // Reset position when image loads
-                                  resetImagePosition();
-                                }}
-                                draggable={false}
-                              />
-                            </div>
+                                }
+                                // Reset position when image loads
+                                resetImagePosition();
+                              }}
+                              draggable={false}
+                            />
+                          </div>
                           </div>
                         </>
                       )}
