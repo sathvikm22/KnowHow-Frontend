@@ -27,7 +27,7 @@ const AdminLayout = ({ children }: { children: ReactNode }) => {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <nav className="w-full fixed top-0 left-0 z-50 bg-gradient-to-r from-purple-600 to-pink-500 shadow-2xl">
+      <nav className="w-full fixed top-0 left-0 z-50 bg-teal-600 shadow-2xl">
         <div className="px-3 sm:px-4 md:px-6 lg:px-8 py-3 sm:py-4 md:py-5">
           {/* Desktop and Tablet Layout */}
           <div className="hidden md:flex items-center justify-between">
@@ -72,7 +72,7 @@ const AdminLayout = ({ children }: { children: ReactNode }) => {
 
         {/* Mobile Menu */}
         {isMobileMenuOpen && (
-          <div className="md:hidden bg-purple-700 border-t border-white/20">
+          <div className="md:hidden bg-teal-700 border-t border-white/20">
             <div className="px-3 py-3 space-y-2">
               {adminNav.map(tab => (
                 <button

@@ -117,3 +117,47 @@
 .rotate-y-180 {
   transform: rotateY(180deg);
 }
+
+/* Custom Scrollbar Styles for Image Adjuster */
+.custom-image-scrollbar::-webkit-scrollbar {
+  width: 14px;
+  height: 14px;
+}
+
+.custom-image-scrollbar::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 8px;
+}
+
+.custom-image-scrollbar::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 8px;
+  border: 2px solid #f1f1f1;
+}
+
+.custom-image-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+
+.dark .custom-image-scrollbar::-webkit-scrollbar-track {
+  background: #374151;
+}
+
+.dark .custom-image-scrollbar::-webkit-scrollbar-thumb {
+  background: #6b7280;
+  border: 2px solid #374151;
+}
+
+.dark .custom-image-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #9ca3af;
+}
+
+/* Firefox scrollbar */
+.custom-image-scrollbar {
+  scrollbar-width: thick;
+  scrollbar-color: #888 #f1f1f1;
+}
+
+.dark .custom-image-scrollbar {
+  scrollbar-color: #6b7280 #374151;
+}

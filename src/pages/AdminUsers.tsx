@@ -81,7 +81,7 @@ const AdminUsers = () => {
           placeholder="Search by name or email..."
           value={search}
           onChange={e => setSearch(e.target.value)}
-          className="w-full max-w-xs px-4 py-2 rounded-lg border-2 border-purple-200 focus:border-purple-500 outline-none transition-colors shadow-sm"
+          className="w-full max-w-xs px-4 py-2 rounded-lg border-2 border-orange-200 focus:border-orange-500 outline-none transition-colors shadow-sm"
         />
       </div>
 

@@ -16,12 +16,31 @@ interface DIYKit {
   description: string;
 }
 
+interface Activity {
+  id: string;
+  name: string;
+  description: string;
+  image_url: string | null;
+  price?: number;
+  category?: 'group' | 'individual';
+}
+
+interface SelectedAddOn {
+  id: string;
+  name: string;
+  price: number;
+  quantity: number;
+}
+
 const Cart = () => {
   const navigate = useNavigate();
   const { cart, updateCartItem, removeFromCart, clearCart } = useCart();
   const [showViewCart, setShowViewCart] = useState(false);
   const [diyKits, setDiyKits] = useState<DIYKit[]>([]);
+  const [activities, setActivities] = useState<Activity[]>([]);
+  const [selectedAddOns, setSelectedAddOns] = useState<SelectedAddOn[]>([]);
   const [loading, setLoading] = useState(true);
+  const [loadingActivities, setLoadingActivities] = useState(true);
 
   useEffect(() => {
     const storedUser = localStorage.getItem('userName');
@@ -29,6 +48,7 @@ const Cart = () => {
       navigate('/');
     }
     fetchDIYKits();
+    fetchActivities();
   }, [navigate]);
 
   const fetchDIYKits = async () => {
@@ -42,6 +62,22 @@ const Cart = () => {
       console.error('Error fetching DIY kits:', error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchActivities = async () => {
+    try {
+      setLoadingActivities(true);
+      const response = await api.getActivities();
+      if (response.success && response.activities) {
+        // Filter only activities with prices
+        const activitiesWithPrice = response.activities.filter((activity: Activity) => activity.price && activity.price > 0);
+        setActivities(activitiesWithPrice);
+      }
+    } catch (error) {
+      console.error('Error fetching activities:', error);
+    } finally {
+      setLoadingActivities(false);
     }
   };
 
@@ -67,6 +103,26 @@ const Cart = () => {
     return `/lovable-uploads/diy-kits/${imageName}.jpg`;
   };
 
+  const getActivityImagePath = (activity: Activity | null) => {
+    if (!activity) return '/placeholder.svg';
+    // Check if image_url exists and is not empty/null
+    if (activity.image_url && activity.image_url.trim() !== '') {
+      const url = activity.image_url.trim();
+      // If it's already a full URL (starts with http), use it directly
+      if (url.startsWith('http://') || url.startsWith('https://')) {
+        return url;
+      }
+      // If it's a Supabase Storage path, construct the full URL
+      if (url.startsWith('/storage/') || url.startsWith('storage/')) {
+        const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || '';
+        return `${supabaseUrl}${url.startsWith('/') ? '' : '/'}${url}`;
+      }
+      // Otherwise, assume it's a relative path
+      return url;
+    }
+    return '/placeholder.svg';
+  };
+
   // Get cart items with kit details
   const cartItems = cart.map(item => {
     const kit = diyKits.find(k => k.name === item.kit_name);
@@ -76,7 +132,42 @@ const Cart = () => {
     };
   });
 
-  const totalPrice = cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+  const cartTotalPrice = cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+  const addOnsTotalPrice = selectedAddOns.reduce((sum, addOn) => sum + (addOn.price * addOn.quantity), 0);
+  const totalPrice = cartTotalPrice + addOnsTotalPrice;
+
+  const handleAddOnToggle = (activity: Activity) => {
+    setSelectedAddOns(prev => {
+      const existing = prev.find(a => a.id === activity.id);
+      if (existing) {
+        // Remove if already selected
+        return prev.filter(a => a.id !== activity.id);
+      } else {
+        // Add with quantity 1
+        return [...prev, {
+          id: activity.id,
+          name: activity.name,
+          price: activity.price || 0,
+          quantity: 1
+        }];
+      }
+    });
+  };
+
+  const handleAddOnQuantityChange = (addOnId: string, change: number) => {
+    setSelectedAddOns(prev => {
+      return prev.map(addOn => {
+        if (addOn.id === addOnId) {
+          const newQuantity = addOn.quantity + change;
+          if (newQuantity <= 0) {
+            return null;
+          }
+          return { ...addOn, quantity: newQuantity };
+        }
+        return addOn;
+      }).filter((addOn): addOn is SelectedAddOn => addOn !== null);
+    });
+  };
 
   const handleUpdateQuantity = async (kitName: string, change: number) => {
     const cartItem = cart.find(item => item.kit_name === kitName);
@@ -124,12 +215,20 @@ const Cart = () => {
 
     // Prepare cart data
     const cartData = {
-      items: cartItems.map(item => ({
-        name: item.kit_name,
-        quantity: item.quantity,
-        unit_price: item.price,
-        total: item.price * item.quantity
-      })),
+      items: [
+        ...cartItems.map(item => ({
+          name: item.kit_name,
+          quantity: item.quantity,
+          unit_price: item.price,
+          total: item.price * item.quantity
+        })),
+        ...selectedAddOns.map(addOn => ({
+          name: addOn.name,
+          quantity: addOn.quantity,
+          unit_price: addOn.price,
+          total: addOn.price * addOn.quantity
+        }))
+      ],
       subtotal: totalPrice,
       totalAmount: totalPrice,
       customerName: userName,
@@ -143,21 +242,22 @@ const Cart = () => {
   };
 
   const handleBrowseDIYKits = () => {
-    const currentPath = window.location.pathname;
-    if (currentPath !== '/home') {
-      navigate('/home');
-      setTimeout(() => {
-        const element = document.getElementById('shop-diy-kits');
-        if (element) {
-          element.scrollIntoView({ behavior: 'smooth' });
-        }
-      }, 100);
-    } else {
+    navigate('/home');
+    // Wait for page to load and then scroll to DIY kits section
+    setTimeout(() => {
       const element = document.getElementById('shop-diy-kits');
       if (element) {
         element.scrollIntoView({ behavior: 'smooth' });
+      } else {
+        // Retry after a longer delay if element not found yet
+        setTimeout(() => {
+          const retryElement = document.getElementById('shop-diy-kits');
+          if (retryElement) {
+            retryElement.scrollIntoView({ behavior: 'smooth' });
+          }
+        }, 500);
       }
-    }
+    }, 300);
   };
 
   return (
@@ -310,17 +410,87 @@ const Cart = () => {
                   </div>
                 ))}
 
-                {/* Cart Summary */}
-                <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-4 sm:p-6">
-                  <div className="flex justify-between items-center border-t border-gray-200 dark:border-gray-700 pt-4">
-                    <span className="text-lg font-semibold text-gray-800 dark:text-white">
-                      {cartItems.length} {cartItems.length === 1 ? 'Item' : 'Items'}
-                    </span>
-                    <span className="text-xl font-bold text-orange-600">
-                      ₹{totalPrice}
-                    </span>
+                {/* Add Ons Section */}
+                {activities.length > 0 && (
+                  <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-4 sm:p-6">
+                    <h3 className="text-xl font-bold text-gray-800 dark:text-white mb-4">
+                      Add Ons
+                    </h3>
+                    <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
+                      Add additional activities to your order
+                    </p>
+                    <div className="space-y-3">
+                      {activities.map((activity) => {
+                        const isSelected = selectedAddOns.some(a => a.id === activity.id);
+                        const selectedAddOn = selectedAddOns.find(a => a.id === activity.id);
+                        return (
+                          <div
+                            key={activity.id}
+                            className={`border rounded-lg p-3 transition-all ${
+                              isSelected
+                                ? 'border-orange-500 bg-orange-50 dark:bg-orange-900/20'
+                                : 'border-gray-200 dark:border-gray-700 hover:border-orange-300'
+                            }`}
+                          >
+                            <div className="flex items-start justify-between gap-3">
+                              <div className="flex-1">
+                                <div className="flex items-center gap-2 mb-1">
+                                  <input
+                                    type="checkbox"
+                                    checked={isSelected}
+                                    onChange={() => handleAddOnToggle(activity)}
+                                    className="w-4 h-4 text-orange-600 border-gray-300 rounded focus:ring-orange-500"
+                                  />
+                                  <label className="font-semibold text-gray-800 dark:text-white cursor-pointer">
+                                    {activity.name}
+                                  </label>
+                                </div>
+                                {activity.description && (
+                                  <p className="text-xs text-gray-600 dark:text-gray-400 ml-6 mb-2">
+                                    {activity.description.substring(0, 100)}
+                                    {activity.description.length > 100 ? '...' : ''}
+                                  </p>
+                                )}
+                                {isSelected && selectedAddOn && (
+                                  <div className="flex items-center space-x-2 ml-6 mt-2">
+                                    <span className="text-xs text-gray-600 dark:text-gray-400">Quantity:</span>
+                                    <Button
+                                      variant="outline"
+                                      size="sm"
+                                      onClick={() => handleAddOnQuantityChange(activity.id, -1)}
+                                      className="h-6 w-6 p-0 text-xs"
+                                    >
+                                      -
+                                    </Button>
+                                    <span className="w-8 text-center text-sm font-medium">
+                                      {selectedAddOn.quantity}
+                                    </span>
+                                    <Button
+                                      variant="outline"
+                                      size="sm"
+                                      onClick={() => handleAddOnQuantityChange(activity.id, 1)}
+                                      className="h-6 w-6 p-0 text-xs"
+                                    >
+                                      +
+                                    </Button>
+                                    <span className="text-sm font-semibold text-orange-600 ml-2">
+                                      ₹{selectedAddOn.price * selectedAddOn.quantity}
+                                    </span>
+                                  </div>
+                                )}
+                              </div>
+                              <div className="text-right">
+                                <p className="text-sm font-semibold text-gray-800 dark:text-white">
+                                  ₹{activity.price}
+                                </p>
+                              </div>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
                   </div>
-                </div>
+                )}
               </div>
 
               {/* Right Column - Order Summary */}
@@ -333,8 +503,14 @@ const Cart = () => {
                   <div className="space-y-4 mb-6">
                     <div className="flex justify-between text-gray-700 dark:text-gray-300">
                       <span>Subtotal</span>
-                      <span>₹{totalPrice}</span>
+                      <span>₹{cartTotalPrice}</span>
                     </div>
+                    {selectedAddOns.length > 0 && (
+                      <div className="flex justify-between text-gray-700 dark:text-gray-300 text-sm">
+                        <span className="ml-4">Add Ons</span>
+                        <span>₹{addOnsTotalPrice}</span>
+                      </div>
+                    )}
                     <div className="flex justify-between text-gray-700 dark:text-gray-300">
                       <span>Shipping</span>
                       <span className="text-sm">TBD</span>
@@ -342,10 +518,6 @@ const Cart = () => {
                     <div className="flex justify-between text-gray-700 dark:text-gray-300">
                       <span>Discount</span>
                       <span>- ₹0</span>
-                    </div>
-                    <div className="flex justify-between text-gray-700 dark:text-gray-300">
-                      <span>Tax</span>
-                      <span className="text-sm">TBD</span>
                     </div>
                     <div className="border-t border-gray-200 dark:border-gray-700 pt-4">
                       <div className="flex justify-between items-center">

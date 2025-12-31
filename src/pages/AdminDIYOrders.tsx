@@ -299,7 +299,7 @@ const AdminDIYOrders = () => {
                 <Button
                   onClick={() => handleUpdate(order.id)}
                   disabled={updatingOrderId === order.id}
-                  className="w-full bg-purple-600 hover:bg-purple-700 text-white"
+                  className="w-full bg-orange-500 hover:bg-orange-400 text-white"
                 >
                   {updatingOrderId === order.id ? (
                     <>

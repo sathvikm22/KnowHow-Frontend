@@ -118,9 +118,7 @@ const Hero = () => {
             </h1>
             
             <p className="text-base sm:text-lg md:text-2xl lg:text-3xl text-gray-700 dark:text-gray-300 mb-8 md:mb-12 max-w-3xl mx-auto animate-fade-in leading-relaxed text-center px-2 sm:px-4" style={{animationDelay: '0.3s'}}>
-              Discover the joy of hands-on creativity in our vibrant studio 
-              <br className="hidden sm:block" />
-              From art to craft, every experience tells a story
+              Discover the joy of hands-on creativity in our vibrant studio From art to craft, every experience tells a story
             </p>
             
             <div className="flex justify-center mb-16 animate-fade-in" style={{animationDelay: '0.6s'}}>

@@ -583,7 +583,7 @@ const AdminAddOns = () => {
     return (
       <AdminLayout>
         <div className="flex items-center justify-center h-screen">
-          <Loader2 className="w-8 h-8 animate-spin text-purple-600" />
+          <Loader2 className="w-8 h-8 animate-spin text-orange-600" />
         </div>
       </AdminLayout>
     );
@@ -603,7 +603,7 @@ const AdminAddOns = () => {
             }}
             className={`px-6 py-3 font-semibold transition-colors ${
               activeTab === 'activities'
-                ? 'border-b-2 border-purple-600 text-purple-600'
+                ? 'border-b-2 border-purple-600 text-orange-600'
                 : 'text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200'
             }`}
           >
@@ -616,7 +616,7 @@ const AdminAddOns = () => {
             }}
             className={`px-6 py-3 font-semibold transition-colors ${
               activeTab === 'diy-kits'
-                ? 'border-b-2 border-purple-600 text-purple-600'
+                ? 'border-b-2 border-purple-600 text-orange-600'
                 : 'text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200'
             }`}
           >
@@ -638,7 +638,7 @@ const AdminAddOns = () => {
               {!isAdding && !editingId && (
                 <button
                   onClick={handleAddActivity}
-                  className="flex items-center space-x-2 px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
+                  className="flex items-center space-x-2 px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-400 transition-colors"
                 >
                   <Plus className="w-5 h-5" />
                   <span>Add Activity</span>
@@ -661,7 +661,7 @@ const AdminAddOns = () => {
                       type="text"
                       value={activityForm.name}
                       onChange={(e) => setActivityForm({ ...activityForm, name: e.target.value })}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
                       placeholder="Activity name"
                     />
                   </div>
@@ -673,7 +673,7 @@ const AdminAddOns = () => {
                       type="number"
                       value={activityForm.price}
                       onChange={(e) => setActivityForm({ ...activityForm, price: e.target.value })}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
                       placeholder="0"
                       min="0"
                       step="0.01"
@@ -696,7 +696,7 @@ const AdminAddOns = () => {
                           value="group"
                           checked={activityForm.category === 'group'}
                           onChange={(e) => setActivityForm({ ...activityForm, category: e.target.value as 'group' | 'individual' })}
-                          className="w-4 h-4 text-purple-600 focus:ring-purple-500"
+                          className="w-4 h-4 text-orange-600 focus:ring-orange-500"
                         />
                         <span className="text-gray-700 dark:text-gray-300 font-medium">Group</span>
                         <span className="text-xs text-gray-500 dark:text-gray-400 ml-2">(comes under Any 1/2/3 activities)</span>
@@ -713,7 +713,7 @@ const AdminAddOns = () => {
                           value="individual"
                           checked={activityForm.category === 'individual'}
                           onChange={(e) => setActivityForm({ ...activityForm, category: e.target.value as 'group' | 'individual' })}
-                          className="w-4 h-4 text-purple-600 focus:ring-purple-500"
+                          className="w-4 h-4 text-orange-600 focus:ring-orange-500"
                         />
                         <span className="text-gray-700 dark:text-gray-300 font-medium">Individual</span>
                         <span className="text-xs text-gray-500 dark:text-gray-400 ml-2">(like Jewelry, Tufting)</span>
@@ -727,7 +727,7 @@ const AdminAddOns = () => {
                     <textarea
                       value={activityForm.description}
                       onChange={(e) => setActivityForm({ ...activityForm, description: e.target.value })}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
                       rows={3}
                       placeholder="Activity description"
                     />
@@ -736,113 +736,121 @@ const AdminAddOns = () => {
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                       Image
                     </label>
-                    <div className="space-y-2">
+                    <div className="space-y-3">
                       {/* Image Preview */}
                       {(imagePreview || (activityForm.image_url && activityForm.image_url.trim() !== '')) && (
-                        <div 
-                          ref={(el) => {
-                            scrollContainerRef.current = el;
-                          }}
-                          className="relative w-full h-48 border border-gray-300 rounded-lg overflow-auto bg-gray-100 dark:bg-gray-700"
-                          style={{ scrollbarWidth: 'thin' }}
-                        >
-                          <div
-                            className="relative"
-                            style={{
-                              cursor: isDragging ? 'grabbing' : 'grab',
-                              userSelect: 'none',
-                              width: 'max-content',
-                              height: 'max-content',
-                              minWidth: '100%',
-                              minHeight: '100%'
+                        <>
+                          {/* Control Buttons - Outside Image Frame */}
+                          <div className="flex items-center justify-between bg-gray-50 dark:bg-gray-800 rounded-lg p-2 border border-gray-200 dark:border-gray-700">
+                            <div className="flex items-center gap-2 text-xs text-gray-600 dark:text-gray-400">
+                              <span>💡 Drag image or use scrollbars to adjust position</span>
+                            </div>
+                            <div className="flex gap-2">
+                              <button
+                                type="button"
+                                onClick={resetImagePosition}
+                                className="flex items-center gap-1.5 px-3 py-1.5 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors text-sm font-medium"
+                                title="Reset position to center"
+                              >
+                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                                </svg>
+                                <span>Reset</span>
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  setImagePreview(null);
+                                  setSelectedImageFile(null);
+                                  setActivityForm({ ...activityForm, image_url: '' });
+                                  setImagePosition({ x: 0, y: 0 });
+                                  const fileInput = document.getElementById('image-upload-activity') as HTMLInputElement;
+                                  if (fileInput) fileInput.value = '';
+                                }}
+                                className="flex items-center gap-1.5 px-3 py-1.5 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors text-sm font-medium"
+                                title="Remove image"
+                              >
+                                <X className="w-4 h-4" />
+                                <span>Remove</span>
+                              </button>
+                            </div>
+                          </div>
+                          
+                          {/* Image Container with Improved Scrollbar */}
+                          <div 
+                            ref={(el) => {
+                              scrollContainerRef.current = el;
                             }}
-                            onMouseDown={(e) => {
-                              const container = e.currentTarget.closest('.overflow-auto') as HTMLElement;
-                              handleMouseDown(e, container);
-                            }}
-                            onMouseMove={(e) => {
-                              const container = e.currentTarget.closest('.overflow-auto') as HTMLElement;
-                              handleMouseMove(e, container);
-                            }}
-                            onMouseUp={handleMouseUp}
-                            onMouseLeave={handleMouseUp}
+                            className="relative w-full h-64 border-2 border-gray-300 dark:border-gray-600 rounded-lg overflow-auto bg-gray-100 dark:bg-gray-700 custom-image-scrollbar shadow-inner"
                           >
-                            <img
-                              key={imagePreview || activityForm.image_url}
-                              src={imagePreview || activityForm.image_url || ''}
-                              alt="Preview"
-                              className="block"
+                            <div
+                              className="relative"
                               style={{
-                                pointerEvents: 'none',
-                                maxWidth: 'none',
-                                height: 'auto',
-                                display: 'block'
+                                cursor: isDragging ? 'grabbing' : 'grab',
+                                userSelect: 'none',
+                                width: 'max-content',
+                                height: 'max-content',
+                                minWidth: '100%',
+                                minHeight: '100%'
                               }}
-                              onError={(e) => {
-                                const target = e.target as HTMLImageElement;
-                                console.error('❌ Preview image failed to load:', imagePreview || activityForm.image_url);
-                                target.style.display = 'none';
+                              onMouseDown={(e) => {
+                                const container = e.currentTarget.closest('.overflow-auto') as HTMLElement;
+                                handleMouseDown(e, container);
                               }}
-                              onLoad={(e) => {
-                                console.log('✅ Preview image loaded:', imagePreview || activityForm.image_url);
-                                const img = e.target as HTMLImageElement;
-                                // Make image larger to enable scrolling - scale to 1.5x container size minimum
-                                const container = img.closest('.overflow-auto') as HTMLElement;
-                                if (container) {
-                                  const containerWidth = container.clientWidth;
-                                  const containerHeight = container.clientHeight;
-                                  const scale = 1.5; // Scale factor to ensure scrolling is possible
-                                  // Ensure image is at least scale times the container size
-                                  if (img.naturalWidth > 0 && img.naturalHeight > 0) {
-                                    const aspectRatio = img.naturalWidth / img.naturalHeight;
-                                    if (containerWidth / containerHeight > aspectRatio) {
-                                      // Container is wider, scale based on height
-                                      img.style.height = `${containerHeight * scale}px`;
-                                      img.style.width = 'auto';
-                                    } else {
-                                      // Container is taller, scale based on width
-                                      img.style.width = `${containerWidth * scale}px`;
-                                      img.style.height = 'auto';
+                              onMouseMove={(e) => {
+                                const container = e.currentTarget.closest('.overflow-auto') as HTMLElement;
+                                handleMouseMove(e, container);
+                              }}
+                              onMouseUp={handleMouseUp}
+                              onMouseLeave={handleMouseUp}
+                            >
+                              <img
+                                key={imagePreview || activityForm.image_url}
+                                src={imagePreview || activityForm.image_url || ''}
+                                alt="Preview"
+                                className="block"
+                                style={{
+                                  pointerEvents: 'none',
+                                  maxWidth: 'none',
+                                  height: 'auto',
+                                  display: 'block'
+                                }}
+                                onError={(e) => {
+                                  const target = e.target as HTMLImageElement;
+                                  console.error('❌ Preview image failed to load:', imagePreview || activityForm.image_url);
+                                  target.style.display = 'none';
+                                }}
+                                onLoad={(e) => {
+                                  console.log('✅ Preview image loaded:', imagePreview || activityForm.image_url);
+                                  const img = e.target as HTMLImageElement;
+                                  // Make image larger to enable scrolling - scale to 1.5x container size minimum
+                                  const container = img.closest('.overflow-auto') as HTMLElement;
+                                  if (container) {
+                                    const containerWidth = container.clientWidth;
+                                    const containerHeight = container.clientHeight;
+                                    const scale = 1.5; // Scale factor to ensure scrolling is possible
+                                    // Ensure image is at least scale times the container size
+                                    if (img.naturalWidth > 0 && img.naturalHeight > 0) {
+                                      const aspectRatio = img.naturalWidth / img.naturalHeight;
+                                      if (containerWidth / containerHeight > aspectRatio) {
+                                        // Container is wider, scale based on height
+                                        img.style.height = `${containerHeight * scale}px`;
+                                        img.style.width = 'auto';
+                                      } else {
+                                        // Container is taller, scale based on width
+                                        img.style.width = `${containerWidth * scale}px`;
+                                        img.style.height = 'auto';
+                                      }
                                     }
                                   }
-                                }
-                                // Reset position when image loads
-                                resetImagePosition();
-                              }}
-                              draggable={false}
-                            />
+                                  // Reset position when image loads
+                                  resetImagePosition();
+                                }}
+                                draggable={false}
+                              />
+                            </div>
                           </div>
-                          <div className="sticky top-2 right-2 float-right flex gap-2 z-10 clear-both">
-                            <button
-                              type="button"
-                              onClick={resetImagePosition}
-                              className="p-1 bg-blue-500 text-white rounded-full hover:bg-blue-600"
-                              title="Reset position"
-                            >
-                              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-                              </svg>
-                            </button>
-                            <button
-                              type="button"
-                              onClick={() => {
-                                setImagePreview(null);
-                                setSelectedImageFile(null);
-                                setActivityForm({ ...activityForm, image_url: '' });
-                                setImagePosition({ x: 0, y: 0 });
-                                const fileInput = document.getElementById('image-upload-activity') as HTMLInputElement;
-                                if (fileInput) fileInput.value = '';
-                              }}
-                              className="p-1 bg-red-500 text-white rounded-full hover:bg-red-600"
-                              title="Remove image"
-                            >
-                              <X className="w-4 h-4" />
-                            </button>
-                          </div>
-                          <div className="sticky bottom-2 left-2 float-left text-xs text-gray-500 dark:text-gray-400 bg-white/80 dark:bg-gray-800/80 px-2 py-1 rounded z-10">
-                            Drag to reposition • Use scrollbars to adjust view
-                          </div>
-                        </div>
+                        </>
                       )}
                       
                       {/* File Upload */}
@@ -865,7 +873,7 @@ const AdminAddOns = () => {
                             type="button"
                             onClick={() => handleImageUpload('activities')}
                             disabled={uploadingImage}
-                            className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2"
+                            className="px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-400 disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2"
                           >
                             {uploadingImage ? (
                               <>
@@ -968,7 +976,7 @@ const AdminAddOns = () => {
               {!isAdding && !editingId && (
                 <button
                   onClick={handleAddDIYKit}
-                  className="flex items-center space-x-2 px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
+                  className="flex items-center space-x-2 px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-400 transition-colors"
                 >
                   <Plus className="w-5 h-5" />
                   <span>Add DIY Kit</span>
@@ -991,7 +999,7 @@ const AdminAddOns = () => {
                       type="text"
                       value={diyKitForm.name}
                       onChange={(e) => setDiyKitForm({ ...diyKitForm, name: e.target.value })}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
                       placeholder="DIY Kit name"
                     />
                   </div>
@@ -1003,7 +1011,7 @@ const AdminAddOns = () => {
                       type="number"
                       value={diyKitForm.price}
                       onChange={(e) => setDiyKitForm({ ...diyKitForm, price: e.target.value })}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
                       placeholder="499"
                       min="0"
                       step="0.01"
@@ -1013,113 +1021,121 @@ const AdminAddOns = () => {
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                       Image
                     </label>
-                    <div className="space-y-2">
+                    <div className="space-y-3">
                       {/* Image Preview */}
                       {(imagePreview || (diyKitForm.image_url && diyKitForm.image_url.trim() !== '')) && (
-                        <div 
-                          ref={(el) => {
-                            scrollContainerRef.current = el;
-                          }}
-                          className="relative w-full h-48 border border-gray-300 rounded-lg overflow-auto bg-gray-100 dark:bg-gray-700"
-                          style={{ scrollbarWidth: 'thin' }}
-                        >
-                          <div
-                            className="relative"
-                            style={{
-                              cursor: isDragging ? 'grabbing' : 'grab',
-                              userSelect: 'none',
-                              width: 'max-content',
-                              height: 'max-content',
-                              minWidth: '100%',
-                              minHeight: '100%'
+                        <>
+                          {/* Control Buttons - Outside Image Frame */}
+                          <div className="flex items-center justify-between bg-gray-50 dark:bg-gray-800 rounded-lg p-2 border border-gray-200 dark:border-gray-700">
+                            <div className="flex items-center gap-2 text-xs text-gray-600 dark:text-gray-400">
+                              <span>💡 Drag image or use scrollbars to adjust position</span>
+                            </div>
+                            <div className="flex gap-2">
+                              <button
+                                type="button"
+                                onClick={resetImagePosition}
+                                className="flex items-center gap-1.5 px-3 py-1.5 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors text-sm font-medium"
+                                title="Reset position to center"
+                              >
+                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                                </svg>
+                                <span>Reset</span>
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  setImagePreview(null);
+                                  setSelectedImageFile(null);
+                                  setDiyKitForm({ ...diyKitForm, image_url: '' });
+                                  setImagePosition({ x: 0, y: 0 });
+                                  const fileInput = document.getElementById('image-upload-diy') as HTMLInputElement;
+                                  if (fileInput) fileInput.value = '';
+                                }}
+                                className="flex items-center gap-1.5 px-3 py-1.5 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors text-sm font-medium"
+                                title="Remove image"
+                              >
+                                <X className="w-4 h-4" />
+                                <span>Remove</span>
+                              </button>
+                            </div>
+                          </div>
+                          
+                          {/* Image Container with Improved Scrollbar */}
+                          <div 
+                            ref={(el) => {
+                              scrollContainerRef.current = el;
                             }}
-                            onMouseDown={(e) => {
-                              const container = e.currentTarget.closest('.overflow-auto') as HTMLElement;
-                              handleMouseDown(e, container);
-                            }}
-                            onMouseMove={(e) => {
-                              const container = e.currentTarget.closest('.overflow-auto') as HTMLElement;
-                              handleMouseMove(e, container);
-                            }}
-                            onMouseUp={handleMouseUp}
-                            onMouseLeave={handleMouseUp}
+                            className="relative w-full h-64 border-2 border-gray-300 dark:border-gray-600 rounded-lg overflow-auto bg-gray-100 dark:bg-gray-700 custom-image-scrollbar shadow-inner"
                           >
-                            <img
-                              key={imagePreview || diyKitForm.image_url}
-                              src={imagePreview || diyKitForm.image_url || ''}
-                              alt="Preview"
-                              className="block"
+                            <div
+                              className="relative"
                               style={{
-                                pointerEvents: 'none',
-                                maxWidth: 'none',
-                                height: 'auto',
-                                display: 'block'
+                                cursor: isDragging ? 'grabbing' : 'grab',
+                                userSelect: 'none',
+                                width: 'max-content',
+                                height: 'max-content',
+                                minWidth: '100%',
+                                minHeight: '100%'
                               }}
-                              onError={(e) => {
-                                const target = e.target as HTMLImageElement;
-                                console.error('❌ Preview image failed to load:', imagePreview || diyKitForm.image_url);
-                                target.style.display = 'none';
+                              onMouseDown={(e) => {
+                                const container = e.currentTarget.closest('.overflow-auto') as HTMLElement;
+                                handleMouseDown(e, container);
                               }}
-                              onLoad={(e) => {
-                                console.log('✅ Preview image loaded:', imagePreview || diyKitForm.image_url);
-                                const img = e.target as HTMLImageElement;
-                                // Make image larger to enable scrolling - scale to 1.5x container size minimum
-                                const container = img.closest('.overflow-auto') as HTMLElement;
-                                if (container) {
-                                  const containerWidth = container.clientWidth;
-                                  const containerHeight = container.clientHeight;
-                                  const scale = 1.5; // Scale factor to ensure scrolling is possible
-                                  // Ensure image is at least scale times the container size
-                                  if (img.naturalWidth > 0 && img.naturalHeight > 0) {
-                                    const aspectRatio = img.naturalWidth / img.naturalHeight;
-                                    if (containerWidth / containerHeight > aspectRatio) {
-                                      // Container is wider, scale based on height
-                                      img.style.height = `${containerHeight * scale}px`;
-                                      img.style.width = 'auto';
-                                    } else {
-                                      // Container is taller, scale based on width
-                                      img.style.width = `${containerWidth * scale}px`;
-                                      img.style.height = 'auto';
+                              onMouseMove={(e) => {
+                                const container = e.currentTarget.closest('.overflow-auto') as HTMLElement;
+                                handleMouseMove(e, container);
+                              }}
+                              onMouseUp={handleMouseUp}
+                              onMouseLeave={handleMouseUp}
+                            >
+                              <img
+                                key={imagePreview || diyKitForm.image_url}
+                                src={imagePreview || diyKitForm.image_url || ''}
+                                alt="Preview"
+                                className="block"
+                                style={{
+                                  pointerEvents: 'none',
+                                  maxWidth: 'none',
+                                  height: 'auto',
+                                  display: 'block'
+                                }}
+                                onError={(e) => {
+                                  const target = e.target as HTMLImageElement;
+                                  console.error('❌ Preview image failed to load:', imagePreview || diyKitForm.image_url);
+                                  target.style.display = 'none';
+                                }}
+                                onLoad={(e) => {
+                                  console.log('✅ Preview image loaded:', imagePreview || diyKitForm.image_url);
+                                  const img = e.target as HTMLImageElement;
+                                  // Make image larger to enable scrolling - scale to 1.5x container size minimum
+                                  const container = img.closest('.overflow-auto') as HTMLElement;
+                                  if (container) {
+                                    const containerWidth = container.clientWidth;
+                                    const containerHeight = container.clientHeight;
+                                    const scale = 1.5; // Scale factor to ensure scrolling is possible
+                                    // Ensure image is at least scale times the container size
+                                    if (img.naturalWidth > 0 && img.naturalHeight > 0) {
+                                      const aspectRatio = img.naturalWidth / img.naturalHeight;
+                                      if (containerWidth / containerHeight > aspectRatio) {
+                                        // Container is wider, scale based on height
+                                        img.style.height = `${containerHeight * scale}px`;
+                                        img.style.width = 'auto';
+                                      } else {
+                                        // Container is taller, scale based on width
+                                        img.style.width = `${containerWidth * scale}px`;
+                                        img.style.height = 'auto';
+                                      }
                                     }
                                   }
-                                }
-                                // Reset position when image loads
-                                resetImagePosition();
-                              }}
-                              draggable={false}
-                            />
+                                  // Reset position when image loads
+                                  resetImagePosition();
+                                }}
+                                draggable={false}
+                              />
+                            </div>
                           </div>
-                          <div className="sticky top-2 right-2 float-right flex gap-2 z-10 clear-both">
-                            <button
-                              type="button"
-                              onClick={resetImagePosition}
-                              className="p-1 bg-blue-500 text-white rounded-full hover:bg-blue-600"
-                              title="Reset position"
-                            >
-                              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-                              </svg>
-                            </button>
-                            <button
-                              type="button"
-                              onClick={() => {
-                                setImagePreview(null);
-                                setSelectedImageFile(null);
-                                setDiyKitForm({ ...diyKitForm, image_url: '' });
-                                setImagePosition({ x: 0, y: 0 });
-                                const fileInput = document.getElementById('image-upload-diy') as HTMLInputElement;
-                                if (fileInput) fileInput.value = '';
-                              }}
-                              className="p-1 bg-red-500 text-white rounded-full hover:bg-red-600"
-                              title="Remove image"
-                            >
-                              <X className="w-4 h-4" />
-                            </button>
-                          </div>
-                          <div className="sticky bottom-2 left-2 float-left text-xs text-gray-500 dark:text-gray-400 bg-white/80 dark:bg-gray-800/80 px-2 py-1 rounded z-10">
-                            Drag to reposition • Use scrollbars to adjust view
-                          </div>
-                        </div>
+                        </>
                       )}
                       
                       {/* File Upload */}
@@ -1142,7 +1158,7 @@ const AdminAddOns = () => {
                             type="button"
                             onClick={() => handleImageUpload('diy-kits')}
                             disabled={uploadingImage}
-                            className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2"
+                            className="px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-400 disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2"
                           >
                             {uploadingImage ? (
                               <>
@@ -1167,7 +1183,7 @@ const AdminAddOns = () => {
                     <textarea
                       value={diyKitForm.description}
                       onChange={(e) => setDiyKitForm({ ...diyKitForm, description: e.target.value })}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
                       rows={5}
                       placeholder="Detailed description of the DIY kit..."
                     />
