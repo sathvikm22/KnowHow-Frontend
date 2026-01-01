@@ -72,38 +72,38 @@ const Hero = () => {
         <div className="hidden md:block absolute top-1/2 left-2 w-16 h-16 bg-gradient-to-br from-orange-300 to-red-300 rounded-full opacity-45 animate-pulse" style={{animationDelay: '1.5s'}}></div>
         <div className="hidden md:block absolute top-2/5 right-2 w-18 h-18 bg-gradient-to-bl from-yellow-300 to-pink-300 rounded-full opacity-50 animate-bounce" style={{animationDelay: '0.8s'}}></div>
 
-        {/* Mobile-only animations - positioned far to the sides */}
-        <div className="md:hidden absolute top-20 -left-4 w-12 h-12 bg-blue-400 rounded-full opacity-40 animate-bounce flex items-center justify-center">
-          <Calendar className="w-6 h-6 text-white" />
+        {/* Mobile-only animations - positioned inwards for better visibility */}
+        <div className="md:hidden absolute top-20 left-4 w-16 h-16 bg-blue-400 rounded-full opacity-60 animate-bounce flex items-center justify-center">
+          <Calendar className="w-8 h-8 text-white" />
         </div>
-        <div className="md:hidden absolute top-1/3 -left-2 w-10 h-10 bg-orange-400 rounded-full opacity-40 animate-bounce flex items-center justify-center" style={{animationDelay: '1s'}}>
-          <Palette className="w-5 h-5 text-white" />
+        <div className="md:hidden absolute top-1/3 left-2 w-14 h-14 bg-orange-400 rounded-full opacity-60 animate-bounce flex items-center justify-center" style={{animationDelay: '1s'}}>
+          <Palette className="w-7 h-7 text-white" />
         </div>
-        <div className="md:hidden absolute top-2/3 -left-3 w-8 h-8 bg-purple-400 rounded-full opacity-40 animate-pulse flex items-center justify-center" style={{animationDelay: '0.5s'}}>
-          <Brush className="w-4 h-4 text-white" />
+        <div className="md:hidden absolute top-2/3 left-3 w-12 h-12 bg-purple-400 rounded-full opacity-60 animate-pulse flex items-center justify-center" style={{animationDelay: '0.5s'}}>
+          <Brush className="w-6 h-6 text-white" />
         </div>
-        <div className="md:hidden absolute bottom-32 -left-2 w-10 h-10 bg-orange-400 rounded-full opacity-40 animate-bounce flex items-center justify-center" style={{animationDelay: '1s'}}>
-          <Users className="w-5 h-5 text-white" />
+        <div className="md:hidden absolute bottom-32 left-2 w-14 h-14 bg-orange-400 rounded-full opacity-60 animate-bounce flex items-center justify-center" style={{animationDelay: '1s'}}>
+          <Users className="w-7 h-7 text-white" />
         </div>
-        <div className="md:hidden absolute top-1/2 -left-1 w-8 h-8 bg-teal-400 rounded-full opacity-40 animate-pulse flex items-center justify-center" style={{animationDelay: '2s'}}>
-          <Scissors className="w-4 h-4 text-white" />
+        <div className="md:hidden absolute top-1/2 left-1 w-12 h-12 bg-teal-400 rounded-full opacity-60 animate-pulse flex items-center justify-center" style={{animationDelay: '2s'}}>
+          <Scissors className="w-6 h-6 text-white" />
         </div>
 
         {/* Right side mobile animations */}
-        <div className="md:hidden absolute top-40 -right-4 w-12 h-12 bg-pink-400 rounded-full opacity-40 animate-pulse flex items-center justify-center">
-          <Heart className="w-6 h-6 text-white" />
+        <div className="md:hidden absolute top-40 right-4 w-16 h-16 bg-pink-400 rounded-full opacity-60 animate-pulse flex items-center justify-center">
+          <Heart className="w-8 h-8 text-white" />
         </div>
-        <div className="md:hidden absolute top-1/4 -right-2 w-10 h-10 bg-yellow-400 rounded-full opacity-40 animate-bounce flex items-center justify-center" style={{animationDelay: '1.5s'}}>
-          <Star className="w-5 h-5 text-white" />
+        <div className="md:hidden absolute top-1/4 right-2 w-14 h-14 bg-yellow-400 rounded-full opacity-60 animate-bounce flex items-center justify-center" style={{animationDelay: '1.5s'}}>
+          <Star className="w-7 h-7 text-white" />
         </div>
-        <div className="md:hidden absolute top-2/3 -right-3 w-8 h-8 bg-indigo-400 rounded-full opacity-40 animate-pulse flex items-center justify-center" style={{animationDelay: '3s'}}>
-          <Sparkles className="w-4 h-4 text-white" />
+        <div className="md:hidden absolute top-2/3 right-3 w-12 h-12 bg-indigo-400 rounded-full opacity-60 animate-pulse flex items-center justify-center" style={{animationDelay: '3s'}}>
+          <Sparkles className="w-6 h-6 text-white" />
         </div>
-        <div className="md:hidden absolute bottom-20 -right-2 w-8 h-8 bg-green-400 rounded-full opacity-40 animate-pulse flex items-center justify-center" style={{animationDelay: '2s'}}>
-          <Sparkles className="w-4 h-4 text-white" />
+        <div className="md:hidden absolute bottom-20 right-2 w-12 h-12 bg-green-400 rounded-full opacity-60 animate-pulse flex items-center justify-center" style={{animationDelay: '2s'}}>
+          <Sparkles className="w-6 h-6 text-white" />
         </div>
-        <div className="md:hidden absolute top-1/2 -right-1 w-10 h-10 bg-red-400 rounded-full opacity-40 animate-bounce flex items-center justify-center" style={{animationDelay: '2.5s'}}>
-          <Heart className="w-5 h-5 text-white" />
+        <div className="md:hidden absolute top-1/2 right-1 w-14 h-14 bg-red-400 rounded-full opacity-60 animate-bounce flex items-center justify-center" style={{animationDelay: '2.5s'}}>
+          <Heart className="w-7 h-7 text-white" />
         </div>
       </div>
 
