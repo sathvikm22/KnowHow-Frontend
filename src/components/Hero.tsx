@@ -18,7 +18,7 @@ const Hero = () => {
   };
 
   return (
-    <section id="home" className="relative min-h-screen bg-cyan-100 dark:bg-gray-900 overflow-hidden">
+    <section id="home" className="relative min-h-screen dark:bg-gray-900 overflow-hidden" style={{ backgroundColor: '#acf1e5' }}>
       {/* Animated Background Elements */}
       <div className="absolute inset-0">
         {/* Left Side Floating Icons - Hidden on mobile, visible on desktop */}
@@ -111,7 +111,7 @@ const Hero = () => {
         <div className="flex flex-col items-center justify-center min-h-screen text-center">
           {/* Main Content */}
           <div className="w-full max-w-full px-2 sm:px-6">
-            <h1 className="text-5xl sm:text-7xl md:text-8xl lg:text-8xl xl:text-9xl font-bold text-gray-800 dark:text-white mb-6 md:mb-8 leading-tight animate-fade-in" style={{ fontFamily: "'Bowlby One SC', sans-serif", letterSpacing: '0.05em', textAlign: 'center', width: '100%' }}>
+            <h1 className="text-5xl sm:text-7xl md:text-8xl lg:text-8xl xl:text-9xl font-bold text-black dark:text-white mb-6 md:mb-8 leading-tight animate-fade-in" style={{ fontFamily: "'Bowlby One SC', sans-serif", letterSpacing: '0.05em', textAlign: 'center', width: '100%' }}>
               <div className="block" style={{ textAlign: 'center' }}>CREATE</div>
               <div className="block text-orange-600" style={{ textAlign: 'center' }}>MEMORIES</div>
               <div className="block whitespace-nowrap" style={{ textAlign: 'center' }}>THAT LAST</div>

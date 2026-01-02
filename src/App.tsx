@@ -21,7 +21,6 @@ import GoogleAuthCallback from './pages/GoogleAuthCallback';
 import PrivacyPolicy from './pages/PrivacyPolicy';
 import ShippingPolicy from './pages/ShippingPolicy';
 import TermsAndConditions from './pages/TermsAndConditions';
-import CancellationsAndRefunds from './pages/CancellationsAndRefunds';
 import ContactUs from './pages/ContactUs';
 import Orders from './pages/Orders';
 import MyOrders from './pages/MyOrders';
@@ -127,10 +126,6 @@ const App = () => {
               <Route path="/terms-and-conditions" element={<TermsAndConditions />} />
               <Route path="/terms" element={<TermsAndConditions />} />
               <Route path="/terms-of-service" element={<TermsAndConditions />} />
-              <Route path="/cancellations-refunds" element={<CancellationsAndRefunds />} />
-              <Route path="/refund-policy" element={<CancellationsAndRefunds />} />
-              <Route path="/cancellation-policy" element={<CancellationsAndRefunds />} />
-              <Route path="/returns" element={<CancellationsAndRefunds />} />
               <Route path="/contact-us" element={<ContactUs />} />
               <Route path="/contact" element={<ContactUs />} />
               <Route path="/orders" element={<ProtectedRoute requireAuth={true}><Orders /></ProtectedRoute>} />

@@ -52,6 +52,33 @@ const Login = () => {
   const location = useLocation();
   const [searchParams] = useSearchParams();
 
+  // Add noindex, nofollow meta tag for SEO (login pages should not be indexed)
+  useEffect(() => {
+    // Create or update the robots meta tag
+    let robotsMeta = document.querySelector('meta[name="robots"]');
+    if (!robotsMeta) {
+      robotsMeta = document.createElement('meta');
+      robotsMeta.setAttribute('name', 'robots');
+      document.head.appendChild(robotsMeta);
+    }
+    robotsMeta.setAttribute('content', 'noindex, nofollow');
+    
+    // Cleanup: restore original robots meta on unmount (if it exists in index.html)
+    return () => {
+      const originalRobots = document.querySelector('meta[name="robots"]');
+      if (originalRobots) {
+        // Check if there's an original value in index.html, otherwise remove
+        const indexHtmlRobots = document.querySelector('meta[name="robots"][data-original]');
+        if (indexHtmlRobots) {
+          robotsMeta?.setAttribute('content', indexHtmlRobots.getAttribute('content') || 'index, follow');
+        } else {
+          // If no original, we can leave it or set a default
+          // For now, we'll just leave it as noindex for login page
+        }
+      }
+    };
+  }, []);
+
   // Check if user is already logged in and redirect
   useEffect(() => {
     const checkExistingAuth = async () => {

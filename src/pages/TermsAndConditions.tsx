@@ -109,7 +109,7 @@ const TermsAndConditions = () => {
 
               <h3 className="text-xl font-semibold text-gray-900 dark:text-white mt-6 mb-3">5.3 Cancellation Policy</h3>
               <p className="text-gray-700 dark:text-gray-300 leading-relaxed">
-                Please refer to our <button onClick={() => navigate('/cancellations-refunds')} className="text-blue-600 hover:underline">Cancellations and Refunds Policy</button> for detailed information about cancellation terms and refund procedures.
+                Cancellation terms and refund procedures are subject to our booking policies. For specific cancellation requests, please contact us directly at knowhowcafe2025@gmail.com or call 95910 32562.
               </p>
             </section>
 
