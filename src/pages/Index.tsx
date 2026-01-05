@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import Hero from '../components/Hero';
 import About from '../components/About';
 import Activities from '../components/Activities';
@@ -6,6 +7,7 @@ import Testimonials from '../components/Testimonials';
 import Location from '../components/Location';
 import Contact from '../components/Contact';
 import Navigation from '../components/Navigation';
+import { setCanonicalTag } from '../utils/seo';
 import React from 'react';
 
 const EventsSection = () => {
@@ -88,6 +90,9 @@ const EventsSection = () => {
 };
 
 const Index = () => {
+  useEffect(() => {
+    setCanonicalTag('/');
+  }, []);
 
   return (
     <div className="min-h-screen bg-purple-50 dark:bg-purple-100 transition-colors duration-300">

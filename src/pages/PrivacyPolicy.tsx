@@ -2,11 +2,13 @@ import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Navigation from '../components/Navigation';
 import { api } from '../lib/api';
+import { setCanonicalTag } from '../utils/seo';
 
 const PrivacyPolicy = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
+    setCanonicalTag('/privacy-policy');
     // Optional: Check if user is logged in, but allow access to privacy policy
     // const storedUser = localStorage.getItem('userName');
     // if (!storedUser) {
@@ -442,7 +444,7 @@ const PrivacyPolicy = () => {
               </p>
               <button
                 onClick={() => {
-                  navigate('/home');
+                  navigate('/');
                   // Scroll to top after navigation
                   setTimeout(() => {
                     window.scrollTo({ top: 0, behavior: 'smooth' });

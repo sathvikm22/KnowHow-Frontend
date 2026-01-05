@@ -35,7 +35,7 @@ const PaymentFailed = () => {
               Try Again
             </Button>
             <Button
-              onClick={() => navigate('/home')}
+              onClick={() => navigate('/')}
               variant="outline"
               className="flex-1"
             >

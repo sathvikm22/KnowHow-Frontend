@@ -1,10 +1,15 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Navigation from '../components/Navigation';
 import { Instagram, Phone, Mail, MapPin } from 'lucide-react';
+import { setCanonicalTag } from '../utils/seo';
 
 const ContactUs = () => {
   const navigate = useNavigate();
+
+  useEffect(() => {
+    setCanonicalTag('/contact-us');
+  }, []);
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -285,7 +290,7 @@ const ContactUs = () => {
           <div className="mt-8 text-center">
             <button
               onClick={() => {
-                navigate('/home');
+                navigate('/');
                 setTimeout(() => {
                   window.scrollTo({ top: 0, behavior: 'smooth' });
                 }, 100);

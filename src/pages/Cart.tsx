@@ -242,7 +242,7 @@ const Cart = () => {
   };
 
   const handleBrowseDIYKits = () => {
-      navigate('/home');
+      navigate('/');
     // Wait for page to load and then scroll to DIY kits section
       setTimeout(() => {
       const element = document.getElementById('shop-diy-kits');

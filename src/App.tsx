@@ -110,7 +110,7 @@ const App = () => {
           <Router>
             <Routes>
               <Route path="/" element={<Index />} />
-              <Route path="/home" element={<Index />} />
+              <Route path="/home" element={<Navigate to="/" replace />} />
               <Route path="/login" element={<Login />} />
               <Route path="/signup" element={<SignUp />} />
               <Route path="/booking" element={<ProtectedRoute requireAuth={true}><Booking /></ProtectedRoute>} />
@@ -122,12 +122,12 @@ const App = () => {
               <Route path="/auth/google/callback" element={<GoogleAuthCallback />} />
               <Route path="/privacy-policy" element={<PrivacyPolicy />} />
               <Route path="/shipping-policy" element={<ShippingPolicy />} />
-              <Route path="/shipping" element={<ShippingPolicy />} />
+              <Route path="/shipping" element={<Navigate to="/shipping-policy" replace />} />
               <Route path="/terms-and-conditions" element={<TermsAndConditions />} />
-              <Route path="/terms" element={<TermsAndConditions />} />
-              <Route path="/terms-of-service" element={<TermsAndConditions />} />
+              <Route path="/terms" element={<Navigate to="/terms-and-conditions" replace />} />
+              <Route path="/terms-of-service" element={<Navigate to="/terms-and-conditions" replace />} />
               <Route path="/contact-us" element={<ContactUs />} />
-              <Route path="/contact" element={<ContactUs />} />
+              <Route path="/contact" element={<Navigate to="/contact-us" replace />} />
               <Route path="/orders" element={<ProtectedRoute requireAuth={true}><Orders /></ProtectedRoute>} />
               <Route path="/my-orders" element={<ProtectedRoute requireAuth={true}><MyOrders /></ProtectedRoute>} />
               <Route path="/all-orders" element={<ProtectedRoute requireAuth={true}><AllOrders /></ProtectedRoute>} />

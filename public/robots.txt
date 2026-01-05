@@ -1,82 +1,18 @@
 # robots.txt for Know-How Creative Studio
 # Allow crawling of public pages while blocking admin and protected routes
 
-# Allow social media bots for better sharing
-User-agent: Googlebot
-Allow: /
-Disallow: /admin/
-Disallow: /booking
-Disallow: /activities
-Disallow: /buy
-Disallow: /cart
-Disallow: /checkout
-Disallow: /cart-checkout
-Disallow: /orders
-Disallow: /my-orders
-Disallow: /all-orders
-Disallow: /auth/
-Disallow: /payment-processing
-Disallow: /success
-Disallow: /failed
-Disallow: /home
-
-User-agent: Bingbot
-Allow: /
-Disallow: /admin/
-Disallow: /booking
-Disallow: /activities
-Disallow: /buy
-Disallow: /cart
-Disallow: /checkout
-Disallow: /cart-checkout
-Disallow: /orders
-Disallow: /my-orders
-Disallow: /all-orders
-Disallow: /auth/
-Disallow: /payment-processing
-Disallow: /success
-Disallow: /failed
-Disallow: /home
-
-User-agent: Twitterbot
-Allow: /
-Disallow: /admin/
-Disallow: /booking
-Disallow: /activities
-Disallow: /buy
-Disallow: /cart
-Disallow: /checkout
-Disallow: /cart-checkout
-Disallow: /orders
-Disallow: /my-orders
-Disallow: /all-orders
-Disallow: /auth/
-Disallow: /payment-processing
-Disallow: /success
-Disallow: /failed
-Disallow: /home
-
-User-agent: facebookexternalhit
-Allow: /
-Disallow: /admin/
-Disallow: /booking
-Disallow: /activities
-Disallow: /buy
-Disallow: /cart
-Disallow: /checkout
-Disallow: /cart-checkout
-Disallow: /orders
-Disallow: /my-orders
-Disallow: /all-orders
-Disallow: /auth/
-Disallow: /payment-processing
-Disallow: /success
-Disallow: /failed
-Disallow: /home
-
-# Default rules for all other bots
+# Allow all search engines to crawl public pages
 User-agent: *
 Allow: /
+Allow: /privacy-policy
+Allow: /shipping-policy
+Allow: /terms-and-conditions
+Allow: /contact-us
+Allow: /signup
+Allow: /forgot-password
+Allow: /login
+
+# Block admin and protected routes
 Disallow: /admin/
 Disallow: /booking
 Disallow: /activities
@@ -91,7 +27,6 @@ Disallow: /auth/
 Disallow: /payment-processing
 Disallow: /success
 Disallow: /failed
-Disallow: /home
 
 # Sitemap location
 Sitemap: https://www.knowhowindia.in/sitemap.xml

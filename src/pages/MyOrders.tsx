@@ -135,7 +135,7 @@ const MyOrders = () => {
           <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-8 text-center">
             <Package className="w-16 h-16 text-gray-400 mx-auto mb-4" />
             <p className="text-gray-600 dark:text-gray-300 mb-4">No orders found.</p>
-            <Button onClick={() => navigate('/home')} className="bg-orange-500 hover:bg-orange-600">
+            <Button onClick={() => navigate('/')} className="bg-orange-500 hover:bg-orange-600">
               Shop Now
             </Button>
           </div>

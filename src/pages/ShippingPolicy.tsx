@@ -1,8 +1,14 @@
+import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Navigation from '../components/Navigation';
+import { setCanonicalTag } from '../utils/seo';
 
 const ShippingPolicy = () => {
   const navigate = useNavigate();
+
+  useEffect(() => {
+    setCanonicalTag('/shipping-policy');
+  }, []);
 
   return (
     <div className="min-h-screen bg-purple-50 dark:bg-purple-100 transition-colors duration-300">
@@ -200,7 +206,7 @@ const ShippingPolicy = () => {
               </p>
               <button
                 onClick={() => {
-                  navigate('/home');
+                  navigate('/');
                   setTimeout(() => {
                     window.scrollTo({ top: 0, behavior: 'smooth' });
                   }, 100);
