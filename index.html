@@ -151,6 +151,28 @@
     }
     </script>
     
+    <!-- Ensure canonical tag is set correctly before React loads -->
+    <script>
+      // Set canonical tag immediately to prevent Google from seeing wrong domain
+      (function() {
+        const canonicalUrl = 'https://www.knowhowindia.in' + window.location.pathname;
+        let canonical = document.querySelector('link[rel="canonical"]');
+        if (canonical) {
+          canonical.href = canonicalUrl;
+        } else {
+          canonical = document.createElement('link');
+          canonical.rel = 'canonical';
+          canonical.href = canonicalUrl;
+          document.head.appendChild(canonical);
+        }
+        // Also ensure og:url matches
+        let ogUrl = document.querySelector('meta[property="og:url"]');
+        if (ogUrl) {
+          ogUrl.content = canonicalUrl;
+        }
+      })();
+    </script>
+    
     <!-- Hide static content initially, visible only to crawlers -->
     <style>
       /* Hide by default - React app will render immediately */

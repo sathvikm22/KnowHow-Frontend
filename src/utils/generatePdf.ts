@@ -207,7 +207,7 @@ export const generateReceiptPDF = async (receiptData: ReceiptData) => {
 
   doc.setFontSize(8);
   doc.setTextColor(0, 0, 0);
-  doc.text('knowhowcafe.com', leftColumnX, currentY + 16);
+  doc.text('knowhowindia.in', leftColumnX, currentY + 16);
   doc.text('knowhowcafe2025@gmail.com', leftColumnX, currentY + 22);
   doc.text('95910 32562', leftColumnX, currentY + 28);
   const addressLines = doc.splitTextToSize('No.716 17th Main, 38th Cross, 4th T Block, Jayanagar, Bangalore - 560041', 80);
