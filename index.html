@@ -153,22 +153,40 @@
     
     <!-- Ensure canonical tag is set correctly before React loads -->
     <script>
-      // Set canonical tag immediately to prevent Google from seeing wrong domain
+      // Map alternative URLs to their canonical versions
       (function() {
-        const canonicalUrl = 'https://www.knowhowindia.in' + window.location.pathname;
-        let canonical = document.querySelector('link[rel="canonical"]');
-        if (canonical) {
-          canonical.href = canonicalUrl;
-        } else {
-          canonical = document.createElement('link');
-          canonical.rel = 'canonical';
-          canonical.href = canonicalUrl;
-          document.head.appendChild(canonical);
-        }
+        const pathMappings = {
+          '/home': '/',
+          '/shipping': '/shipping-policy',
+          '/terms': '/terms-and-conditions',
+          '/terms-of-service': '/terms-and-conditions',
+          '/contact': '/contact-us'
+        };
+        
+        // Get the current path and map it to canonical if needed
+        const currentPath = window.location.pathname;
+        const canonicalPath = pathMappings[currentPath] || currentPath;
+        const canonicalUrl = 'https://www.knowhowindia.in' + (canonicalPath === '/' ? '' : canonicalPath);
+        
+        // Remove any existing canonical tags
+        const existingCanonicals = document.querySelectorAll('link[rel="canonical"]');
+        existingCanonicals.forEach(canonical => canonical.remove());
+        
+        // Create new canonical tag with the correct URL
+        const canonical = document.createElement('link');
+        canonical.rel = 'canonical';
+        canonical.href = canonicalUrl;
+        document.head.appendChild(canonical);
+        
         // Also ensure og:url matches
         let ogUrl = document.querySelector('meta[property="og:url"]');
         if (ogUrl) {
           ogUrl.content = canonicalUrl;
+        } else {
+          ogUrl = document.createElement('meta');
+          ogUrl.setAttribute('property', 'og:url');
+          ogUrl.content = canonicalUrl;
+          document.head.appendChild(ogUrl);
         }
       })();
     </script>
