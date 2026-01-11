@@ -14,6 +14,7 @@ Allow: /login
 
 # Block admin and protected routes
 Disallow: /admin/
+Disallow: /home
 Disallow: /booking
 Disallow: /activities
 Disallow: /buy

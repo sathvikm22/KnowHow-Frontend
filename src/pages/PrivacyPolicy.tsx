@@ -35,7 +35,7 @@ const PrivacyPolicy = () => {
   };
 
   return (
-    <div className="min-h-screen bg-purple-50 dark:bg-purple-100 transition-colors duration-300">
+    <div className="min-h-screen bg-teal-50 dark:bg-teal-100 transition-colors duration-300">
       <Navigation />
       <div className="pt-20 pb-16 px-4 sm:px-6 lg:px-8">
         <div className="max-w-4xl mx-auto">
