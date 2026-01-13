@@ -31,6 +31,25 @@ const Checkout = () => {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    // Set noindex meta tag to prevent search engine indexing
+    let robotsMeta = document.querySelector('meta[name="robots"]');
+    if (!robotsMeta) {
+      robotsMeta = document.createElement('meta');
+      robotsMeta.setAttribute('name', 'robots');
+      document.head.appendChild(robotsMeta);
+    }
+    robotsMeta.setAttribute('content', 'noindex, nofollow');
+
+    // Cleanup: restore default robots meta on unmount
+    return () => {
+      const defaultRobots = document.querySelector('meta[name="robots"]');
+      if (defaultRobots) {
+        defaultRobots.setAttribute('content', 'index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1');
+      }
+    };
+  }, []);
+
+  useEffect(() => {
     const state = location.state as CheckoutLocationState;
     if (!state?.orderData) {
       navigate('/booking');
