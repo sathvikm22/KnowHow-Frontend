@@ -8,7 +8,7 @@ const Location = () => {
   };
 
   return (
-    <section id="location" className="py-20 bg-orange-100 dark:bg-gray-800">
+    <section id="location" className="py-20 transition-colors duration-300" style={{ backgroundColor: '#acf1e5' }}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
           <div>

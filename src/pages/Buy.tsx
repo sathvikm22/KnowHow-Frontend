@@ -95,7 +95,7 @@ const Buy = () => {
 
   if (loading || !selectedKit) {
     return (
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+      <div className="min-h-screen transition-colors duration-300 w-full" style={{ backgroundColor: '#acf1e5' }}>
         <Navigation />
         <div className="flex items-center justify-center h-screen">
           <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600"></div>
@@ -107,7 +107,7 @@ const Buy = () => {
   const isSelectedKitInCart = cart.some(item => item.kit_name === selectedKit?.name);
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 w-full">
+    <div className="min-h-screen transition-colors duration-300 w-full" style={{ backgroundColor: '#acf1e5' }}>
       <Navigation />
       <div className="w-full px-4 sm:px-6 lg:px-8 py-6 sm:py-8 pt-20 sm:pt-24">
         <div className="max-w-7xl mx-auto">

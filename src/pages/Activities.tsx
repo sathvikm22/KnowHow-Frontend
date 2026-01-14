@@ -1,10 +1,12 @@
 import React from 'react';
+import Navigation from '../components/Navigation';
+import ActivitiesComponent from '../components/Activities';
 
 const Activities = () => {
   return (
-    <div>
-      <h1>Our Activities</h1>
-      <p>This is the activities page.</p>
+    <div className="min-h-screen transition-colors duration-300" style={{ backgroundColor: '#acf1e5' }}>
+      <Navigation />
+      <ActivitiesComponent />
     </div>
   );
 };
