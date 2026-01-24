@@ -109,6 +109,7 @@ class ApiClient {
       if (response.status === 401 || response.status === 403) {
         // Try to refresh access token using refresh token
         try {
+          // Refresh endpoint is at /api/auth/refresh (baseUrl is already /api)
           const refreshResponse = await fetch(`${this.baseUrl}/auth/refresh`, {
             method: 'POST',
             credentials: 'include',

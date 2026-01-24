@@ -75,11 +75,9 @@ const Activities = () => {
       console.log(`🖼️ Using image_url for ${activity.name}:`, url);
       return url;
     }
-    // Fallback to default image path based on name
-    const imageName = activity.name.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
-    const fallbackUrl = `/lovable-uploads/${imageName}.png`;
-    console.log(`⚠️ No image_url for ${activity.name}, using fallback:`, fallbackUrl);
-    return fallbackUrl;
+    // Use placeholder instead of guessing filename (files have UUID-based names)
+    console.log(`⚠️ No image_url for ${activity.name}, using placeholder`);
+    return '/lovable-uploads/placeholder.svg';
   };
 
   if (loading) {
@@ -134,16 +132,9 @@ const Activities = () => {
                         onError={(e) => {
                           const target = e.target as HTMLImageElement;
                           console.error(`❌ Image failed to load for ${activity.name}:`, imageUrl);
-                          // Try fallback if we were using image_url
-                          if (activity.image_url && activity.image_url.trim() !== '') {
-                            const fallbackUrl = getImageUrl(activity);
-                            if (target.src !== fallbackUrl && !fallbackUrl.includes('placeholder')) {
-                              console.log(`   Trying fallback: ${fallbackUrl}`);
-                              target.src = fallbackUrl;
-                            } else {
-                              target.src = '/lovable-uploads/placeholder.svg';
-                            }
-                          } else {
+                          // Always use placeholder on error (don't try fallback - files have UUID names)
+                          if (!target.src.includes('placeholder')) {
+                            console.log(`   Using placeholder for ${activity.name}`);
                             target.src = '/lovable-uploads/placeholder.svg';
                           }
                         }}

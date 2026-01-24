@@ -315,6 +315,9 @@ const AdminAddOns = () => {
         }
         // It's a URL, safe to save
         imageUrl = trimmed;
+      } else {
+        // Warn if no image is provided (but allow saving - frontend will show placeholder)
+        console.warn('⚠️  No image URL provided for activity. Frontend will show placeholder.');
       }
       
       const payload = {
