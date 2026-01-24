@@ -191,6 +191,23 @@ const Login = () => {
         // DO NOT store tokens - they are in HttpOnly cookies (secure by design)
         console.log('✅ Authentication successful - tokens in HttpOnly cookies');
         
+        // Verify cookies were set by immediately calling /me endpoint
+        // Small delay to ensure cookies are processed by browser
+        await new Promise(resolve => setTimeout(resolve, 100));
+        
+        try {
+          const verifyResponse = await api.getCurrentUser();
+          if (verifyResponse.success && verifyResponse.user) {
+            console.log('✅ Session verified - cookies are working');
+          } else {
+            console.warn('⚠️  Session verification failed - cookies may not be set');
+            // Continue anyway - cookies might still work
+          }
+        } catch (verifyError) {
+          console.warn('⚠️  Could not verify session immediately:', verifyError);
+          // Continue anyway - cookies might still work, browser might need a moment
+        }
+        
         // Dispatch custom event to notify CookieConsent and Cart components
         // This also helps with cross-tab synchronization
         window.dispatchEvent(new CustomEvent('authStateChanged'));
