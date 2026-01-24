@@ -476,32 +476,18 @@ const Login = () => {
                   type="button"
                   className="w-full flex items-center justify-center px-4 py-2 border border-gray-300 rounded-xl hover:bg-gray-50 transition-colors"
                   onClick={() => {
-                    // Get backend URL from environment variable (without /api suffix)
-                    const getBackendUrl = () => {
-                      const envUrl = import.meta.env.VITE_BACKEND_URL || import.meta.env.VITE_API_URL;
-                      if (envUrl) {
-                        return envUrl.replace(/\/+$/, ''); // Remove trailing slashes
-                      }
-                      return 'http://localhost:3000'; // Default for local development
-                    };
-                    
-                    // Get current frontend URL (production domain)
-                    const getFrontendUrl = () => {
-                      // In production, use the actual domain
-                      if (window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
-                        return `${window.location.protocol}//${window.location.host}`;
-                      }
-                      // For local development
-                      return 'http://localhost:8080';
-                    };
-                    
-                    const backendBase = getBackendUrl();
-                    const frontendUrl = getFrontendUrl();
-                    
-                    // Pass frontend URL as query parameter so backend knows where to redirect
+                    const envUrl = import.meta.env.VITE_BACKEND_URL || import.meta.env.VITE_API_URL;
+                    let backendBase = envUrl ? envUrl.replace(/\/+$/, '') : '';
+                    if (!backendBase) {
+                      const h = window.location.hostname;
+                      backendBase = (h === 'www.knowhowindia.in' || h === 'knowhowindia.in')
+                        ? 'https://knowhow-backend-d2gs.onrender.com'
+                        : 'http://localhost:3000';
+                    }
+                    const frontendUrl = (window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1')
+                      ? `${window.location.protocol}//${window.location.host}`
+                      : 'http://localhost:8080';
                     const googleAuthUrl = `${backendBase}/api/auth/google?frontend_url=${encodeURIComponent(frontendUrl)}`;
-                    console.log('Redirecting to Google OAuth:', googleAuthUrl);
-                    console.log('Frontend URL being sent:', frontendUrl);
                     window.location.href = googleAuthUrl;
                   }}
                 >

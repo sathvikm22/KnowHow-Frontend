@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import AdminLayout from '../components/AdminLayout';
-import { api } from '@/lib/api';
+import { api, API_BASE } from '@/lib/api';
 import { Loader2, Plus, Edit, Trash2, Save, X, Upload } from 'lucide-react';
 
 interface Activity {
@@ -70,7 +70,7 @@ const AdminAddOns = () => {
       setError(null);
       
       if (activeTab === 'activities') {
-        const response = await fetch(`${import.meta.env.VITE_BACKEND_URL || 'http://localhost:3000'}/api/addons/activities`, {
+        const response = await fetch(`${API_BASE}/api/addons/activities`, {
           credentials: 'include',
           headers: {
             'Content-Type': 'application/json'
@@ -90,7 +90,7 @@ const AdminAddOns = () => {
           setError(data.message || 'Failed to fetch activities');
         }
       } else {
-        const response = await fetch(`${import.meta.env.VITE_BACKEND_URL || 'http://localhost:3000'}/api/addons/diy-kits`, {
+        const response = await fetch(`${API_BASE}/api/addons/diy-kits`, {
           credentials: 'include',
           headers: {
             // NO Authorization header - tokens are in HttpOnly cookies
@@ -182,7 +182,7 @@ const AdminAddOns = () => {
         try {
           const base64Image = reader.result as string;
 
-          const response = await fetch(`${import.meta.env.VITE_BACKEND_URL || 'http://localhost:3000'}/api/upload/image`, {
+          const response = await fetch(`${API_BASE}/api/upload/image`, {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
@@ -334,8 +334,8 @@ const AdminAddOns = () => {
       console.log('   Final image URL being saved:', imageUrl);
       
       const url = editingId
-        ? `${import.meta.env.VITE_BACKEND_URL || 'http://localhost:3000'}/api/addons/activities/${editingId}`
-        : `${import.meta.env.VITE_BACKEND_URL || 'http://localhost:3000'}/api/addons/activities`;
+        ? `${API_BASE}/api/addons/activities/${editingId}`
+        : `${API_BASE}/api/addons/activities`;
       
       const method = editingId ? 'PUT' : 'POST';
       
@@ -389,7 +389,7 @@ const AdminAddOns = () => {
   const handleDeleteActivity = async (id: string) => {
     try {
       setError(null);
-      const response = await fetch(`${import.meta.env.VITE_BACKEND_URL || 'http://localhost:3000'}/api/addons/activities/${id}`, {
+      const response = await fetch(`${API_BASE}/api/addons/activities/${id}`, {
         method: 'DELETE',
         headers: {
           // NO Authorization header - tokens are in HttpOnly cookies
@@ -486,8 +486,8 @@ const AdminAddOns = () => {
       console.log('   Final image URL being saved:', imageUrl);
       
       const url = editingId
-        ? `${import.meta.env.VITE_BACKEND_URL || 'http://localhost:3000'}/api/addons/diy-kits/${editingId}`
-        : `${import.meta.env.VITE_BACKEND_URL || 'http://localhost:3000'}/api/addons/diy-kits`;
+        ? `${API_BASE}/api/addons/diy-kits/${editingId}`
+        : `${API_BASE}/api/addons/diy-kits`;
       
       const method = editingId ? 'PUT' : 'POST';
       
@@ -541,7 +541,7 @@ const AdminAddOns = () => {
   const handleDeleteDIYKit = async (id: string) => {
     try {
       setError(null);
-      const response = await fetch(`${import.meta.env.VITE_BACKEND_URL || 'http://localhost:3000'}/api/addons/diy-kits/${id}`, {
+      const response = await fetch(`${API_BASE}/api/addons/diy-kits/${id}`, {
         method: 'DELETE',
         headers: {
           // NO Authorization header - tokens are in HttpOnly cookies

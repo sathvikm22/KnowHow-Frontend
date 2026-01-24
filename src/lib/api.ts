@@ -1,14 +1,12 @@
-// Get API base URL from environment variable
-// VITE_BACKEND_URL should be the base URL (e.g., http://localhost:3000 or https://knowhow-backend-d2gs.onrender.com)
-// We append /api to it
-// Remove trailing slashes and ensure HTTPS in production
+const PRODUCTION_BACKEND = 'https://knowhow-backend-d2gs.onrender.com';
+
 const getBackendUrl = () => {
   const envUrl = import.meta.env.VITE_BACKEND_URL || import.meta.env.VITE_API_URL;
-  if (envUrl) {
-    // Remove trailing slashes
-    return envUrl.replace(/\/+$/, '');
+  if (envUrl) return envUrl.replace(/\/+$/, '');
+  if (typeof window !== 'undefined') {
+    const h = window.location.hostname;
+    if (h === 'www.knowhowindia.in' || h === 'knowhowindia.in') return PRODUCTION_BACKEND;
   }
-  // Default to localhost for development
   return 'http://localhost:3000';
 };
 
@@ -488,8 +486,8 @@ class ApiClient {
 }
 
 export const api = new ApiClient(API_BASE_URL);
+export { API_BASE };
 
-// Export standalone functions for easier importing
 export const logout = () => api.logout();
 export const getCurrentUser = () => api.getCurrentUser();
 
