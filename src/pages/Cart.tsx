@@ -209,9 +209,10 @@ const Cart = () => {
       return;
     }
 
-    // Save to localStorage for future use
-    localStorage.setItem('deliveryAddress', customerAddress);
-    localStorage.setItem('deliveryPhone', customerPhone);
+    // DO NOT store PII in localStorage - fetch from backend when needed
+    // For now, pass directly to checkout (will be stored securely on backend)
+    // localStorage.setItem('deliveryAddress', customerAddress); // REMOVED - security
+    // localStorage.setItem('deliveryPhone', customerPhone); // REMOVED - security
 
     // Prepare cart data
     const cartData = {

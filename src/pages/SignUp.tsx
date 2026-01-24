@@ -209,18 +209,14 @@ const SignUp = () => {
       );
       
       if (response.success) {
-        // Store user data
+        // Store user data (non-sensitive UI state only)
+        // Tokens are in HttpOnly cookies set by backend
         if (response.user) {
           localStorage.setItem('userName', response.user.name);
           localStorage.setItem('userEmail', response.user.email);
         }
         
-        // Store token in localStorage as fallback (even when cookies are accepted)
-        // This ensures authentication works even if cookies fail or aren't set properly
-        // The backend will prefer cookies over the Authorization header if both are present
-        if (response.token) {
-          localStorage.setItem('authToken', response.token);
-        }
+        // DO NOT store tokens - they are in HttpOnly cookies (secure by design)
         
         localStorage.removeItem('isAdmin');
         

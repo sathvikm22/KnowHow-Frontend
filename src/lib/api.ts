@@ -53,32 +53,15 @@ class ApiClient {
     
     const config: RequestInit = {
       ...options,
-      credentials: 'include', // Always include credentials for cookies
+      credentials: 'include', // Always include credentials for HttpOnly cookies
       headers: {
         'Content-Type': 'application/json',
         ...options.headers,
       },
     };
 
-    // Check cookie consent status
-    const cookieConsent = localStorage.getItem('cookieConsent');
-    const hasConsent = cookieConsent === 'accepted';
-
-    // Get token from localStorage (if available)
-    const token = localStorage.getItem('authToken');
-
-    // Add auth token to header:
-    // 1. If cookies are NOT accepted, always send token in header (in-memory auth)
-    // 2. If cookies ARE accepted, still send token as fallback (in case cookie isn't set or fails)
-    // The backend will prefer cookies over headers if both are present
-    if (token) {
-      config.headers = {
-        ...config.headers,
-        Authorization: `Bearer ${token}`,
-      };
-    }
-    // Note: Even with cookies accepted, we send the token in header as fallback
-    // The backend checks cookies first, then falls back to Authorization header
+    // NO Authorization header - tokens are in HttpOnly cookies only
+    // This prevents XSS token theft
 
     try {
       console.log('API Request:', { 
@@ -122,6 +105,48 @@ class ApiClient {
         return data;
       }
       
+      // Handle 401/403 - try to refresh token automatically
+      if (response.status === 401 || response.status === 403) {
+        // Try to refresh access token using refresh token
+        try {
+          const refreshResponse = await fetch(`${this.baseUrl}/auth/refresh`, {
+            method: 'POST',
+            credentials: 'include',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+          });
+
+          if (refreshResponse.ok) {
+            // Retry original request with new access token
+            return this.request<T>(endpoint, options);
+          } else {
+            // Refresh failed - user needs to login again
+            // Clear any stale auth state
+            localStorage.removeItem('userName');
+            localStorage.removeItem('userEmail');
+            localStorage.removeItem('isAdmin');
+            window.dispatchEvent(new CustomEvent('userLoggedOut'));
+            
+            const errorMessage = data.message || data.error || 'Session expired. Please login again.';
+            const error = new Error(errorMessage);
+            (error as any).status = response.status;
+            throw error;
+          }
+        } catch (refreshError) {
+          // Refresh failed - clear auth state
+          localStorage.removeItem('userName');
+          localStorage.removeItem('userEmail');
+          localStorage.removeItem('isAdmin');
+          window.dispatchEvent(new CustomEvent('userLoggedOut'));
+          
+          const errorMessage = data.message || data.error || 'Session expired. Please login again.';
+          const error = new Error(errorMessage);
+          (error as any).status = response.status;
+          throw error;
+        }
+      }
+
       // For other errors, throw with detailed error info
       if (!response.ok) {
         const errorMessage = data.message || data.error || `Request failed with status ${response.status}`;
@@ -233,29 +258,42 @@ class ApiClient {
   }
 
   async getCurrentUser(): Promise<ApiResponse> {
-    return this.request('/auth/me', {
+    const response = await this.request('/auth/me', {
       method: 'GET',
     });
+    
+    // Update localStorage with user info from backend (non-sensitive UI state only)
+    if (response.success && response.user) {
+      localStorage.setItem('userName', response.user.name);
+      localStorage.setItem('userEmail', response.user.email);
+      // DO NOT store phone/address in localStorage - fetch from backend when needed
+    }
+    
+    return response;
   }
 
   async logout(): Promise<ApiResponse> {
     try {
-      // Try to call logout endpoint
+      // Call logout endpoint (clears HttpOnly cookies on backend)
       const result = await this.request('/auth/logout', {
         method: 'POST',
       });
-      // Clear token from localStorage
-      localStorage.removeItem('authToken');
+      // Clear user info from localStorage (no tokens stored)
       localStorage.removeItem('userName');
+      localStorage.removeItem('userEmail');
       localStorage.removeItem('isAdmin');
+      localStorage.removeItem('deliveryPhone');
+      localStorage.removeItem('deliveryAddress');
       // Dispatch logout event for components to react
       window.dispatchEvent(new CustomEvent('userLoggedOut'));
       return result;
     } catch (error) {
-      // Even if API call fails, clear local token
-      localStorage.removeItem('authToken');
+      // Even if API call fails, clear local user info
       localStorage.removeItem('userName');
+      localStorage.removeItem('userEmail');
       localStorage.removeItem('isAdmin');
+      localStorage.removeItem('deliveryPhone');
+      localStorage.removeItem('deliveryAddress');
       // Dispatch logout event for components to react
       window.dispatchEvent(new CustomEvent('userLoggedOut'));
       return { success: true, message: 'Logged out successfully' };

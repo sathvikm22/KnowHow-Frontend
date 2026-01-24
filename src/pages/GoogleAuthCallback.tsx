@@ -64,28 +64,31 @@ const GoogleAuthCallback = () => {
           return;
         }
 
-        // Store authentication data
-        setStatus('Storing authentication data...');
+        // Tokens are already set in HttpOnly cookies by backend
+        // Only store non-sensitive UI state
+        setStatus('Authentication successful...');
         
-        // Check cookie consent status
-        const cookieConsent = localStorage.getItem('cookieConsent');
-        const hasConsent = cookieConsent === 'accepted';
-        
-        // Store user data
+        // Store user data (non-sensitive UI state only)
         localStorage.setItem('userEmail', email);
         if (name) {
           localStorage.setItem('userName', name);
         }
-        
-        // Store token in localStorage as fallback (even when cookies are accepted)
-        // This ensures authentication works even if cookies fail or aren't set properly
-        // The backend will prefer cookies over the Authorization header if both are present
-        localStorage.setItem('authToken', token);
 
         if (isAdmin) {
           localStorage.setItem('isAdmin', 'true');
         } else {
           localStorage.removeItem('isAdmin');
+        }
+        
+        // Verify session by fetching user from backend (tokens in cookies)
+        try {
+          const userResponse = await api.getCurrentUser();
+          if (userResponse.success && userResponse.user) {
+            // Session verified - user is authenticated via HttpOnly cookies
+            console.log('Session verified via HttpOnly cookies');
+          }
+        } catch (error) {
+          console.error('Failed to verify session:', error);
         }
 
         // Dispatch custom event to notify CookieConsent and Cart components

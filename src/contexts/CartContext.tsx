@@ -27,8 +27,10 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
 
   const refreshCart = async () => {
     try {
-      const authToken = localStorage.getItem('authToken');
-      if (!authToken) {
+      // Check if user is authenticated (UI state check)
+      // Actual auth is verified by backend via HttpOnly cookies
+      const userName = localStorage.getItem('userName');
+      if (!userName) {
         setCart([]);
         setLoading(false);
         return;

@@ -19,10 +19,11 @@ const CookieConsent = () => {
   ];
 
   // Helper function to check if user is still logged in
+  // Note: Actual auth is verified by backend via HttpOnly cookies
   const isUserLoggedIn = (): boolean => {
-    const authToken = localStorage.getItem('authToken');
     const userName = localStorage.getItem('userName');
-    return !!(authToken && userName);
+    // Check UI state only - actual auth is via HttpOnly cookies
+    return !!userName;
   };
 
   const checkAndShowConsent = async () => {

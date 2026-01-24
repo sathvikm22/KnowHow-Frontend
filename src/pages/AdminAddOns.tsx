@@ -73,7 +73,8 @@ const AdminAddOns = () => {
         const response = await fetch(`${import.meta.env.VITE_BACKEND_URL || 'http://localhost:3000'}/api/addons/activities`, {
           credentials: 'include',
           headers: {
-            'Authorization': `Bearer ${localStorage.getItem('authToken')}`
+            'Content-Type': 'application/json'
+            // NO Authorization header - tokens are in HttpOnly cookies
           }
         });
         const data = await response.json();
@@ -92,7 +93,7 @@ const AdminAddOns = () => {
         const response = await fetch(`${import.meta.env.VITE_BACKEND_URL || 'http://localhost:3000'}/api/addons/diy-kits`, {
           credentials: 'include',
           headers: {
-            'Authorization': `Bearer ${localStorage.getItem('authToken')}`
+            // NO Authorization header - tokens are in HttpOnly cookies
           }
         });
         const data = await response.json();
@@ -185,7 +186,7 @@ const AdminAddOns = () => {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
-              'Authorization': `Bearer ${localStorage.getItem('authToken')}`
+              // NO Authorization header - tokens are in HttpOnly cookies
             },
             credentials: 'include',
             body: JSON.stringify({
@@ -339,7 +340,7 @@ const AdminAddOns = () => {
         method,
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('authToken')}`
+          // NO Authorization header - tokens are in HttpOnly cookies
         },
         credentials: 'include',
         body: JSON.stringify(payload)
@@ -388,7 +389,7 @@ const AdminAddOns = () => {
       const response = await fetch(`${import.meta.env.VITE_BACKEND_URL || 'http://localhost:3000'}/api/addons/activities/${id}`, {
         method: 'DELETE',
         headers: {
-          'Authorization': `Bearer ${localStorage.getItem('authToken')}`
+          // NO Authorization header - tokens are in HttpOnly cookies
         },
         credentials: 'include'
       });
@@ -491,7 +492,7 @@ const AdminAddOns = () => {
         method,
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('authToken')}`
+          // NO Authorization header - tokens are in HttpOnly cookies
         },
         credentials: 'include',
         body: JSON.stringify(payload)
@@ -540,7 +541,7 @@ const AdminAddOns = () => {
       const response = await fetch(`${import.meta.env.VITE_BACKEND_URL || 'http://localhost:3000'}/api/addons/diy-kits/${id}`, {
         method: 'DELETE',
         headers: {
-          'Authorization': `Bearer ${localStorage.getItem('authToken')}`
+          // NO Authorization header - tokens are in HttpOnly cookies
         },
         credentials: 'include'
       });
