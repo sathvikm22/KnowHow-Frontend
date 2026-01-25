@@ -18,7 +18,7 @@ const GoogleAuthCallback = () => {
         const code = searchParams.get('code') || urlParams.get('code');
         const error = searchParams.get('error') || urlParams.get('error');
 
-        console.log('Extracted code:', code ? code.substring(0, 20) + '...' : 'null');
+        console.log('Extracted code:', code || 'null');
         console.log('Extracted error:', error);
 
         if (error) {
