@@ -10,28 +10,41 @@ const GoogleAuthCallback = () => {
   useEffect(() => {
     const processCallback = async () => {
       try {
+        console.log('=== GoogleAuthCallback Processing ===');
+        console.log('Full URL:', window.location.href);
+        console.log('Search params:', window.location.search);
+        
         const urlParams = new URLSearchParams(window.location.search);
         const code = searchParams.get('code') || urlParams.get('code');
         const error = searchParams.get('error') || urlParams.get('error');
 
+        console.log('Extracted code:', code ? code.substring(0, 20) + '...' : 'null');
+        console.log('Extracted error:', error);
+
         if (error) {
+          console.log('Error detected, redirecting to login');
           setStatus('Authentication failed. Redirecting...');
           setTimeout(() => navigate('/login?error=' + encodeURIComponent(error), { replace: true }), 1000);
           return;
         }
 
         if (!code) {
+          console.log('No code found in URL, redirecting to login');
           setStatus('Missing auth code. Redirecting...');
           setTimeout(() => navigate('/login?error=missing_code', { replace: true }), 1000);
           return;
         }
 
         setStatus('Completing sign-in...');
+        console.log('Calling api.completeGoogleSignIn...');
         let result;
         try {
           result = await api.completeGoogleSignIn(code);
-        } catch (e) {
+          console.log('completeGoogleSignIn result:', result);
+        } catch (e: any) {
           console.error('Google complete failed:', e);
+          console.error('Error message:', e?.message);
+          console.error('Error response:', e?.response);
           setStatus('Sign-in failed. Redirecting...');
           setTimeout(() => navigate('/login?error=complete_failed', { replace: true }), 1000);
           return;

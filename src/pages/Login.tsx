@@ -145,9 +145,14 @@ const Login = () => {
         'oauth_not_configured': 'Google OAuth is not properly configured. Please contact support.',
         'missing_parameters': 'Missing authentication parameters. Please try signing in again.',
         'callback_error': 'An error occurred during authentication. Please try again.',
-        'access_denied': 'You denied access to your Google account. Please try again and grant the necessary permissions.'
+        'access_denied': 'You denied access to your Google account. Please try again and grant the necessary permissions.',
+        'missing_code': 'Missing authentication code from Google. Please try again.',
+        'complete_failed': 'Failed to complete Google sign-in. Please try again.',
+        'oauth_code_failed': 'Failed to process authentication. Please try again.',
+        'oauth_callback_failed': 'Google sign-in callback failed. Please try again.'
       };
-      setLoginError(errorMessages[error] || 'An error occurred during Google sign-in. Please try again.');
+      console.log('Login error from URL:', error);
+      setLoginError(errorMessages[error] || `An error occurred during Google sign-in (${error}). Please try again.`);
       
       // Clear the error from URL
       navigate('/login', { replace: true });
