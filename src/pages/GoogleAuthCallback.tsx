@@ -11,9 +11,7 @@ const GoogleAuthCallback = () => {
     const processCallback = async () => {
       try {
         const urlParams = new URLSearchParams(window.location.search);
-        const email = searchParams.get('email') || urlParams.get('email');
-        const name = searchParams.get('name') || urlParams.get('name');
-        const isAdmin = (searchParams.get('isAdmin') || urlParams.get('isAdmin')) === 'true';
+        const code = searchParams.get('code') || urlParams.get('code');
         const error = searchParams.get('error') || urlParams.get('error');
 
         if (error) {
@@ -22,29 +20,32 @@ const GoogleAuthCallback = () => {
           return;
         }
 
-        // Backend never sends token in URL – auth is via HttpOnly cookies only.
-        // It redirects here with email/name after setting cookies. Verify session via /me.
-        setStatus('Verifying session...');
+        if (!code) {
+          setStatus('Missing auth code. Redirecting...');
+          setTimeout(() => navigate('/login?error=missing_code', { replace: true }), 1000);
+          return;
+        }
 
-        let userResponse;
+        setStatus('Completing sign-in...');
+        let result;
         try {
-          userResponse = await api.getCurrentUser();
+          result = await api.completeGoogleSignIn(code);
         } catch (e) {
-          console.error('Failed to verify session:', e);
-          setStatus('Session invalid. Redirecting...');
-          setTimeout(() => navigate('/login?error=session_invalid', { replace: true }), 1000);
+          console.error('Google complete failed:', e);
+          setStatus('Sign-in failed. Redirecting...');
+          setTimeout(() => navigate('/login?error=complete_failed', { replace: true }), 1000);
           return;
         }
 
-        if (!userResponse?.success || !userResponse?.user) {
-          setStatus('Session invalid. Redirecting...');
-          setTimeout(() => navigate('/login?error=session_invalid', { replace: true }), 1000);
+        if (!result?.success || !result?.user) {
+          setStatus('Sign-in failed. Redirecting...');
+          setTimeout(() => navigate('/login?error=complete_failed', { replace: true }), 1000);
           return;
         }
 
-        const user = userResponse.user;
+        const user = result.user;
         localStorage.setItem('userEmail', user.email);
-        localStorage.setItem('userName', user.name || name || 'User');
+        localStorage.setItem('userName', user.name || 'User');
         if (user.email?.toLowerCase() === 'knowhowcafe2025@gmail.com') {
           localStorage.setItem('isAdmin', 'true');
         } else {
