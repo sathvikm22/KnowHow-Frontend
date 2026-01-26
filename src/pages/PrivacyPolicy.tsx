@@ -50,13 +50,15 @@ const PrivacyPolicy = () => {
       localStorage.removeItem('cookieConsent');
       localStorage.removeItem('cookieConsentDate');
       window.cookieConsentGiven = false;
-      alert('Your cookie consent has been withdrawn. Non-essential cookies will no longer be loaded. Please refresh the page for changes to take effect.');
+      // Consent withdrawn successfully - user can refresh page if needed
+      console.log('Cookie consent withdrawn successfully');
     } catch (error) {
       console.error('Error withdrawing consent:', error);
       // Fallback: clear localStorage
       localStorage.removeItem('cookieConsent');
       localStorage.removeItem('cookieConsentDate');
-      alert('Your cookie consent has been withdrawn locally. Please refresh the page for changes to take effect.');
+      window.cookieConsentGiven = false;
+      console.log('Cookie consent withdrawn locally');
     }
   };
 
