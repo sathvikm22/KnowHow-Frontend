@@ -256,6 +256,12 @@ class ApiClient {
     });
   }
 
+  async completeGoogleSignIn(code: string): Promise<ApiResponse> {
+    return this.request('/auth/google/complete', {
+      method: 'POST',
+      body: JSON.stringify({ code }),
+    });
+  }
 
   async getCurrentUser(): Promise<ApiResponse> {
     const response = await this.request('/auth/me', {
