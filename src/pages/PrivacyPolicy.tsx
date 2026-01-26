@@ -7,11 +7,13 @@ import { setCanonicalTag } from '../utils/seo';
 const PrivacyPolicy = () => {
   const navigate = useNavigate();
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [cookieConsent, setCookieConsent] = useState<'accepted' | 'declined' | null>(null);
+  const [isLoadingConsent, setIsLoadingConsent] = useState(true);
 
   useEffect(() => {
     setCanonicalTag('/privacy-policy');
     
-    // Check if user is logged in
+    // Check if user is logged in and get cookie consent status
     const checkAuth = async () => {
       const storedUser = localStorage.getItem('userName');
       if (storedUser) {
@@ -25,18 +27,35 @@ const PrivacyPolicy = () => {
             setIsLoggedIn(true);
           } else {
             // API call succeeded but user not found - keep as logged in if localStorage has user
-            // This handles edge cases where API might fail but user is actually logged in
             setIsLoggedIn(!!storedUser);
           }
         } catch (error) {
           // API call failed - but if localStorage has user, assume they're logged in
-          // This handles cases where cookies might not be set yet but user just logged in
           console.log('Could not verify session, using localStorage state:', error);
           setIsLoggedIn(!!storedUser);
         }
+        
+        // Get cookie consent status
+        try {
+          const consentResult = await api.getCookieConsent();
+          if (consentResult.success) {
+            const consent = consentResult.data?.cookieConsent || consentResult.cookieConsent;
+            setCookieConsent(consent || null);
+          } else {
+            // Check localStorage as fallback
+            const localConsent = localStorage.getItem('cookieConsent');
+            setCookieConsent(localConsent === 'accepted' ? 'accepted' : localConsent === 'declined' ? 'declined' : null);
+          }
+        } catch (error) {
+          // Check localStorage as fallback
+          const localConsent = localStorage.getItem('cookieConsent');
+          setCookieConsent(localConsent === 'accepted' ? 'accepted' : localConsent === 'declined' ? 'declined' : null);
+        }
       } else {
         setIsLoggedIn(false);
+        setCookieConsent(null);
       }
+      setIsLoadingConsent(false);
     };
     
     checkAuth();
@@ -50,7 +69,10 @@ const PrivacyPolicy = () => {
       localStorage.removeItem('cookieConsent');
       localStorage.removeItem('cookieConsentDate');
       window.cookieConsentGiven = false;
-      // Consent withdrawn successfully - user can refresh page if needed
+      // Update state
+      setCookieConsent('declined');
+      // Dispatch event to trigger cookie popup on next page load
+      window.dispatchEvent(new CustomEvent('cookieConsentChanged', { detail: { accepted: false } }));
       console.log('Cookie consent withdrawn successfully');
     } catch (error) {
       console.error('Error withdrawing consent:', error);
@@ -58,7 +80,32 @@ const PrivacyPolicy = () => {
       localStorage.removeItem('cookieConsent');
       localStorage.removeItem('cookieConsentDate');
       window.cookieConsentGiven = false;
+      setCookieConsent('declined');
       console.log('Cookie consent withdrawn locally');
+    }
+  };
+
+  const handleAcceptConsent = async () => {
+    try {
+      // Update consent to accepted in Supabase
+      await api.updateCookieConsent('accepted');
+      // Also update localStorage
+      localStorage.setItem('cookieConsent', 'accepted');
+      localStorage.setItem('cookieConsentDate', new Date().toISOString());
+      window.cookieConsentGiven = true;
+      // Update state
+      setCookieConsent('accepted');
+      // Dispatch event to load analytics scripts
+      window.dispatchEvent(new CustomEvent('cookieConsentChanged', { detail: { accepted: true } }));
+      console.log('Cookie consent accepted successfully');
+    } catch (error) {
+      console.error('Error accepting consent:', error);
+      // Fallback: update localStorage
+      localStorage.setItem('cookieConsent', 'accepted');
+      localStorage.setItem('cookieConsentDate', new Date().toISOString());
+      window.cookieConsentGiven = true;
+      setCookieConsent('accepted');
+      console.log('Cookie consent accepted locally');
     }
   };
 
@@ -247,24 +294,67 @@ const PrivacyPolicy = () => {
                 </ul>
               </div>
 
-              <h3 className="text-xl font-semibold text-gray-900 dark:text-white mt-6 mb-3">6.1 How to Withdraw Consent</h3>
-              <p className="text-gray-700 dark:text-gray-300 leading-relaxed mb-4">
-                You can withdraw your consent at any time:
-              </p>
-              <ul className="list-disc list-inside text-gray-700 dark:text-gray-300 space-y-2 ml-4">
-                {isLoggedIn && (
-                  <li>Click the button below to withdraw consent</li>
-                )}
-                <li>Contact us at <strong>knowhowcafe2025@gmail.com</strong> to request consent withdrawal</li>
-                <li>Clear your browser's localStorage and cookies (this will also log you out)</li>
-              </ul>
-              {isLoggedIn && (
-                <button
-                  onClick={handleWithdrawConsent}
-                  className="mt-4 bg-red-500 text-white px-6 py-3 rounded-xl font-semibold hover:bg-red-600 transition-colors duration-300"
-                >
-                  Withdraw Cookie Consent
-                </button>
+              <h3 className="text-xl font-semibold text-gray-900 dark:text-white mt-6 mb-3">6.1 Cookie Consent Management</h3>
+              {isLoggedIn && !isLoadingConsent && (
+                <>
+                  {cookieConsent === 'accepted' ? (
+                    <>
+                      <p className="text-gray-700 dark:text-gray-300 leading-relaxed mb-4">
+                        You have accepted cookie consent. You can withdraw your consent at any time:
+                      </p>
+                      <ul className="list-disc list-inside text-gray-700 dark:text-gray-300 space-y-2 ml-4 mb-4">
+                        <li>Click the button below to withdraw consent</li>
+                        <li>Contact us at <strong>knowhowcafe2025@gmail.com</strong> to request consent withdrawal</li>
+                        <li>Clear your browser's localStorage and cookies (this will also log you out)</li>
+                      </ul>
+                      <button
+                        onClick={handleWithdrawConsent}
+                        className="mt-4 bg-red-500 text-white px-6 py-3 rounded-xl font-semibold hover:bg-red-600 transition-colors duration-300"
+                      >
+                        Withdraw Cookie Consent
+                      </button>
+                    </>
+                  ) : cookieConsent === 'declined' ? (
+                    <>
+                      <p className="text-gray-700 dark:text-gray-300 leading-relaxed mb-4">
+                        You have withdrawn cookie consent. You can accept cookies again at any time:
+                      </p>
+                      <ul className="list-disc list-inside text-gray-700 dark:text-gray-300 space-y-2 ml-4 mb-4">
+                        <li>Click the button below to accept cookie consent</li>
+                        <li>This will enable analytics and tracking cookies</li>
+                        <li>You can withdraw consent again at any time</li>
+                      </ul>
+                      <button
+                        onClick={handleAcceptConsent}
+                        className="mt-4 bg-green-500 text-white px-6 py-3 rounded-xl font-semibold hover:bg-green-600 transition-colors duration-300"
+                      >
+                        Accept Cookie Consent
+                      </button>
+                    </>
+                  ) : (
+                    <>
+                      <p className="text-gray-700 dark:text-gray-300 leading-relaxed mb-4">
+                        You haven't given cookie consent yet. You can accept or decline:
+                      </p>
+                      <ul className="list-disc list-inside text-gray-700 dark:text-gray-300 space-y-2 ml-4 mb-4">
+                        <li>Click the button below to accept cookie consent</li>
+                        <li>This will enable analytics and tracking cookies</li>
+                        <li>You can withdraw consent at any time</li>
+                      </ul>
+                      <button
+                        onClick={handleAcceptConsent}
+                        className="mt-4 bg-green-500 text-white px-6 py-3 rounded-xl font-semibold hover:bg-green-600 transition-colors duration-300"
+                      >
+                        Accept Cookie Consent
+                      </button>
+                    </>
+                  )}
+                </>
+              )}
+              {!isLoggedIn && (
+                <p className="text-gray-700 dark:text-gray-300 leading-relaxed mb-4">
+                  Please log in to manage your cookie consent preferences.
+                </p>
               )}
 
               <h3 className="text-xl font-semibold text-gray-900 dark:text-white mt-6 mb-3">6.2 How to Opt Out of Analytics</h3>

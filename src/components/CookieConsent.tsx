@@ -166,6 +166,23 @@ const CookieConsent = () => {
       setIsLoading(false);
     };
 
+    // Listen for cookie consent changes - show popup if consent was withdrawn
+    const handleCookieConsentChange = (e: CustomEvent) => {
+      if (!e.detail?.accepted) {
+        // Consent was withdrawn - show popup again if user is logged in
+        if (isUserLoggedIn() && !excludedPaths.includes(location.pathname)) {
+          setTimeout(() => {
+            if (isUserLoggedIn() && !excludedPaths.includes(location.pathname)) {
+              setShow(true);
+            }
+          }, 500);
+        }
+      } else {
+        // Consent was accepted - hide popup
+        setShow(false);
+      }
+    };
+
     // Monitor localStorage changes for logout (cross-tab)
     const handleStorageChange = (e: StorageEvent) => {
       if (e.key === 'authToken' && !e.newValue) {
@@ -173,11 +190,23 @@ const CookieConsent = () => {
         setShow(false);
         setIsLoading(false);
       }
+      // Also check if cookieConsent was changed
+      if (e.key === 'cookieConsent' && (!e.newValue || e.newValue === 'declined')) {
+        // Consent was withdrawn - show popup if user is logged in
+        if (isUserLoggedIn() && !excludedPaths.includes(location.pathname)) {
+          setTimeout(() => {
+            if (isUserLoggedIn() && !excludedPaths.includes(location.pathname)) {
+              setShow(true);
+            }
+          }, 500);
+        }
+      }
     };
 
     // Add event listeners
     window.addEventListener('authStateChanged', handleAuthChange);
     window.addEventListener('userLoggedOut', handleLogout);
+    window.addEventListener('cookieConsentChanged', handleCookieConsentChange as EventListener);
     window.addEventListener('storage', handleStorageChange);
     
     // Also check periodically if popup is showing to ensure user is still logged in
@@ -191,6 +220,7 @@ const CookieConsent = () => {
     return () => {
       window.removeEventListener('authStateChanged', handleAuthChange);
       window.removeEventListener('userLoggedOut', handleLogout);
+      window.removeEventListener('cookieConsentChanged', handleCookieConsentChange as EventListener);
       window.removeEventListener('storage', handleStorageChange);
       clearTimeout(checkTimer);
       clearInterval(loginCheckInterval);
