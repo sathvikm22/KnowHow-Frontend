@@ -76,7 +76,8 @@ const CookieConsent = () => {
           setIsLoading(false);
         }
       } else {
-        // If API call fails, fallback to localStorage check
+        // If API call fails (e.g., 401 or user not found), treat as never consented
+        // This handles new users who don't have a consent record yet
         const localConsent = localStorage.getItem('cookieConsent');
         if (!localConsent || localConsent === 'declined') {
           setTimeout(() => {
@@ -86,17 +87,20 @@ const CookieConsent = () => {
               setIsLoading(false);
               return;
             }
-            setShow(true);
+            if (!excludedPaths.includes(location.pathname)) {
+              setShow(true);
+            }
             setIsLoading(false);
-          }, 500);
+          }, 1500);
         } else {
           setShow(false);
           setIsLoading(false);
         }
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error checking cookie consent:', error);
-      // Fallback to localStorage check
+      // If API call fails (401, 404, etc.), treat as never consented
+      // This is important for new users who don't have a consent record yet
       const localConsent = localStorage.getItem('cookieConsent');
       if (!localConsent || localConsent === 'declined') {
         setTimeout(() => {
@@ -106,9 +110,11 @@ const CookieConsent = () => {
             setIsLoading(false);
             return;
           }
-          setShow(true);
+          if (!excludedPaths.includes(location.pathname)) {
+            setShow(true);
+          }
           setIsLoading(false);
-        }, 500);
+        }, 1500);
       } else {
         setShow(false);
         setIsLoading(false);

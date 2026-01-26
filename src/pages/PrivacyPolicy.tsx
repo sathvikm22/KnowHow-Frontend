@@ -15,15 +15,24 @@ const PrivacyPolicy = () => {
     const checkAuth = async () => {
       const storedUser = localStorage.getItem('userName');
       if (storedUser) {
-        // Verify session is still valid
+        // First set to true based on localStorage (optimistic)
+        setIsLoggedIn(true);
+        
+        // Then verify session is still valid (but don't fail if API call fails)
         try {
           const result = await api.getCurrentUser();
           if (result?.success && result?.user) {
             setIsLoggedIn(true);
+          } else {
+            // API call succeeded but user not found - keep as logged in if localStorage has user
+            // This handles edge cases where API might fail but user is actually logged in
+            setIsLoggedIn(!!storedUser);
           }
         } catch (error) {
-          // Session invalid, user not logged in
-          setIsLoggedIn(false);
+          // API call failed - but if localStorage has user, assume they're logged in
+          // This handles cases where cookies might not be set yet but user just logged in
+          console.log('Could not verify session, using localStorage state:', error);
+          setIsLoggedIn(!!storedUser);
         }
       } else {
         setIsLoggedIn(false);
