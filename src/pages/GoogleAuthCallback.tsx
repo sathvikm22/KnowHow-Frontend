@@ -15,11 +15,14 @@ const GoogleAuthCallback = () => {
         console.log('Search params:', window.location.search);
         
         const urlParams = new URLSearchParams(window.location.search);
-        const code = searchParams.get('code') || urlParams.get('code');
+        const success = searchParams.get('success') || urlParams.get('success');
         const error = searchParams.get('error') || urlParams.get('error');
+        const email = searchParams.get('email') || urlParams.get('email');
+        const name = searchParams.get('name') || urlParams.get('name');
 
-        console.log('Extracted code:', code || 'null');
+        console.log('Extracted success:', success);
         console.log('Extracted error:', error);
+        console.log('Extracted email:', email);
 
         if (error) {
           console.log('Error detected, redirecting to login');
@@ -28,37 +31,38 @@ const GoogleAuthCallback = () => {
           return;
         }
 
-        if (!code) {
-          console.log('No code found in URL, redirecting to login');
-          setStatus('Missing auth code. Redirecting...');
-          setTimeout(() => navigate('/login?error=missing_code', { replace: true }), 1000);
+        if (!success || success !== 'true') {
+          console.log('No success flag found, redirecting to login');
+          setStatus('Authentication failed. Redirecting...');
+          setTimeout(() => navigate('/login?error=oauth_failed', { replace: true }), 1000);
           return;
         }
 
-        setStatus('Completing sign-in...');
-        console.log('Calling api.completeGoogleSignIn...');
-        let result;
+        // Cookies should be set by backend redirect, verify session
+        setStatus('Verifying session...');
+        console.log('Verifying session with /api/auth/me...');
+        
+        let user;
         try {
-          result = await api.completeGoogleSignIn(code);
-          console.log('completeGoogleSignIn result:', result);
+          const result = await api.getCurrentUser();
+          console.log('getCurrentUser result:', result);
+          
+          if (!result?.success || !result?.user) {
+            throw new Error('Failed to verify session');
+          }
+          
+          user = result.user;
         } catch (e: any) {
-          console.error('Google complete failed:', e);
+          console.error('Session verification failed:', e);
           console.error('Error message:', e?.message);
-          console.error('Error response:', e?.response);
           setStatus('Sign-in failed. Redirecting...');
-          setTimeout(() => navigate('/login?error=complete_failed', { replace: true }), 1000);
+          setTimeout(() => navigate('/login?error=session_verification_failed', { replace: true }), 1000);
           return;
         }
 
-        if (!result?.success || !result?.user) {
-          setStatus('Sign-in failed. Redirecting...');
-          setTimeout(() => navigate('/login?error=complete_failed', { replace: true }), 1000);
-          return;
-        }
-
-        const user = result.user;
+        // Update localStorage with user info
         localStorage.setItem('userEmail', user.email);
-        localStorage.setItem('userName', user.name || 'User');
+        localStorage.setItem('userName', user.name || name || 'User');
         if (user.email?.toLowerCase() === 'knowhowcafe2025@gmail.com') {
           localStorage.setItem('isAdmin', 'true');
         } else {
