@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Navigation from '../components/Navigation';
 import { api } from '../lib/api';
@@ -6,14 +6,31 @@ import { setCanonicalTag } from '../utils/seo';
 
 const PrivacyPolicy = () => {
   const navigate = useNavigate();
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   useEffect(() => {
     setCanonicalTag('/privacy-policy');
-    // Optional: Check if user is logged in, but allow access to privacy policy
-    // const storedUser = localStorage.getItem('userName');
-    // if (!storedUser) {
-    //   navigate('/');
-    // }
+    
+    // Check if user is logged in
+    const checkAuth = async () => {
+      const storedUser = localStorage.getItem('userName');
+      if (storedUser) {
+        // Verify session is still valid
+        try {
+          const result = await api.getCurrentUser();
+          if (result?.success && result?.user) {
+            setIsLoggedIn(true);
+          }
+        } catch (error) {
+          // Session invalid, user not logged in
+          setIsLoggedIn(false);
+        }
+      } else {
+        setIsLoggedIn(false);
+      }
+    };
+    
+    checkAuth();
   }, [navigate]);
 
   const handleWithdrawConsent = async () => {
@@ -224,23 +241,29 @@ const PrivacyPolicy = () => {
                 You can withdraw your consent at any time:
               </p>
               <ul className="list-disc list-inside text-gray-700 dark:text-gray-300 space-y-2 ml-4">
-                <li>Click the button below to withdraw consent</li>
+                {isLoggedIn && (
+                  <li>Click the button below to withdraw consent</li>
+                )}
                 <li>Contact us at <strong>knowhowcafe2025@gmail.com</strong> to request consent withdrawal</li>
                 <li>Clear your browser's localStorage and cookies (this will also log you out)</li>
               </ul>
-              <button
-                onClick={handleWithdrawConsent}
-                className="mt-4 bg-red-500 text-white px-6 py-3 rounded-xl font-semibold hover:bg-red-600 transition-colors duration-300"
-              >
-                Withdraw Cookie Consent
-              </button>
+              {isLoggedIn && (
+                <button
+                  onClick={handleWithdrawConsent}
+                  className="mt-4 bg-red-500 text-white px-6 py-3 rounded-xl font-semibold hover:bg-red-600 transition-colors duration-300"
+                >
+                  Withdraw Cookie Consent
+                </button>
+              )}
 
               <h3 className="text-xl font-semibold text-gray-900 dark:text-white mt-6 mb-3">6.2 How to Opt Out of Analytics</h3>
               <p className="text-gray-700 dark:text-gray-300 leading-relaxed mb-4">
                 If you've previously consented but want to opt out of Google Analytics:
               </p>
               <ul className="list-disc list-inside text-gray-700 dark:text-gray-300 space-y-2 ml-4">
-                <li>Use the "Withdraw Cookie Consent" button above</li>
+                {isLoggedIn && (
+                  <li>Use the "Withdraw Cookie Consent" button above</li>
+                )}
                 <li>Install the <a href="https://tools.google.com/dlpage/gaoptout" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">Google Analytics Opt-out Browser Add-on</a></li>
                 <li>Contact us to request manual opt-out</li>
               </ul>
@@ -368,7 +391,7 @@ const PrivacyPolicy = () => {
                 <div className="bg-teal-50 dark:bg-teal-900/20 rounded-xl p-4">
                   <h4 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">Right to Withdraw Consent</h4>
                   <p className="text-gray-700 dark:text-gray-300">
-                    You can withdraw consent for non-essential cookies and tracking at any time using the button above or by contacting us.
+                    You can withdraw consent for non-essential cookies and tracking at any time {isLoggedIn && 'using the button above or '}by contacting us.
                   </p>
                 </div>
               </div>
