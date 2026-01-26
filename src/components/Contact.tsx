@@ -17,7 +17,7 @@ const Contact = () => {
       <div className="relative z-10 py-12 sm:py-16 lg:py-20">
         {/* Top Section - Heading, Text, and Button */}
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center mb-12 sm:mb-16 lg:mb-20">
-          <h2 className="text-4xl md:text-5xl font-bold text-black mb-6 tracking-wide px-2" style={{ fontFamily: "'Anton', sans-serif" }}>
+          <h2 className="text-4xl md:text-5xl font-bold text-black mb-6 tracking-wide px-2" style={{ fontFamily: "'Bowlby One SC', sans-serif", letterSpacing: '0.02em' }}>
             WHERE EVERY EXPERIENCE
             <br />
             TELLS A STORY

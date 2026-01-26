@@ -18,7 +18,7 @@ const EventsSection = () => {
   return (
     <div id="events-section" className="max-w-5xl mx-auto py-12 px-4 scroll-mt-28">
       {/* Gradient Heading */}
-      <h2 className="text-4xl md:text-5xl font-bold text-center mb-2 tracking-wide" style={{ fontFamily: "'Anton', sans-serif" }}>
+      <h2 className="text-4xl md:text-5xl font-bold text-center mb-2 tracking-wide" style={{ fontFamily: "'Bowlby One SC', sans-serif", letterSpacing: '0.02em' }}>
         <span className="block text-black">DISCOVER OUR</span>
         <span className="block text-black">CREATIVE EVENTS</span>
       </h2>
