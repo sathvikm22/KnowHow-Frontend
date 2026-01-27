@@ -42,67 +42,55 @@ const CookieConsent = () => {
     }
 
     try {
-      // Get cookie consent status from Supabase
+      console.log('🍪 Checking cookie consent status...');
+      // Get cookie consent status from database
       const response = await api.getCookieConsent();
+      console.log('🍪 Cookie consent API response:', response);
       
       if (response.success) {
-        const cookieConsent = response.data?.cookieConsent || response.cookieConsent;
+        // Handle different response structures
+        const cookieConsent = response.cookieConsent || response.data?.cookieConsent || null;
+        console.log('🍪 Cookie consent from database:', cookieConsent);
         
         // Show popup if:
-        // 1. User has never given consent (null)
-        // 2. User has declined (show every login)
+        // 1. User has never given consent (null) - NEW USER or user who hasn't accepted yet
+        // 2. User has declined - show popup every time they log in
         // Don't show if user has accepted
         if (cookieConsent === null || cookieConsent === 'declined') {
+          console.log('🍪 Showing cookie consent popup (consent:', cookieConsent, ')');
           // Delay to ensure page is fully loaded after redirect
           setTimeout(() => {
             // CRITICAL: Double-check user is still logged in before showing
             if (!isUserLoggedIn()) {
+              console.log('🍪 User logged out, hiding popup');
               setShow(false);
               setIsLoading(false);
               return;
             }
             // Double-check we're still on an authenticated page
             if (!excludedPaths.includes(location.pathname)) {
+              console.log('🍪 Showing cookie consent popup');
               setShow(true);
+            } else {
+              console.log('🍪 On excluded path, not showing popup');
             }
             setIsLoading(false);
-          }, 1500); // Longer delay to ensure redirect is complete
+          }, 2000); // 2 second delay to ensure redirect is complete
         } else if (cookieConsent === 'accepted') {
           // User has accepted - don't show popup
+          console.log('🍪 User has accepted cookies, not showing popup');
           setShow(false);
           setIsLoading(false);
         } else {
+          console.log('🍪 Unknown consent status:', cookieConsent);
           setShow(false);
           setIsLoading(false);
         }
       } else {
         // If API call fails (e.g., 401 or user not found), treat as never consented
         // This handles new users who don't have a consent record yet
-        const localConsent = localStorage.getItem('cookieConsent');
-        if (!localConsent || localConsent === 'declined') {
-          setTimeout(() => {
-            // CRITICAL: Check user is still logged in before showing
-            if (!isUserLoggedIn()) {
-              setShow(false);
-              setIsLoading(false);
-              return;
-            }
-            if (!excludedPaths.includes(location.pathname)) {
-              setShow(true);
-            }
-            setIsLoading(false);
-          }, 1500);
-        } else {
-          setShow(false);
-          setIsLoading(false);
-        }
-      }
-    } catch (error: any) {
-      console.error('Error checking cookie consent:', error);
-      // If API call fails (401, 404, etc.), treat as never consented
-      // This is important for new users who don't have a consent record yet
-      const localConsent = localStorage.getItem('cookieConsent');
-      if (!localConsent || localConsent === 'declined') {
+        console.log('🍪 API call returned success=false, treating as never consented');
+        // For new users, always show popup if they're logged in
         setTimeout(() => {
           // CRITICAL: Check user is still logged in before showing
           if (!isUserLoggedIn()) {
@@ -111,14 +99,30 @@ const CookieConsent = () => {
             return;
           }
           if (!excludedPaths.includes(location.pathname)) {
+            console.log('🍪 Showing popup for new user (API returned success=false)');
             setShow(true);
           }
           setIsLoading(false);
-        }, 1500);
-      } else {
-        setShow(false);
-        setIsLoading(false);
+        }, 2000);
       }
+    } catch (error: any) {
+      console.error('🍪 Error checking cookie consent:', error);
+      // If API call throws an error (401, 404, network error, etc.), treat as never consented
+      // This is important for new users who don't have a consent record yet
+      // Show popup for logged-in users (they need to accept/decline)
+      setTimeout(() => {
+        // CRITICAL: Check user is still logged in before showing
+        if (!isUserLoggedIn()) {
+          setShow(false);
+          setIsLoading(false);
+          return;
+        }
+        if (!excludedPaths.includes(location.pathname)) {
+          console.log('🍪 Showing popup after error (treating as never consented - new user)');
+          setShow(true);
+        }
+        setIsLoading(false);
+      }, 2000);
     }
   };
 
@@ -137,6 +141,7 @@ const CookieConsent = () => {
 
     // Listen for custom auth events (for same-tab auth changes)
     const handleAuthChange = () => {
+      console.log('🍪 Auth state changed, checking cookie consent');
       // Immediately hide popup if user logged out
       if (!isUserLoggedIn()) {
         setShow(false);
@@ -146,6 +151,7 @@ const CookieConsent = () => {
       
       // Don't check if on excluded page
       if (excludedPaths.includes(location.pathname)) {
+        console.log('🍪 On excluded path, skipping consent check');
         return;
       }
       // Wait a bit for localStorage to be set and page to load, then check consent
@@ -156,8 +162,9 @@ const CookieConsent = () => {
           setIsLoading(false);
           return;
         }
+        console.log('🍪 User logged in, checking consent status');
         checkAndShowConsent();
-      }, 1500); // Wait longer after auth change to ensure redirect is complete
+      }, 2000); // Wait longer after auth change to ensure redirect is complete
     };
 
     // Listen for logout events - immediately hide popup
@@ -168,17 +175,22 @@ const CookieConsent = () => {
 
     // Listen for cookie consent changes - show popup if consent was withdrawn
     const handleCookieConsentChange = (e: CustomEvent) => {
+      console.log('🍪 Cookie consent changed event:', e.detail);
       if (!e.detail?.accepted) {
-        // Consent was withdrawn - show popup again if user is logged in
+        // Consent was withdrawn - re-check database and show popup if user is logged in
+        console.log('🍪 Consent withdrawn, re-checking database status');
         if (isUserLoggedIn() && !excludedPaths.includes(location.pathname)) {
+          // Re-check consent status from database
           setTimeout(() => {
             if (isUserLoggedIn() && !excludedPaths.includes(location.pathname)) {
-              setShow(true);
+              console.log('🍪 Re-checking consent after withdrawal');
+              checkAndShowConsent();
             }
-          }, 500);
+          }, 1000);
         }
       } else {
         // Consent was accepted - hide popup
+        console.log('🍪 Consent accepted, hiding popup');
         setShow(false);
       }
     };
@@ -191,14 +203,21 @@ const CookieConsent = () => {
         setIsLoading(false);
       }
       // Also check if cookieConsent was changed
-      if (e.key === 'cookieConsent' && (!e.newValue || e.newValue === 'declined')) {
-        // Consent was withdrawn - show popup if user is logged in
-        if (isUserLoggedIn() && !excludedPaths.includes(location.pathname)) {
-          setTimeout(() => {
-            if (isUserLoggedIn() && !excludedPaths.includes(location.pathname)) {
-              setShow(true);
-            }
-          }, 500);
+      if (e.key === 'cookieConsent') {
+        console.log('🍪 CookieConsent changed in localStorage:', e.newValue);
+        if (!e.newValue || e.newValue === 'declined') {
+          // Consent was withdrawn - show popup if user is logged in
+          if (isUserLoggedIn() && !excludedPaths.includes(location.pathname)) {
+            setTimeout(() => {
+              if (isUserLoggedIn() && !excludedPaths.includes(location.pathname)) {
+                console.log('🍪 Showing popup after localStorage change (consent withdrawn)');
+                setShow(true);
+              }
+            }, 1000);
+          }
+        } else if (e.newValue === 'accepted') {
+          // Consent was accepted - hide popup
+          setShow(false);
         }
       }
     };
@@ -229,15 +248,14 @@ const CookieConsent = () => {
 
   const handleAccept = async () => {
     try {
-      // Update consent in Supabase (this will also set the auth cookie on backend)
+      console.log('🍪 User accepted cookie consent, updating database...');
+      // Update consent in Supabase to 'accepted'
       await api.updateCookieConsent('accepted');
+      console.log('🍪 Cookie consent updated to accepted in database');
+      
       // Also update localStorage for immediate effect
       localStorage.setItem('cookieConsent', 'accepted');
       localStorage.setItem('cookieConsentDate', new Date().toISOString());
-      
-      // Keep token in localStorage as fallback (even though we're using cookies)
-      // This ensures authentication works if cookies fail or aren't set properly
-      // The backend will prefer cookies over the Authorization header if both are present
       
       setShow(false);
       
@@ -247,42 +265,45 @@ const CookieConsent = () => {
       
       // Dispatch event to notify auth system
       window.dispatchEvent(new CustomEvent('cookieConsentChanged', { detail: { accepted: true } }));
+      console.log('🍪 Cookie consent accepted, popup will not show again');
     } catch (error) {
-      console.error('Error updating cookie consent:', error);
+      console.error('🍪 Error updating cookie consent:', error);
       // Still update localStorage as fallback
       localStorage.setItem('cookieConsent', 'accepted');
+      localStorage.setItem('cookieConsentDate', new Date().toISOString());
+      window.cookieConsentGiven = true;
       setShow(false);
     }
   };
 
   const handleDecline = async () => {
     try {
-      // Update consent in Supabase (this will also clear the auth cookie on backend)
+      console.log('🍪 User declined cookie consent, updating database...');
+      // Update consent in Supabase to 'declined'
       await api.updateCookieConsent('declined');
+      console.log('🍪 Cookie consent updated to declined in database');
+      
       // Also update localStorage for immediate effect
       localStorage.setItem('cookieConsent', 'declined');
       localStorage.setItem('cookieConsentDate', new Date().toISOString());
       
-      // Clear auth cookie by calling logout (clears HttpOnly cookie)
-      // Note: User will remain logged in via in-memory state until refresh
-      try {
-        await api.logout();
-      } catch (logoutError) {
-        // Ignore logout errors - cookie might not exist
-        console.log('Logout call completed (cookie may not have existed)');
-      }
+      // Don't clear auth cookies - user should stay logged in
+      // Cookie consent is for analytics/tracking, not authentication
       
       setShow(false);
       
       // Don't load non-essential scripts
       window.cookieConsentGiven = false;
       
-      // Dispatch event to notify auth system
+      // Dispatch event to notify other components
       window.dispatchEvent(new CustomEvent('cookieConsentChanged', { detail: { accepted: false } }));
+      console.log('🍪 Cookie consent declined, popup will show again on next login');
     } catch (error) {
-      console.error('Error updating cookie consent:', error);
+      console.error('🍪 Error updating cookie consent:', error);
       // Still update localStorage as fallback
       localStorage.setItem('cookieConsent', 'declined');
+      localStorage.setItem('cookieConsentDate', new Date().toISOString());
+      window.cookieConsentGiven = false;
       setShow(false);
     }
   };
