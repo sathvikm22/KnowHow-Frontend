@@ -187,7 +187,7 @@ const Navigation = () => {
             ) : (
               <button 
                 onClick={handleLogin}
-                className="bg-pink-500 text-white px-3 xl:px-4 py-1.5 sm:py-2 rounded-lg text-xs sm:text-sm font-medium hover:bg-pink-600 transition-colors duration-300 whitespace-nowrap flex-shrink-0"
+                className="bg-orange-500 text-white px-3 xl:px-4 py-1.5 sm:py-2 rounded-lg text-xs sm:text-sm font-medium hover:bg-orange-600 transition-colors duration-300 whitespace-nowrap flex-shrink-0"
               >
                 Login
               </button>
@@ -245,7 +245,7 @@ const Navigation = () => {
             ) : (
               <button 
                 onClick={handleLogin}
-                className="bg-pink-500 text-white px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg text-xs sm:text-sm font-medium hover:bg-pink-600 transition-colors duration-300 whitespace-nowrap flex-shrink-0"
+                className="bg-orange-500 text-white px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg text-xs sm:text-sm font-medium hover:bg-orange-600 transition-colors duration-300 whitespace-nowrap flex-shrink-0"
               >
                 Login
               </button>
@@ -337,7 +337,7 @@ const Navigation = () => {
                   handleLogin();
                   setIsOpen(false);
                 }}
-                className="w-full bg-pink-500 text-white px-3 py-2 rounded-md font-medium mt-4 text-sm sm:text-base hover:bg-pink-600"
+                className="w-full bg-orange-500 text-white px-3 py-2 rounded-md font-medium mt-4 text-sm sm:text-base hover:bg-orange-600"
               >
                 Login
               </button>
