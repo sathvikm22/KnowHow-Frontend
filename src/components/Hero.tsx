@@ -18,7 +18,7 @@ const Hero = () => {
   };
 
   return (
-    <section id="home" className="relative min-h-screen dark:bg-gray-900 overflow-hidden" style={{ backgroundColor: '#acf1e5' }}>
+    <section id="home" className="relative min-h-screen dark:bg-gray-900 overflow-hidden" style={{ backgroundColor: '#ABF3E5' }}>
       {/* Animated Background Elements */}
       <div className="absolute inset-0">
         {/* Left Side Floating Icons - Hidden on mobile, visible on desktop */}

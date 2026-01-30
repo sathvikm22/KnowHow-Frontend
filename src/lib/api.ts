@@ -264,18 +264,33 @@ class ApiClient {
   }
 
   async getCurrentUser(): Promise<ApiResponse> {
-    const response = await this.request('/auth/me', {
-      method: 'GET',
-    });
-    
-    // Update localStorage with user info from backend (non-sensitive UI state only)
-    if (response.success && response.user) {
-      localStorage.setItem('userName', response.user.name);
-      localStorage.setItem('userEmail', response.user.email);
-      // DO NOT store phone/address in localStorage - fetch from backend when needed
+    try {
+      const response = await this.request('/auth/me', {
+        method: 'GET',
+      });
+
+      // Update localStorage with user info from backend (non-sensitive UI state only)
+      if (response.success && response.user) {
+        localStorage.setItem('userName', response.user.name);
+        localStorage.setItem('userEmail', response.user.email);
+        // DO NOT store phone/address in localStorage - fetch from backend when needed
+      }
+
+      return response;
+    } catch (error: any) {
+      // 404 "User not found" = session invalid (e.g. user deleted, wrong DB, or RLS blocking)
+      const isUserNotFound =
+        (error as any)?.status === 404 ||
+        (error?.message && String(error.message).toLowerCase().includes('user not found'));
+      if (isUserNotFound) {
+        localStorage.removeItem('userName');
+        localStorage.removeItem('userEmail');
+        localStorage.removeItem('isAdmin');
+        window.dispatchEvent(new CustomEvent('userLoggedOut'));
+        return { success: false, message: 'User not found' };
+      }
+      throw error;
     }
-    
-    return response;
   }
 
   async logout(): Promise<ApiResponse> {
