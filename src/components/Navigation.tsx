@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Menu, X, LogOut, Shield, ShoppingCart } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { logout, getCurrentUser } from '../lib/api';
 import { useCart } from '../contexts/CartContext';
 
@@ -14,7 +14,18 @@ const Navigation = () => {
     return '';
   });
   const navigate = useNavigate();
+  const location = useLocation();
   const { cartCount } = useCart();
+  const isPrivacyPage = location.pathname === '/privacy-policy';
+
+  const handlePrivacyClick = () => {
+    if (isPrivacyPage) {
+      navigate('/');
+    } else {
+      navigate('/privacy-policy');
+    }
+    setIsOpen(false);
+  };
 
   // Ensure light mode is always enabled
   useEffect(() => {
@@ -139,10 +150,10 @@ const Navigation = () => {
           {/* Right side - Icons and Buttons */}
           <div className="hidden lg:flex items-center gap-2 xl:gap-2.5 flex-shrink-0 pr-2 sm:pr-3 lg:pr-4">
             <button
-              onClick={() => navigate('/privacy-policy')}
+              onClick={handlePrivacyClick}
               className="text-white hover:text-yellow-300 p-1.5 sm:p-2 rounded-lg transition-colors duration-300"
-              title="Privacy & Cookies Policy"
-              aria-label="Privacy & Cookies Policy"
+              title={isPrivacyPage ? 'Back to Home' : 'Privacy & Cookies Policy'}
+              aria-label={isPrivacyPage ? 'Back to Home' : 'Privacy & Cookies Policy'}
             >
               <Shield size={18} className="sm:w-5 sm:h-5" />
             </button>
@@ -197,10 +208,10 @@ const Navigation = () => {
           {/* Right side - Icons/Buttons for medium screens (md but not lg) */}
           <div className="hidden md:flex lg:hidden items-center gap-2 flex-shrink-0 pr-2 sm:pr-3 lg:pr-4">
             <button
-              onClick={() => navigate('/privacy-policy')}
+              onClick={handlePrivacyClick}
               className="text-white hover:text-yellow-300 p-1.5 sm:p-2 rounded-lg transition-colors duration-300"
-              title="Privacy & Cookies Policy"
-              aria-label="Privacy & Cookies Policy"
+              title={isPrivacyPage ? 'Back to Home' : 'Privacy & Cookies Policy'}
+              aria-label={isPrivacyPage ? 'Back to Home' : 'Privacy & Cookies Policy'}
             >
               <Shield size={18} className="sm:w-5 sm:h-5" />
             </button>
@@ -344,13 +355,10 @@ const Navigation = () => {
             )}
             <div className="pt-4 border-t border-white/20">
               <button
-                onClick={() => {
-                  navigate('/privacy-policy');
-                  setIsOpen(false);
-                }}
+                onClick={handlePrivacyClick}
                 className="text-white hover:text-yellow-300 block w-full text-left px-3 py-2 rounded-md text-xs sm:text-sm font-medium hover:bg-white/10"
               >
-                Privacy & Cookies Policy
+                {isPrivacyPage ? 'Back to Home' : 'Privacy & Cookies Policy'}
               </button>
             </div>
           </div>
