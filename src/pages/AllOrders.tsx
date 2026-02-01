@@ -52,9 +52,13 @@ interface Booking {
   participants: number;
   created_at: string;
   customer_name?: string;
+  user_name?: string; // DB column name from backend
   customer_email?: string;
+  user_email?: string;
   customer_phone?: string;
+  user_phone?: string;
   customer_address?: string;
+  user_address?: string;
   payment_method?: string;
   cashfree_order_id?: string;
   cashfree_payment_id?: string;
@@ -219,9 +223,9 @@ const AllOrders = () => {
     const receipt: ReceiptData = {
       orderId: booking.cashfree_order_id || booking.razorpay_order_id || booking.id,
       internalBillId: booking.internal_bill_id || `REF-${booking.id.slice(0, 8)}`,
-      customerName: booking.customer_name || 'Customer',
-      customerEmail: booking.customer_email || '',
-      customerPhone: booking.customer_phone || '',
+      customerName: booking.customer_name || booking.user_name || 'Customer',
+      customerEmail: booking.customer_email || booking.user_email || '',
+      customerPhone: booking.customer_phone || booking.user_phone || '',
       items: [{
         name: booking.combo_name || booking.activity_name,
         quantity: booking.participants,
@@ -244,9 +248,9 @@ const AllOrders = () => {
     const receipt: ReceiptData = {
       orderId: booking.cashfree_order_id || booking.razorpay_order_id || booking.id,
       internalBillId: booking.internal_bill_id || `BILL-${booking.id.slice(0, 8)}`,
-      customerName: booking.customer_name || 'Customer',
-      customerEmail: booking.customer_email || '',
-      customerPhone: booking.customer_phone || '',
+      customerName: booking.customer_name || booking.user_name || 'Customer',
+      customerEmail: booking.customer_email || booking.user_email || '',
+      customerPhone: booking.customer_phone || booking.user_phone || '',
       items: [{
         name: booking.combo_name || booking.activity_name,
         quantity: booking.participants,
@@ -414,9 +418,9 @@ const AllOrders = () => {
     const receipt: ReceiptData = {
       orderId: booking.cashfree_order_id || booking.razorpay_order_id || booking.id,
       internalBillId: booking.internal_bill_id || `UPD-${booking.id.slice(0, 8)}`,
-      customerName: booking.customer_name || 'Customer',
-      customerEmail: booking.customer_email || '',
-      customerPhone: booking.customer_phone || '',
+      customerName: booking.customer_name || booking.user_name || 'Customer',
+      customerEmail: booking.customer_email || booking.user_email || '',
+      customerPhone: booking.customer_phone || booking.user_phone || '',
       items: [{
         name: booking.combo_name || booking.activity_name,
         quantity: booking.participants,
@@ -601,7 +605,7 @@ const AllOrders = () => {
                               customerName: booking.customer_name || 'Customer',
                               customerEmail: booking.customer_email || '',
                               customerPhone: booking.customer_phone || '',
-                              customerAddress: booking.customer_address,
+                              customerAddress: booking.customer_address || booking.user_address,
                               items: [{
                                 name: activityName,
                                 quantity: booking.participants || 1,

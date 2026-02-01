@@ -241,16 +241,16 @@ const Receipt = ({ receiptData, open = true, onOpenChange, showAsDialog = true }
             </div>
           </div>
         </div>
+      </div>
 
-        {/* Footer with Orange Waves */}
-        <div className="relative mt-6 h-12 overflow-hidden flex-shrink-0">
-          <svg className="absolute bottom-0 left-0 w-full h-full" viewBox="0 0 1200 100" preserveAspectRatio="none">
-            <path d="M0,50 Q300,0 600,50 T1200,50 L1200,100 L0,100 Z" fill="rgba(249, 115, 22, 0.1)" />
-          </svg>
-          <svg className="absolute bottom-0 right-0 w-full h-full" viewBox="0 0 1200 100" preserveAspectRatio="none">
-            <path d="M0,50 Q300,100 600,50 T1200,50 L1200,100 L0,100 Z" fill="rgba(249, 115, 22, 0.1)" />
-          </svg>
-        </div>
+      {/* Footer with Orange Waves - fills remaining space so no empty white at bottom */}
+      <div className="relative flex-1 min-h-[4rem] flex-shrink-0 overflow-hidden">
+        <svg className="absolute inset-0 w-full h-full" viewBox="0 0 1200 100" preserveAspectRatio="none">
+          <path d="M0,50 Q300,0 600,50 T1200,50 L1200,100 L0,100 Z" fill="rgba(249, 115, 22, 0.1)" />
+        </svg>
+        <svg className="absolute inset-0 w-full h-full" viewBox="0 0 1200 100" preserveAspectRatio="none">
+          <path d="M0,50 Q300,100 600,50 T1200,50 L1200,100 L0,100 Z" fill="rgba(249, 115, 22, 0.1)" />
+        </svg>
       </div>
     </div>
   );
