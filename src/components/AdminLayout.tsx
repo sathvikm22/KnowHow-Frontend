@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { ReactNode } from 'react';
 import { Menu, X } from 'lucide-react';
+import { logout } from '@/lib/api';
 
 const adminNav = [
   { name: 'Bookings', path: '/admin/dashboard/bookings' },
@@ -15,14 +16,20 @@ const AdminLayout = ({ children }: { children: ReactNode }) => {
   const navigate = useNavigate();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
-  const handleLogout = () => {
-    // Clear all auth-related data
-    localStorage.removeItem('authToken');
-    localStorage.removeItem('userName');
-    localStorage.removeItem('isAdmin');
-    // Dispatch logout event for components to react (CookieConsent, etc.)
-    window.dispatchEvent(new CustomEvent('userLoggedOut'));
-    navigate('/');
+  const handleLogout = async () => {
+    try {
+      // Call API to clear server session (HttpOnly cookies)
+      await logout();
+    } catch (error) {
+      console.error('Logout error:', error);
+    } finally {
+      // Clear local state and navigate so main nav shows Login
+      localStorage.removeItem('authToken');
+      localStorage.removeItem('userName');
+      localStorage.removeItem('isAdmin');
+      window.dispatchEvent(new CustomEvent('userLoggedOut'));
+      navigate('/');
+    }
   };
 
   return (

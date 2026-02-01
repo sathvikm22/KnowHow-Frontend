@@ -318,7 +318,7 @@ const AllOrders = () => {
       console.log('Available slots response:', response);
       
       if (response && response.success) {
-        const slots = response.data?.available_slots || response.available_slots || [];
+        const slots = response.data?.available_slots ?? (response as { available_slots?: string[] }).available_slots ?? [];
         console.log('Available slots:', slots);
         setAvailableSlots(slots);
         

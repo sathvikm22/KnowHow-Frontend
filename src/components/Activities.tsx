@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { api } from '@/lib/api';
 
 interface Activity {
@@ -15,6 +15,18 @@ const Activities = () => {
   const navigate = useNavigate();
   const [activities, setActivities] = useState<Activity[]>([]);
   const [loading, setLoading] = useState(true);
+  const [showAll, setShowAll] = useState(false);
+  const [limit, setLimit] = useState(5); // mobile 5, laptop 9
+  const sectionRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const updateLimit = () => {
+      setLimit(window.innerWidth < 768 ? 5 : 9);
+    };
+    updateLimit();
+    window.addEventListener('resize', updateLimit);
+    return () => window.removeEventListener('resize', updateLimit);
+  }, []);
 
   useEffect(() => {
     fetchActivities();
@@ -92,8 +104,11 @@ const Activities = () => {
     );
   }
 
+  const activitiesToShow = showAll ? activities : activities.slice(0, limit);
+  const hasMore = activities.length > limit;
+
   return (
-    <section id="activities" className="py-20" style={{ backgroundColor: '#FAF1C8' }}>
+    <section id="activities" ref={sectionRef} className="py-20" style={{ backgroundColor: '#FAF1C8' }}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-16">
           <h2 className="text-4xl md:text-5xl font-bold mb-6 tracking-wide" style={{ fontFamily: "'Bowlby One SC', sans-serif", letterSpacing: '0.02em', color: '#191919' }}>
@@ -111,8 +126,9 @@ const Activities = () => {
             <p className="text-gray-600 dark:text-gray-400">No activities available at the moment.</p>
           </div>
         ) : (
+          <>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
-            {activities.map((activity) => (
+            {activitiesToShow.map((activity) => (
               <div
                 key={activity.id}
                 className="group relative bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-3xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-500 transform hover:scale-105 border border-black"
@@ -160,6 +176,37 @@ const Activities = () => {
               </div>
             ))}
           </div>
+          {!showAll && hasMore && (
+            <div className="flex justify-center mt-6 sm:mt-8">
+              <button
+                onClick={() => {
+                  setShowAll(true);
+                  setTimeout(() => {
+                    sectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                  }, 50);
+                }}
+                className="workshop-btn"
+              >
+                <div><span>View All</span></div>
+              </button>
+            </div>
+          )}
+          {showAll && (
+            <div className="flex justify-center mt-6 sm:mt-8">
+              <button
+                onClick={() => {
+                  setShowAll(false);
+                  setTimeout(() => {
+                    sectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                  }, 50);
+                }}
+                className="workshop-btn"
+              >
+                <div><span>Show Less</span></div>
+              </button>
+            </div>
+          )}
+          </>
         )}
       </div>
     </section>

@@ -33,21 +33,35 @@ const Navigation = () => {
     localStorage.setItem('theme', 'light');
   }, []);
 
+  // When logout is triggered (e.g. from AdminLayout), clear nav state so Login shows
   useEffect(() => {
-    // Try to get user from API first, fallback to localStorage
+    const onLoggedOut = () => {
+      setUserName('');
+      localStorage.removeItem('userName');
+      localStorage.removeItem('isAdmin');
+    };
+    window.addEventListener('userLoggedOut', onLoggedOut);
+    return () => window.removeEventListener('userLoggedOut', onLoggedOut);
+  }, []);
+
+  useEffect(() => {
     const fetchUser = async () => {
       try {
         const result = await getCurrentUser();
         if (result.success && result.user) {
           setUserName(result.user.name);
           localStorage.setItem('userName', result.user.name);
+        } else {
+          // Session invalid or no user – clear so nav shows Login
+          setUserName('');
+          localStorage.removeItem('userName');
+          localStorage.removeItem('isAdmin');
         }
       } catch (error) {
-        // If API call fails, check localStorage as fallback
-        const storedUser = localStorage.getItem('userName');
-        if (storedUser && storedUser !== userName) {
-          setUserName(storedUser);
-        }
+        // API failed (e.g. 401/404 after logout) – clear so nav shows Login
+        setUserName('');
+        localStorage.removeItem('userName');
+        localStorage.removeItem('isAdmin');
       }
     };
 
