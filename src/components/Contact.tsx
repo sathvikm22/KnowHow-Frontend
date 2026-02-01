@@ -27,9 +27,9 @@ const Contact = () => {
           <div className="flex justify-center px-4">
             <button 
               onClick={handleBookWorkshop}
-              className="bg-orange-500 text-white px-6 sm:px-8 py-3 sm:py-4 rounded-full font-medium text-base sm:text-lg hover:bg-orange-600 hover:shadow-xl transition-all duration-300 transform hover:scale-105 w-full sm:w-auto max-w-xs sm:max-w-none"
+              className="workshop-btn"
             >
-              BOOK A WORKSHOP
+              <div><span>BOOK A WORKSHOP</span></div>
             </button>
           </div>
         </div>

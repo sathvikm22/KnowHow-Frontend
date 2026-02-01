@@ -151,9 +151,9 @@ const Stats = () => {
                   sectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
                 }, 50);
               }}
-              className="bg-gradient-to-r from-orange-400 to-pink-500 text-white px-6 sm:px-8 py-2 sm:py-3 rounded-full font-semibold text-sm sm:text-lg shadow-lg hover:scale-105 transition-transform"
+              className="workshop-btn"
             >
-              View All
+              <div><span>View All</span></div>
             </button>
           </div>
         )}
@@ -166,9 +166,9 @@ const Stats = () => {
                   sectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
                 }, 50);
               }}
-              className="bg-gradient-to-r from-orange-400 to-pink-500 text-white px-6 sm:px-8 py-2 sm:py-3 rounded-full font-semibold text-sm sm:text-lg shadow-lg hover:scale-105 transition-transform"
+              className="workshop-btn"
             >
-              Show Less
+              <div><span>Show Less</span></div>
             </button>
           </div>
         )}

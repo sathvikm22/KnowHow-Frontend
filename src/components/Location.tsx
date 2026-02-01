@@ -38,9 +38,9 @@ const Location = () => {
             <div className="flex justify-center lg:justify-start">
               <button 
                 onClick={handleMapClick}
-                className="bg-orange-500 text-white px-6 py-3 rounded-full font-medium text-base hover:shadow-xl transition-all duration-300 transform hover:scale-105 hover:bg-orange-600"
+                className="workshop-btn"
               >
-                GET DIRECTIONS
+                <div><span>GET DIRECTIONS</span></div>
               </button>
             </div>
           </div>
