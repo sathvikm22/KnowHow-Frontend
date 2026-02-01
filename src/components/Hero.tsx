@@ -1,24 +1,20 @@
 import { useState } from 'react';
-import { ArrowRight, Sparkles, Heart, Users, Calendar, Palette, Brush, Scissors, Star } from 'lucide-react';
+import { Sparkles, Heart, Users, Calendar, Palette, Brush, Scissors, Star, ChevronDown } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 const Hero = () => {
   const navigate = useNavigate();
 
-  const handleStartCreating = () => {
-    document.getElementById('activities')?.scrollIntoView({ behavior: 'smooth' });
-  };
-
   const handleExploreActivities = () => {
     navigate('/activities');
   };
 
-  const handleLearnMore = () => {
+  const handleScrollToAbout = () => {
     document.getElementById('about')?.scrollIntoView({ behavior: 'smooth' });
   };
 
   return (
-    <section id="home" className="relative min-h-screen dark:bg-gray-900 overflow-hidden" style={{ backgroundColor: '#B3ECEC' }}>
+    <section id="home" className="relative min-h-[85vh] md:min-h-screen dark:bg-gray-900 overflow-hidden" style={{ backgroundColor: '#B3ECEC' }}>
       {/* Animated Background Elements */}
       <div className="absolute inset-0">
         {/* Left Side Floating Icons - Hidden on mobile, visible on desktop */}
@@ -107,41 +103,33 @@ const Hero = () => {
         </div>
       </div>
 
-      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-20">
-        <div className="flex flex-col items-center justify-center min-h-screen text-center">
-          {/* Main Content */}
-          <div className="w-full max-w-full px-2 sm:px-6">
-            <h1 className="text-5xl sm:text-7xl md:text-8xl lg:text-8xl xl:text-9xl font-bold text-black dark:text-white mb-6 md:mb-8 leading-tight animate-fade-in" style={{ fontFamily: "'Bowlby One SC', sans-serif", letterSpacing: '0.05em', textAlign: 'center', width: '100%' }}>
+      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 sm:pt-16 md:pt-20 pb-6 sm:pb-8 md:pb-0 h-full flex flex-col min-h-[85vh] md:min-h-screen">
+        {/* Text block - vertically centered in the hero */}
+        <div className="flex-1 flex flex-col items-center justify-center text-center min-h-0">
+          <div className="w-full max-w-full px-2 sm:px-6 mx-auto">
+            <h1 className="text-5xl sm:text-7xl md:text-8xl lg:text-8xl xl:text-9xl font-bold text-black dark:text-white mb-4 md:mb-8 leading-tight animate-fade-in" style={{ fontFamily: "'Bowlby One SC', sans-serif", letterSpacing: '0.05em', textAlign: 'center', width: '100%' }}>
               <div className="block" style={{ textAlign: 'center' }}>CREATE</div>
               <div className="block text-orange-600" style={{ textAlign: 'center' }}>MEMORIES</div>
               <div className="block whitespace-nowrap" style={{ textAlign: 'center' }}>THAT LAST</div>
             </h1>
             
-            <p className="text-base sm:text-lg md:text-2xl lg:text-3xl text-gray-700 dark:text-gray-300 mb-8 md:mb-12 max-w-3xl mx-auto animate-fade-in leading-relaxed text-center px-2 sm:px-4" style={{animationDelay: '0.3s'}}>
+            <p className="text-base sm:text-lg md:text-2xl lg:text-3xl text-gray-700 dark:text-gray-300 mb-0 max-w-3xl mx-auto animate-fade-in leading-relaxed text-center px-2 sm:px-4 md:mb-12" style={{animationDelay: '0.3s'}}>
               Discover the joy of hands-on creativity in our vibrant studio From art to craft, every experience tells a story
             </p>
-            
-            <div className="flex justify-center mb-16 animate-fade-in" style={{animationDelay: '0.6s'}}>
-              <button 
-                onClick={handleStartCreating}
-                className="group bg-orange-500 text-white px-10 py-5 rounded-full font-semibold text-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 flex items-center justify-center space-x-3"
-              >
-                <span>Start Creating</span>
-                <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-              </button>
-            </div>
-
-            {/* Learn More Section */}
-            <div className="animate-fade-in" style={{animationDelay: '0.9s'}}>
-              <button 
-                onClick={handleLearnMore}
-                className="text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors flex items-center justify-center space-x-2 mx-auto group text-lg"
-              >
-                <span>Learn More</span>
-                <ArrowRight className="w-5 h-5 rotate-90 group-hover:translate-y-1 transition-transform" />
-              </button>
-            </div>
           </div>
+        </div>
+
+        {/* Scroll button - pinned to bottom of hero */}
+        <div className="flex justify-center flex-shrink-0 pt-4 md:pt-8">
+          <button
+            onClick={handleScrollToAbout}
+            className="flex flex-col items-center gap-1 text-black hover:text-orange-600 transition-colors animate-fade-in"
+            style={{ animationDelay: '0.5s' }}
+            aria-label="Scroll to About"
+          >
+            <span className="text-xs sm:text-sm font-medium">Scroll</span>
+            <ChevronDown className="w-8 h-8 sm:w-10 sm:h-10 animate-bounce" />
+          </button>
         </div>
       </div>
     </section>

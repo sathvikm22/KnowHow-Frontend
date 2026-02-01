@@ -12,10 +12,10 @@ const Location = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
           <div>
-            <h2 className="text-5xl md:text-6xl font-bold text-black mb-6 tracking-wide" style={{ fontFamily: "'Bowlby One SC', sans-serif", letterSpacing: '0.02em' }}>
+            <h2 className="text-5xl md:text-6xl font-bold mb-6 tracking-wide" style={{ fontFamily: "'Bowlby One SC', sans-serif", letterSpacing: '0.02em', color: '#191919' }}>
               FIND YOUR
               <br />
-              <span className="text-black">
+              <span>
                 CREATIVE
               </span>
               <br />

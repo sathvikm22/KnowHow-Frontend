@@ -75,7 +75,7 @@ const Stats = () => {
     <section id="shop-diy-kits" ref={sectionRef} className="py-12 sm:py-16 lg:py-20" style={{ backgroundColor: '#FFDBBB' }}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-8 sm:mb-12 lg:mb-16">
-          <h2 className="text-4xl md:text-5xl font-bold text-black mb-4 sm:mb-6 px-2 tracking-wide" style={{ fontFamily: "'Bowlby One SC', sans-serif", letterSpacing: '0.02em' }}>
+          <h2 className="text-4xl md:text-5xl font-bold mb-4 sm:mb-6 px-2 tracking-wide" style={{ fontFamily: "'Bowlby One SC', sans-serif", letterSpacing: '0.02em', color: '#191919' }}>
             Shop DIY Kits
           </h2>
           <div className="w-16 sm:w-20 lg:w-24 h-1 bg-black mx-auto mb-6 sm:mb-8"></div>

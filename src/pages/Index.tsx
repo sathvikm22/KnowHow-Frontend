@@ -19,9 +19,9 @@ const EventsSection = () => {
     <div id="events-section" className="scroll-mt-28" style={{ backgroundColor: '#FAF9F6' }}>
       <div className="max-w-5xl mx-auto py-12 px-4">
       {/* Gradient Heading */}
-      <h2 className="text-4xl md:text-5xl font-bold text-center mb-2 tracking-wide" style={{ fontFamily: "'Bowlby One SC', sans-serif", letterSpacing: '0.02em' }}>
-        <span className="block text-black">DISCOVER OUR</span>
-        <span className="block text-black">CREATIVE EVENTS</span>
+      <h2 className="text-4xl md:text-5xl font-bold text-center mb-2 tracking-wide" style={{ fontFamily: "'Bowlby One SC', sans-serif", letterSpacing: '0.02em', color: '#191919' }}>
+        <span className="block">DISCOVER OUR</span>
+        <span className="block">CREATIVE EVENTS</span>
       </h2>
       <div className="mx-auto mb-8 mt-2 w-40 h-1 rounded-full bg-black"></div>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
