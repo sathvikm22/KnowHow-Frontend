@@ -32,15 +32,15 @@ const Activities = () => {
       setLoading(true);
       const response = await api.getActivities();
       console.log('📥 Activities API response:', response);
+      const activitiesList = response.data?.activities ?? (response as { activities?: Activity[] }).activities ?? [];
       console.log('   Response structure:', {
         success: response.success,
-        hasActivities: !!response.activities,
+        hasActivities: !!activitiesList.length,
         hasData: !!response.data,
         fullResponse: JSON.stringify(response, null, 2)
       });
-      
-      // Handle both response.activities and response.data.activities
-      const activities = response.activities || response.data?.activities || [];
+
+      const activities = activitiesList;
       
       if (response.success && activities.length > 0) {
         console.log('✅ Activities fetched:', activities.length);
@@ -82,7 +82,7 @@ const Activities = () => {
 
   if (loading) {
     return (
-      <section id="activities" className="py-20">
+      <section id="activities" className="py-20" style={{ backgroundColor: '#FFEE8C' }}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center">
             <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600"></div>
@@ -93,7 +93,7 @@ const Activities = () => {
   }
 
   return (
-    <section id="activities" className="py-20">
+    <section id="activities" className="py-20" style={{ backgroundColor: '#FAF1C8' }}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-16">
           <h2 className="text-4xl md:text-5xl font-bold text-black mb-6 tracking-wide" style={{ fontFamily: "'Bowlby One SC', sans-serif", letterSpacing: '0.02em' }}>
