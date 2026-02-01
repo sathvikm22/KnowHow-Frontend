@@ -54,17 +54,17 @@ const ContactUs = () => {
   };
 
   return (
-    <div className="min-h-screen bg-purple-50 dark:bg-purple-100 transition-colors duration-300">
+    <div className="min-h-screen transition-colors duration-300" style={{ backgroundColor: '#FAF9F6' }}>
       <Navigation />
       <div className="pt-20 pb-16 px-4 sm:px-6 lg:px-8">
         <div className="max-w-6xl mx-auto">
           {/* Header */}
           <div className="text-center mb-12">
-            <h1 className="text-4xl sm:text-5xl font-extrabold text-gray-900 mb-4">
+            <h1 className="text-4xl sm:text-5xl font-extrabold text-black mb-4">
               Contact Us
             </h1>
-            <div className="mx-auto mb-4 w-40 h-1 rounded-full bg-gradient-to-r from-pink-400 via-orange-300 via-yellow-300 via-green-400 to-blue-400"></div>
-            <p className="text-gray-600 text-lg max-w-2xl mx-auto">
+            <div className="mx-auto mb-4 w-40 h-1 rounded-full bg-black"></div>
+            <p className="text-black text-lg max-w-2xl mx-auto">
               Have a question, feedback, or need assistance? We're here to help! Reach out to us through any of the channels below.
             </p>
           </div>
@@ -72,22 +72,22 @@ const ContactUs = () => {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             {/* Contact Information */}
             <div className="bg-white dark:bg-gray-800 rounded-3xl shadow-xl p-8 space-y-6">
-              <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">Get in Touch</h2>
+              <h2 className="text-2xl font-bold text-black mb-6">Get in Touch</h2>
               
               {/* Email */}
               <div className="flex items-start space-x-4">
-                <div className="bg-purple-100 dark:bg-purple-900/30 rounded-full p-3">
-                  <Mail className="w-6 h-6 text-purple-600 dark:text-purple-400" />
+                <div className="bg-gray-200 rounded-full p-3">
+                  <Mail className="w-6 h-6 text-black" />
                 </div>
                 <div>
-                  <h3 className="font-semibold text-gray-900 dark:text-white mb-1">Email</h3>
+                  <h3 className="font-semibold text-black mb-1">Email</h3>
                   <a 
                     href="mailto:knowhowcafe2025@gmail.com" 
-                    className="text-purple-600 dark:text-purple-400 hover:underline"
+                    className="text-black hover:underline"
                   >
                     knowhowcafe2025@gmail.com
                   </a>
-                  <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                  <p className="text-sm text-black mt-1">
                     We typically respond within 24-48 hours
                   </p>
                 </div>
@@ -95,18 +95,18 @@ const ContactUs = () => {
 
               {/* Phone */}
               <div className="flex items-start space-x-4">
-                <div className="bg-blue-100 dark:bg-blue-900/30 rounded-full p-3">
-                  <Phone className="w-6 h-6 text-blue-600 dark:text-blue-400" />
+                <div className="bg-gray-200 rounded-full p-3">
+                  <Phone className="w-6 h-6 text-black" />
                 </div>
                 <div>
-                  <h3 className="font-semibold text-gray-900 dark:text-white mb-1">Phone</h3>
+                  <h3 className="font-semibold text-black mb-1">Phone</h3>
                   <a 
                     href="tel:9591032562" 
-                    className="text-blue-600 dark:text-blue-400 hover:underline"
+                    className="text-black hover:underline"
                   >
                     95910 32562
                   </a>
-                  <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                  <p className="text-sm text-black mt-1">
                     Available during business hours
                   </p>
                 </div>
@@ -114,15 +114,15 @@ const ContactUs = () => {
 
               {/* Location */}
               <div className="flex items-start space-x-4">
-                <div className="bg-green-100 dark:bg-green-900/30 rounded-full p-3">
-                  <MapPin className="w-6 h-6 text-green-600 dark:text-green-400" />
+                <div className="bg-gray-200 rounded-full p-3">
+                  <MapPin className="w-6 h-6 text-black" />
                 </div>
                 <div>
-                  <h3 className="font-semibold text-gray-900 dark:text-white mb-1">Location</h3>
-                  <p className="text-gray-700 dark:text-gray-300">
+                  <h3 className="font-semibold text-black mb-1">Location</h3>
+                  <p className="text-black">
                     Know How Café
                   </p>
-                  <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                  <p className="text-sm text-black mt-1">
                     Visit us for workshops and events
                   </p>
                 </div>
@@ -130,7 +130,7 @@ const ContactUs = () => {
 
               {/* Social Media */}
               <div className="pt-6 border-t border-gray-200 dark:border-gray-700">
-                <h3 className="font-semibold text-gray-900 dark:text-white mb-4">Follow Us</h3>
+                <h3 className="font-semibold text-black mb-4">Follow Us</h3>
                 <div className="flex space-x-4">
                   <a 
                     href="https://instagram.com/know.howindia" 
@@ -156,12 +156,12 @@ const ContactUs = () => {
 
             {/* Contact Form */}
             <div className="bg-white dark:bg-gray-800 rounded-3xl shadow-xl p-8">
-              <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">Send us a Message</h2>
+              <h2 className="text-2xl font-bold text-black mb-6">Send us a Message</h2>
               
               <form onSubmit={handleSubmit} className="space-y-6">
                 <div>
-                  <label htmlFor="name" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    Name <span className="text-red-500">*</span>
+                  <label htmlFor="name" className="block text-sm font-medium text-black mb-2">
+                    Name <span className="text-black">*</span>
                   </label>
                   <input
                     type="text"
@@ -170,14 +170,14 @@ const ContactUs = () => {
                     required
                     value={formData.name}
                     onChange={handleChange}
-                    className="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
+                    className="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-black focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
                     placeholder="Your full name"
                   />
                 </div>
 
                 <div>
-                  <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    Email <span className="text-red-500">*</span>
+                  <label htmlFor="email" className="block text-sm font-medium text-black mb-2">
+                    Email <span className="text-black">*</span>
                   </label>
                   <input
                     type="email"
@@ -186,13 +186,13 @@ const ContactUs = () => {
                     required
                     value={formData.email}
                     onChange={handleChange}
-                    className="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
+                    className="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-black focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
                     placeholder="your.email@example.com"
                   />
                 </div>
 
                 <div>
-                  <label htmlFor="phone" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  <label htmlFor="phone" className="block text-sm font-medium text-black mb-2">
                     Phone Number
                   </label>
                   <input
@@ -201,14 +201,14 @@ const ContactUs = () => {
                     name="phone"
                     value={formData.phone}
                     onChange={handleChange}
-                    className="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
+                    className="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-black focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
                     placeholder="+91 12345 67890"
                   />
                 </div>
 
                 <div>
-                  <label htmlFor="subject" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    Subject <span className="text-red-500">*</span>
+                  <label htmlFor="subject" className="block text-sm font-medium text-black mb-2">
+                    Subject <span className="text-black">*</span>
                   </label>
                   <select
                     id="subject"
@@ -216,7 +216,7 @@ const ContactUs = () => {
                     required
                     value={formData.subject}
                     onChange={handleChange}
-                    className="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
+                    className="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-black focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
                   >
                     <option value="">Select a subject</option>
                     <option value="general">General Inquiry</option>
@@ -229,8 +229,8 @@ const ContactUs = () => {
                 </div>
 
                 <div>
-                  <label htmlFor="message" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    Message <span className="text-red-500">*</span>
+                  <label htmlFor="message" className="block text-sm font-medium text-black mb-2">
+                    Message <span className="text-black">*</span>
                   </label>
                   <textarea
                     id="message"
@@ -239,14 +239,14 @@ const ContactUs = () => {
                     rows={5}
                     value={formData.message}
                     onChange={handleChange}
-                    className="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all resize-none"
+                    className="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-black focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all resize-none"
                     placeholder="Tell us how we can help you..."
                   />
                 </div>
 
                 {submitStatus === 'success' && (
                   <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-xl p-4">
-                    <p className="text-green-800 dark:text-green-200">
+                    <p className="text-black">
                       Thank you! Your message has been sent successfully. We'll get back to you soon.
                     </p>
                   </div>
@@ -254,7 +254,7 @@ const ContactUs = () => {
 
                 {submitStatus === 'error' && (
                   <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl p-4">
-                    <p className="text-red-800 dark:text-red-200">
+                    <p className="text-black">
                       Something went wrong. Please try again or contact us directly via email or phone.
                     </p>
                   </div>
@@ -263,7 +263,7 @@ const ContactUs = () => {
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="w-full bg-purple-500 text-white px-6 py-3 rounded-xl font-semibold hover:bg-purple-600 transition-colors duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="w-full bg-orange-500 text-white px-6 py-3 rounded-xl font-semibold hover:bg-orange-600 transition-colors duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {isSubmitting ? 'Sending...' : 'Send Message'}
                 </button>
@@ -273,15 +273,15 @@ const ContactUs = () => {
 
           {/* Business Hours */}
           <div className="mt-8 bg-white dark:bg-gray-800 rounded-3xl shadow-xl p-8">
-            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6 text-center">Business Hours</h2>
+            <h2 className="text-2xl font-bold text-black mb-6 text-center">Business Hours</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-2xl mx-auto">
               <div className="text-center">
-                <h3 className="font-semibold text-gray-900 dark:text-white mb-2">Monday - Friday</h3>
-                <p className="text-gray-600 dark:text-gray-400">10:00 AM - 7:00 PM</p>
+                <h3 className="font-semibold text-black mb-2">Monday - Friday</h3>
+                <p className="text-black">10:00 AM - 7:00 PM</p>
               </div>
               <div className="text-center">
-                <h3 className="font-semibold text-gray-900 dark:text-white mb-2">Saturday - Sunday</h3>
-                <p className="text-gray-600 dark:text-gray-400">9:00 AM - 8:00 PM</p>
+                <h3 className="font-semibold text-black mb-2">Saturday - Sunday</h3>
+                <p className="text-black">9:00 AM - 8:00 PM</p>
               </div>
             </div>
           </div>
@@ -295,7 +295,7 @@ const ContactUs = () => {
                   window.scrollTo({ top: 0, behavior: 'smooth' });
                 }, 100);
               }}
-              className="inline-block bg-purple-500 text-white px-8 py-3 rounded-xl font-semibold hover:bg-purple-600 transition-colors duration-300"
+              className="inline-block bg-orange-500 text-white px-8 py-3 rounded-xl font-semibold hover:bg-orange-600 transition-colors duration-300"
             >
               Back to Home
             </button>

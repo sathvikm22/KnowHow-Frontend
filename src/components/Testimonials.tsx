@@ -40,7 +40,7 @@ const Testimonials = () => {
   }, [api])
 
   return (
-    <section id="testimonials" className="py-20 bg-green-100">
+    <section id="testimonials" className="py-20" style={{ backgroundColor: '#FAF9F6' }}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-16">
           <h2 className="text-4xl md:text-5xl font-bold text-black mb-6 tracking-wide" style={{ fontFamily: "'Bowlby One SC', sans-serif", letterSpacing: '0.02em' }}>
@@ -53,9 +53,8 @@ const Testimonials = () => {
         </div>
 
         {/* White Rectangle Container */}
-        <div className="bg-white rounded-3xl p-2 mx-auto max-w-7xl shadow-2xl border-4 border-pink-200/60 relative">
-          <div className="absolute -inset-1 rounded-3xl pointer-events-none z-0 bg-gradient-to-r from-pink-400 via-orange-300 to-blue-400 blur-lg opacity-40 animate-pulse"></div>
-          <div className="relative overflow-hidden rounded-2xl p-2 sm:p-4 md:p-6 lg:p-8 bg-white z-10">
+        <div className="bg-white rounded-3xl p-2 mx-auto max-w-7xl shadow-2xl border-2 border-black relative">
+          <div className="relative overflow-hidden rounded-2xl p-2 sm:p-4 md:p-6 lg:p-8 z-10" style={{ backgroundColor: '#B3ECEC' }}>
             <Carousel
               setApi={setApi}
               className="w-full"
@@ -71,7 +70,7 @@ const Testimonials = () => {
                 {galleryImages.map((image, index) => (
                   <CarouselItem key={index} className="pl-4 basis-4/5 md:basis-2/3 lg:basis-1/2 xl:basis-2/5 2xl:basis-1/3">
                     <div className="p-4">
-                      <div className="aspect-[4/3] overflow-hidden rounded-3xl shadow-2xl border-2 border-cyan-200 bg-white hover:shadow-pink-300 transition-all duration-700 transform hover:scale-105">
+                      <div className="aspect-[4/3] overflow-hidden rounded-3xl shadow-2xl border-2 border-black bg-white hover:shadow-gray-400 transition-all duration-700 transform hover:scale-105">
                         <img
                           src={image.src}
                           alt={image.alt}

@@ -70,17 +70,8 @@ const Stats = () => {
   const initialCount = isMobile ? 6 : 10;
   const kitsToShow = showAll ? diyKits : diyKits.slice(0, initialCount);
 
-  // Solid color classes for light and dark mode
-  const boxColors = [
-    'bg-orange-100 dark:bg-orange-900',
-    'bg-blue-100 dark:bg-blue-900',
-    'bg-green-100 dark:bg-green-900',
-    'bg-pink-100 dark:bg-pink-900',
-    'bg-yellow-100 dark:bg-yellow-900',
-  ];
-
   return (
-    <section id="shop-diy-kits" ref={sectionRef} className="py-12 sm:py-16 lg:py-20 bg-gradient-to-br from-blue-100 via-green-100 to-pink-100 dark:from-gray-800 dark:via-gray-900 dark:to-gray-800">
+    <section id="shop-diy-kits" ref={sectionRef} className="py-12 sm:py-16 lg:py-20" style={{ backgroundColor: '#FFDBBB' }}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-8 sm:mb-12 lg:mb-16">
           <h2 className="text-4xl md:text-5xl font-bold text-black mb-4 sm:mb-6 px-2 tracking-wide" style={{ fontFamily: "'Bowlby One SC', sans-serif", letterSpacing: '0.02em' }}>
@@ -99,13 +90,11 @@ const Stats = () => {
           </div>
         ) : (
           <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 sm:gap-6 md:gap-8 lg:gap-10 xl:gap-12 justify-items-center">
-            {kitsToShow.map((kit, idx) => (
+            {kitsToShow.map((kit) => (
             <div
-              key={kit.name}
-              className={
-                `rounded-xl sm:rounded-2xl shadow-lg sm:shadow-2xl hover:shadow-xl sm:hover:shadow-2xl transition-shadow duration-300 overflow-hidden flex flex-col items-center p-2 sm:p-4 md:p-6 border-0 w-full max-w-sm ` +
-                boxColors[idx % boxColors.length]
-              }
+              key={kit.id || kit.name}
+              className="rounded-xl sm:rounded-2xl shadow-lg sm:shadow-2xl hover:shadow-xl sm:hover:shadow-2xl transition-shadow duration-300 overflow-hidden flex flex-col items-center p-2 sm:p-4 md:p-6 border-0 w-full max-w-sm"
+              style={{ backgroundColor: '#FAF9F6' }}
             >
               {/* Image Section - Add images to /public/lovable-uploads/diy-kits/ folder */}
               <div className="w-full mb-2 sm:mb-4 rounded-lg sm:rounded-xl overflow-hidden bg-white/50 dark:bg-gray-700/50 aspect-square flex items-center justify-center shadow-inner">
