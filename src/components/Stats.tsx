@@ -36,8 +36,9 @@ const Stats = () => {
     try {
       setLoading(true);
       const response = await api.getDIYKits();
-      if (response.success && response.kits) {
-        setDiyKits(response.kits);
+      const kits = response.data?.kits ?? (response as { kits?: DIYKit[] }).kits ?? [];
+      if (response.success && kits.length > 0) {
+        setDiyKits(kits);
       } else {
         setDiyKits([]);
       }
@@ -93,11 +94,11 @@ const Stats = () => {
             {kitsToShow.map((kit) => (
             <div
               key={kit.id || kit.name}
-              className="rounded-xl sm:rounded-2xl shadow-lg sm:shadow-2xl hover:shadow-xl sm:hover:shadow-2xl transition-shadow duration-300 overflow-hidden flex flex-col items-center p-2 sm:p-4 md:p-6 border-0 w-full max-w-sm"
+              className="rounded-xl sm:rounded-2xl shadow-lg sm:shadow-2xl hover:shadow-xl sm:hover:shadow-2xl transition-shadow duration-300 overflow-hidden flex flex-col items-center p-2 sm:p-4 md:p-6 border border-black w-full max-w-sm"
               style={{ backgroundColor: '#FAF9F6' }}
             >
               {/* Image Section - Add images to /public/lovable-uploads/diy-kits/ folder */}
-              <div className="w-full mb-2 sm:mb-4 rounded-lg sm:rounded-xl overflow-hidden bg-white/50 dark:bg-gray-700/50 aspect-square flex items-center justify-center shadow-inner">
+              <div className="w-full mb-2 sm:mb-4 rounded-lg sm:rounded-xl overflow-hidden bg-white/50 dark:bg-gray-700/50 aspect-square flex items-center justify-center shadow-inner border border-black">
                 <img 
                   src={getImagePath(kit)}
                   alt={kit.name}

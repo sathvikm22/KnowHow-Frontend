@@ -115,7 +115,7 @@ const Activities = () => {
             {activities.map((activity) => (
               <div
                 key={activity.id}
-                className="group relative bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-3xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-500 transform hover:scale-105"
+                className="group relative bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-3xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-500 transform hover:scale-105 border border-black"
               >
                 <div className="h-48 relative overflow-hidden bg-gray-200 dark:bg-gray-700 flex items-center justify-center">
                   {(() => {
