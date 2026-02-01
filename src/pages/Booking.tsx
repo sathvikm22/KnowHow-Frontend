@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from 'react';
-import { ArrowLeft, Calendar, Clock, CreditCard, Smartphone, QrCode, Check } from 'lucide-react';
+import { ArrowLeft, Calendar, Clock, CreditCard, Smartphone, QrCode, Check, ChevronDown, ChevronUp } from 'lucide-react';
 import Navigation from '../components/Navigation';
 import { useNavigate } from 'react-router-dom';
 import { api } from '@/lib/api';
@@ -25,6 +25,7 @@ const Booking = () => {
   const [addOns, setAddOns] = useState<Array<{activity: Activity; date: string; timeSlot: string}>>([]);
   const [availableSlotsForAddOn, setAvailableSlotsForAddOn] = useState<Record<string, string[]>>({});
   const [loadingAddOnSlots, setLoadingAddOnSlots] = useState<Record<string, boolean>>({});
+  const [addOnsListExpanded, setAddOnsListExpanded] = useState(false);
 
   // Use activity's individual price from API
   const getAddOnPrice = (activity: Activity): number => {
@@ -146,7 +147,7 @@ const Booking = () => {
     }, 0);
   }, [addOns]);
 
-  const getTimeSlots = () => ['11am-1pm', '1-3pm', '3-5pm', '5-8pm'];
+  const getTimeSlots = () => ['12pm-2pm', '2pm-4pm', '4pm-6pm', '6pm-8pm'];
 
   // Update selectedTime when time slot changes
   useEffect(() => {
@@ -457,7 +458,7 @@ const Booking = () => {
                 <span className="w-8 h-8 bg-orange-100 dark:bg-orange-900 rounded-full flex items-center justify-center text-orange-600 dark:text-orange-400 mr-3 text-sm font-bold">4</span>
                 Select Time Slot
               </h2>
-              <p className="text-sm text-red-600 dark:text-red-300 mb-4 text-center">Open from 11 AM to 9 PM</p>
+              <p className="text-sm text-red-600 dark:text-red-300 mb-4 text-center">Open from 12 PM to 8PM</p>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 {getTimeSlots().map((slot) => (
                   <button
@@ -486,29 +487,40 @@ const Booking = () => {
                   Add more activities to your booking. Each add-on will have its own time slot.
                 </p>
                 
-                {/* Available Activities for Add Ons */}
+                {/* Available Activities for Add Ons - collapsible */}
                 {availableAddOnActivities.length > 0 && (
                   <div className="mb-6">
-                    <h3 className="text-lg font-semibold mb-3 text-gray-700 dark:text-gray-300">Available Activities</h3>
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-                      {availableAddOnActivities.map((activity) => (
-                        <div
-                          key={activity.id}
-                          className="p-3 rounded-lg border border-black dark:border-black bg-white dark:bg-gray-700 hover:border-orange-300 dark:hover:border-orange-400 transition-all"
-                        >
-                          <div className="flex items-center justify-between mb-2">
-                            <h4 className="font-semibold text-gray-800 dark:text-white">{activity.name}</h4>
-                            <span className="text-sm font-bold text-orange-600">₹{getAddOnPrice(activity)}</span>
-                          </div>
-                          <button
-                            onClick={() => handleAddAddOn(activity)}
-                            className="w-full mt-2 px-3 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors text-sm"
+                    <button
+                      type="button"
+                      onClick={() => setAddOnsListExpanded((prev) => !prev)}
+                      className="w-full flex items-center justify-between gap-2 p-3 rounded-lg border border-black dark:border-black bg-white dark:bg-gray-700 hover:border-orange-300 dark:hover:border-orange-400 transition-all text-left"
+                    >
+                      <h3 className="text-lg font-semibold text-gray-700 dark:text-gray-300">Available Activities</h3>
+                      <span className="flex-shrink-0 text-gray-600 dark:text-gray-400" aria-hidden>
+                        {addOnsListExpanded ? <ChevronUp className="w-5 h-5" /> : <ChevronDown className="w-5 h-5" />}
+                      </span>
+                    </button>
+                    {addOnsListExpanded && (
+                      <div className="mt-3 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                        {availableAddOnActivities.map((activity) => (
+                          <div
+                            key={activity.id}
+                            className="p-3 rounded-lg border border-black dark:border-black bg-white dark:bg-gray-700 hover:border-orange-300 dark:hover:border-orange-400 transition-all"
                           >
-                            Add to Booking
-                          </button>
-                        </div>
-                      ))}
-                    </div>
+                            <div className="flex items-center justify-between mb-2">
+                              <h4 className="font-semibold text-gray-800 dark:text-white">{activity.name}</h4>
+                              <span className="text-sm font-bold text-orange-600">₹{getAddOnPrice(activity)}</span>
+                            </div>
+                            <button
+                              onClick={() => handleAddAddOn(activity)}
+                              className="w-full mt-2 px-3 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors text-sm border border-black"
+                            >
+                              Add to Booking
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+                    )}
                   </div>
                 )}
 
