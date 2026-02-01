@@ -296,7 +296,7 @@ const Navigation = () => {
       
       {/* Mobile menu */}
       {isOpen && (
-        <div className="md:hidden bg-teal-600 border-t border-white/20">
+        <div className="md:hidden border-t border-gray-300" style={{ backgroundColor: '#FAF9F6' }}>
           <div className="px-3 sm:px-4 pt-2 pb-3 space-y-1">
             {navItems.map((item) => (
               <button
@@ -305,13 +305,13 @@ const Navigation = () => {
                   item.action();
                   setIsOpen(false);
                 }}
-                className="text-white hover:text-yellow-300 block w-full text-left px-3 py-2 rounded-md text-sm sm:text-base font-medium hover:bg-white/10"
+                className="text-black hover:text-orange-500 block w-full text-left px-3 py-2 rounded-md text-sm sm:text-base font-medium hover:bg-gray-200"
               >
                 {item.name}
               </button>
             ))}
             {userName ? (
-              <div className="pt-4 border-t border-white/20 space-y-2">
+              <div className="pt-4 border-t border-gray-300 space-y-2">
                 <button 
                   onClick={() => {
                     handleOrders();
@@ -353,10 +353,10 @@ const Navigation = () => {
                 Login
               </button>
             )}
-            <div className="pt-4 border-t border-white/20">
+            <div className="pt-4 border-t border-gray-300">
               <button
                 onClick={handlePrivacyClick}
-                className="text-white hover:text-yellow-300 block w-full text-left px-3 py-2 rounded-md text-xs sm:text-sm font-medium hover:bg-white/10"
+                className="text-black hover:text-orange-500 block w-full text-left px-3 py-2 rounded-md text-xs sm:text-sm font-medium hover:bg-gray-200"
               >
                 {isPrivacyPage ? 'Back to Home' : 'Privacy & Cookies Policy'}
               </button>
