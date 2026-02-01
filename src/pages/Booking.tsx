@@ -530,8 +530,14 @@ const Booking = () => {
                     <h3 className="text-lg font-semibold text-gray-700 dark:text-gray-300">Selected Add Ons</h3>
                     {addOns.map((addOn, index) => {
                       const key = `${addOn.activity.name}-${addOn.date}`;
-                      const slots = availableSlotsForAddOn[key] || [];
+                      const slotsFromApi = availableSlotsForAddOn[key] || [];
                       const isLoading = loadingAddOnSlots[key];
+                      // Exclude main booking slot and slots already selected by other add-ons in this session
+                      const usedSlots = [
+                        selectedTimeSlot,
+                        ...addOns.filter((_, i) => i !== index).map(a => a.timeSlot).filter(Boolean)
+                      ];
+                      const slots = slotsFromApi.filter(slot => !usedSlots.includes(slot));
                       
                       return (
                         <div key={index} className="p-4 bg-white dark:bg-gray-800 rounded-lg border border-black dark:border-black">
