@@ -34,7 +34,7 @@ const EventsSection = () => {
           aria-label="Host Your Occasion"
         >
           <span className="mb-4 text-black flex-shrink-0">
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 1.343-3 3 0 1.657 1.343 3 3 3s3-1.343 3-3c0-1.657-1.343-3-3-3zm0 0V4m0 0C7.582 4 4 7.582 4 12c0 4.418 3.582 8 8 8s8-3.582 8-8c0-4.418-3.582-8-8-8z" /></svg>
+            <i className="bi bi-calendar-heart mx-auto flex items-center justify-center text-[3rem]" style={{ width: '3rem', height: '3rem' }} aria-hidden />
           </span>
           <h2 className="text-2xl font-extrabold mb-2 text-black flex-shrink-0">Host Your Occasion</h2>
           <p className="mb-4 text-base font-medium text-black flex-grow">Trained host to engage attendees.<br/>We provide you the place for celebration.</p>
@@ -50,7 +50,7 @@ const EventsSection = () => {
           aria-label="We Come To Your Place"
         >
           <span className="mb-4 text-black flex-shrink-0">
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8h2a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2v-8a2 2 0 012-2h2M12 12v4m0 0l-2-2m2 2l2-2m-6-6V4a2 2 0 012-2h4a2 2 0 012 2v2" /></svg>
+            <i className="bi bi-house-up-fill mx-auto flex items-center justify-center text-[3rem]" style={{ width: '3rem', height: '3rem' }} aria-hidden />
           </span>
           <h2 className="text-2xl font-extrabold mb-2 text-black flex-shrink-0">We Come To Your Place</h2>
           <p className="mb-4 text-base font-medium text-black flex-grow">We come to your place to celebrate.<br/>2 hours for ₹399/person</p>
@@ -66,7 +66,7 @@ const EventsSection = () => {
           aria-label="Corporate Workshops"
         >
           <span className="mb-4 text-black flex-shrink-0">
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a4 4 0 00-3-3.87M9 20H4v-2a4 4 0 013-3.87m9-4V6a4 4 0 00-8 0v4m12 4v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2a2 2 0 012-2h12a2 2 0 012 2z" /></svg>
+            <i className="bi bi-pc-display-horizontal mx-auto flex items-center justify-center text-[3rem]" style={{ width: '3rem', height: '3rem' }} aria-hidden />
           </span>
           <h2 className="text-2xl font-extrabold mb-2 text-black flex-shrink-0">Corporate Workshops</h2>
           <p className="mb-4 text-base font-medium text-black flex-grow">Give your employees a fun day off! Book us for your corporate space.</p>

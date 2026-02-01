@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Menu, X, LogOut, Shield, ShoppingCart } from 'lucide-react';
+import { Menu, X, LogOut, ShoppingCart } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { logout, getCurrentUser } from '../lib/api';
 import { useCart } from '../contexts/CartContext';
@@ -155,7 +155,7 @@ const Navigation = () => {
               title={isPrivacyPage ? 'Back to Home' : 'Privacy & Cookies Policy'}
               aria-label={isPrivacyPage ? 'Back to Home' : 'Privacy & Cookies Policy'}
             >
-              <Shield size={18} className="sm:w-5 sm:h-5" />
+              <i className="bi bi-shield-lock w-6 h-6 sm:w-6 sm:h-6 text-xl" aria-hidden />
             </button>
             {userName && (
               <button
@@ -213,7 +213,7 @@ const Navigation = () => {
               title={isPrivacyPage ? 'Back to Home' : 'Privacy & Cookies Policy'}
               aria-label={isPrivacyPage ? 'Back to Home' : 'Privacy & Cookies Policy'}
             >
-              <Shield size={18} className="sm:w-5 sm:h-5" />
+              <i className="bi bi-shield-lock w-6 h-6 sm:w-6 sm:h-6 text-xl" aria-hidden />
             </button>
             {userName && (
               <button
