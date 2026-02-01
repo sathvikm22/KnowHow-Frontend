@@ -220,7 +220,7 @@ const PaymentSuccess = () => {
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       <Navigation />
       <div className="flex items-center justify-center min-h-[calc(100vh-4rem)] px-4">
-        <div className="max-w-md w-full bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-8 text-center overflow-hidden">
+        <div className="max-w-md w-full bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-8 text-center">
           <div className="flex justify-center mb-6">
             <CheckCircle className="w-20 h-20 text-green-500" />
           </div>
@@ -235,7 +235,7 @@ const PaymentSuccess = () => {
               Order ID: {orderId}
             </p>
           )}
-          <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 w-full mt-6">
+          <div className="flex flex-col gap-3 w-full mt-6">
             <Button
               onClick={() => {
                 if (receiptData) {
@@ -246,7 +246,7 @@ const PaymentSuccess = () => {
                   });
                 }
               }}
-              className="w-full sm:flex-1 bg-orange-500 hover:bg-orange-600 text-white font-medium py-6 text-base"
+              className="w-full bg-orange-500 hover:bg-orange-600 text-white font-medium py-6 text-base"
             >
               View Receipt
             </Button>
@@ -254,7 +254,7 @@ const PaymentSuccess = () => {
               <Button
                 onClick={() => navigate('/all-orders')}
                 variant="outline"
-                className="w-full sm:flex-1 border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 font-medium py-6 text-base"
+                className="w-full border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 font-medium py-6 text-base"
               >
                 View My Orders
               </Button>
@@ -262,7 +262,7 @@ const PaymentSuccess = () => {
               <Button
                 onClick={() => navigate('/all-orders')}
                 variant="outline"
-                className="w-full sm:flex-1 border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 font-medium py-6 text-base"
+                className="w-full border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 font-medium py-6 text-base"
               >
                 View My Bookings
               </Button>
@@ -270,7 +270,7 @@ const PaymentSuccess = () => {
             <Button
               onClick={() => navigate('/')}
               variant="outline"
-              className="w-full sm:flex-1 border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 font-medium py-6 text-base"
+              className="w-full border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 font-medium py-6 text-base"
             >
               Back to Home
             </Button>
