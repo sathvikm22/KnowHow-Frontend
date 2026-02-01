@@ -186,7 +186,7 @@ const Navigation = () => {
                 >
                   Book Now
                 </button>
-                <span className="text-gray-800 text-xs sm:text-sm font-medium px-3 xl:px-4 py-1.5 sm:py-1.5 rounded-lg whitespace-nowrap flex-shrink-0" style={{ backgroundColor: '#fffd74' }}>{userName}</span>
+                <span className="nav-user-name-btn flex-shrink-0">{userName}</span>
                 <button 
                   onClick={handleLogout}
                   className="bg-orange-500 text-white px-2.5 xl:px-3 py-1.5 sm:py-1.5 rounded-lg hover:bg-orange-600 transition-colors duration-300 flex-shrink-0"
@@ -244,7 +244,7 @@ const Navigation = () => {
                 >
                   Book Now
                 </button>
-                <span className="text-gray-800 text-xs sm:text-sm font-medium px-3 sm:px-4 py-1.5 sm:py-1.5 rounded-lg whitespace-nowrap flex-shrink-0" style={{ backgroundColor: '#fffd74' }}>{userName}</span>
+                <span className="nav-user-name-btn flex-shrink-0">{userName}</span>
                 <button 
                   onClick={handleLogout}
                   className="bg-orange-500 text-white px-2.5 sm:px-3 py-1.5 sm:py-1.5 rounded-lg hover:bg-orange-600 transition-colors duration-300 flex-shrink-0"
@@ -330,7 +330,7 @@ const Navigation = () => {
                 >
                   Book Now
                 </button>
-                <div className="text-gray-800 font-medium px-3 py-2 rounded-md text-sm sm:text-base text-center" style={{ backgroundColor: '#fffd74' }}>{userName}</div>
+                <span className="nav-user-name-btn block w-full text-center">{userName}</span>
                 <button 
                   onClick={() => {
                     handleLogout();
