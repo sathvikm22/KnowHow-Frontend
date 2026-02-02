@@ -269,7 +269,7 @@ const Cart = () => {
           {/* Header */}
           <div className="mb-6">
             <button
-              onClick={() => navigate('/home')}
+              onClick={() => navigate('/')}
               className="flex items-center text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 mb-4"
             >
               <ArrowLeft className="mr-2 h-5 w-5" />

@@ -221,7 +221,7 @@ const SignUp = () => {
         localStorage.removeItem('isAdmin');
         
         alert('Account created successfully!');
-        window.location.href = '/home';
+        window.location.href = '/';
       } else {
         const errorMsg = response.message || 'Failed to create account';
         // Check if it's an "already exists" error

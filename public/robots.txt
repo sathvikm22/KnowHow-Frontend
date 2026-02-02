@@ -12,6 +12,9 @@ Allow: /signup
 Allow: /forgot-password
 Allow: /login
 
+# Avoid crawl budget on redirect-only URLs (301 to canonical)
+Disallow: /home
+
 # Block admin and protected routes
 Disallow: /admin/
 Disallow: /booking

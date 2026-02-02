@@ -75,7 +75,7 @@ const GoogleAuthCallback = () => {
           if (localStorage.getItem('isAdmin') === 'true') {
             navigate('/admin/dashboard/bookings', { replace: true });
           } else {
-            navigate('/home', { replace: true });
+            navigate('/', { replace: true });
           }
         }, 500);
       } catch (err) {
