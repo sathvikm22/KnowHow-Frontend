@@ -392,8 +392,9 @@ class ApiClient {
     });
   }
 
-  async getMyBookings(): Promise<ApiResponse<{ bookings: any[] }>> {
-    return this.request('/my-bookings', {
+  async getMyBookings(email?: string): Promise<ApiResponse<{ bookings: any[] }>> {
+    const query = email ? `?email=${encodeURIComponent(email)}` : '';
+    return this.request(`/my-bookings${query}`, {
       method: 'GET',
     });
   }
@@ -447,8 +448,9 @@ class ApiClient {
     });
   }
 
-  async getMyDIYOrders(): Promise<ApiResponse<{ orders: any[] }>> {
-    return this.request('/my-diy-orders', {
+  async getMyDIYOrders(email?: string): Promise<ApiResponse<{ orders: any[] }>> {
+    const query = email ? `?email=${encodeURIComponent(email)}` : '';
+    return this.request(`/my-diy-orders${query}`, {
       method: 'GET',
     });
   }

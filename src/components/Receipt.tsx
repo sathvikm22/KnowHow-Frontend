@@ -99,158 +99,164 @@ const Receipt = ({ receiptData, open = true, onOpenChange, showAsDialog = true }
         </div>
       </div>
 
-      {/* Invoice Details */}
-      <div className="p-6 flex-1 overflow-y-auto min-h-0">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-          <div>
-            <h3 className="text-sm font-semibold text-gray-600 dark:text-gray-400 mb-2">
-              Invoice to:
-            </h3>
-            <p className="text-base font-bold text-gray-900 dark:text-white">
-              {receiptData.customerName.toUpperCase()}
-            </p>
-            {receiptData.customerAddress && (
-              <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
-                {receiptData.customerAddress}
-              </p>
-            )}
-            <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
-              {receiptData.customerEmail}
-            </p>
-            <p className="text-sm text-gray-600 dark:text-gray-400">
-              {receiptData.customerPhone}
-            </p>
-          </div>
-          <div className="text-right md:text-left">
-            <div className="mb-3">
-              <span className="text-sm font-semibold text-gray-600 dark:text-gray-400">
-                Invoice No:{' '}
-              </span>
-              <span className="text-sm font-bold text-gray-900 dark:text-white">
-                {receiptData.internalBillId}
-              </span>
-            </div>
-            <div>
-              <span className="text-sm font-semibold text-gray-600 dark:text-gray-400">
-                Date:{' '}
-              </span>
-              <span className="text-sm font-bold text-gray-900 dark:text-white">
-                {formatDate(receiptData.date)}
-              </span>
-            </div>
-            <div className="mt-3">
-              <span className="text-sm font-semibold text-gray-600 dark:text-gray-400">
-                Order ID:{' '}
-              </span>
-              <span className="text-sm font-bold text-gray-900 dark:text-white">
-                {receiptData.orderId}
-              </span>
-            </div>
-            {receiptData.paymentId && (
-              <div className="mt-2">
-                <span className="text-sm font-semibold text-gray-600 dark:text-gray-400">
-                  Payment ID:{' '}
-                </span>
-                <span className="text-sm font-bold text-gray-900 dark:text-white">
-                  {receiptData.paymentId}
-                </span>
-              </div>
-            )}
-          </div>
-        </div>
-
-        {/* Items Table */}
-        <div className="mb-6">
-          <div className="bg-orange-500 rounded-t-lg overflow-hidden">
-            <div className="grid grid-cols-12 gap-4 p-3 text-white font-semibold text-sm">
-              <div className="col-span-6">Item Description</div>
-              <div className="col-span-2 text-right">Unit Price</div>
-              <div className="col-span-2 text-center">Quantity</div>
-              <div className="col-span-2 text-right">Total</div>
-            </div>
-          </div>
-          <div className="border border-gray-200 dark:border-gray-700 rounded-b-lg overflow-hidden">
-            {receiptData.items.map((item, index) => (
-              <div
-                key={index}
-                className={`grid grid-cols-12 gap-4 p-3 text-sm ${
-                  index % 2 === 0
-                    ? 'bg-white dark:bg-gray-800'
-                    : 'bg-gray-50 dark:bg-gray-700'
-                }`}
-              >
-                <div className="col-span-6 text-gray-900 dark:text-white font-medium">
-                  {item.name}
-                </div>
-                <div className="col-span-2 text-right text-gray-700 dark:text-gray-300">
-                  {formatCurrency(item.unitPrice)}
-                </div>
-                <div className="col-span-2 text-center text-gray-700 dark:text-gray-300">
-                  {item.quantity}
-                </div>
-                <div className="col-span-2 text-right text-gray-900 dark:text-white font-semibold">
-                  {formatCurrency(item.total)}
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Summary Section */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {/* Left: Terms & Contact */}
-          <div className="space-y-4">
-            {receiptData.notes && (
-              <div>
-                <h4 className="text-orange-600 dark:text-orange-400 font-bold mb-2 text-sm">
-                  Terms & Conditions:
-                </h4>
-                <p className="text-xs text-gray-600 dark:text-gray-400 whitespace-pre-line">
-                  {receiptData.notes}
+      {/* Invoice Details - scroll only when content overflows; inner fills height so no dead space */}
+      <div className="flex-1 min-h-0 overflow-y-auto">
+        <div className="min-h-full flex flex-col p-8 pb-0">
+          {/* Top: bill content with increased spacing */}
+          <div className="flex-shrink-0">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+              <div className="space-y-3">
+                <h3 className="text-base font-semibold text-gray-600 dark:text-gray-400">
+                  Invoice to:
+                </h3>
+                <p className="text-lg font-bold text-gray-900 dark:text-white">
+                  {receiptData.customerName.toUpperCase()}
+                </p>
+                {receiptData.customerAddress && (
+                  <p className="text-sm text-gray-600 dark:text-gray-400 mt-2 leading-relaxed">
+                    {receiptData.customerAddress}
+                  </p>
+                )}
+                <p className="text-sm text-gray-600 dark:text-gray-400 mt-2">
+                  {receiptData.customerEmail}
+                </p>
+                <p className="text-sm text-gray-600 dark:text-gray-400">
+                  {receiptData.customerPhone}
                 </p>
               </div>
-            )}
-            <div>
-              <h4 className="text-orange-600 dark:text-orange-400 font-bold mb-2 text-sm">
-                Payment Terms:
-              </h4>
-              <p className="text-xs text-gray-600 dark:text-gray-400">
-                Payment received via {receiptData.paymentMode}. Booking confirmed upon payment.
-              </p>
+              <div className="text-right md:text-left space-y-4">
+                <div>
+                  <span className="text-sm font-semibold text-gray-600 dark:text-gray-400">
+                    Invoice No:{' '}
+                  </span>
+                  <span className="text-sm font-bold text-gray-900 dark:text-white">
+                    {receiptData.internalBillId}
+                  </span>
+                </div>
+                <div>
+                  <span className="text-sm font-semibold text-gray-600 dark:text-gray-400">
+                    Date:{' '}
+                  </span>
+                  <span className="text-sm font-bold text-gray-900 dark:text-white">
+                    {formatDate(receiptData.date)}
+                  </span>
+                </div>
+                <div>
+                  <span className="text-sm font-semibold text-gray-600 dark:text-gray-400">
+                    Order ID:{' '}
+                  </span>
+                  <span className="text-sm font-bold text-gray-900 dark:text-white">
+                    {receiptData.orderId}
+                  </span>
+                </div>
+                {receiptData.paymentId && (
+                  <div>
+                    <span className="text-sm font-semibold text-gray-600 dark:text-gray-400">
+                      Payment ID:{' '}
+                    </span>
+                    <span className="text-sm font-bold text-gray-900 dark:text-white">
+                      {receiptData.paymentId}
+                    </span>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Items Table - more padding */}
+            <div className="mb-8">
+              <div className="bg-orange-500 rounded-t-lg overflow-hidden">
+                <div className="grid grid-cols-12 gap-4 py-4 px-4 text-white font-semibold text-sm">
+                  <div className="col-span-6">Item Description</div>
+                  <div className="col-span-2 text-right">Unit Price</div>
+                  <div className="col-span-2 text-center">Quantity</div>
+                  <div className="col-span-2 text-right">Total</div>
+                </div>
+              </div>
+              <div className="border border-gray-200 dark:border-gray-700 rounded-b-lg overflow-hidden">
+                {receiptData.items.map((item, index) => (
+                  <div
+                    key={index}
+                    className={`grid grid-cols-12 gap-4 py-4 px-4 text-sm ${
+                      index % 2 === 0
+                        ? 'bg-white dark:bg-gray-800'
+                        : 'bg-gray-50 dark:bg-gray-700'
+                    }`}
+                  >
+                    <div className="col-span-6 text-gray-900 dark:text-white font-medium">
+                      {item.name}
+                    </div>
+                    <div className="col-span-2 text-right text-gray-700 dark:text-gray-300">
+                      {formatCurrency(item.unitPrice)}
+                    </div>
+                    <div className="col-span-2 text-center text-gray-700 dark:text-gray-300">
+                      {item.quantity}
+                    </div>
+                    <div className="col-span-2 text-right text-gray-900 dark:text-white font-semibold">
+                      {formatCurrency(item.total)}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Summary Section - more spacing */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+              <div className="space-y-6">
+                {receiptData.notes && (
+                  <div>
+                    <h4 className="text-orange-600 dark:text-orange-400 font-bold mb-3 text-sm">
+                      Terms & Conditions:
+                    </h4>
+                    <p className="text-sm text-gray-600 dark:text-gray-400 whitespace-pre-line leading-relaxed">
+                      {receiptData.notes}
+                    </p>
+                  </div>
+                )}
+                <div>
+                  <h4 className="text-orange-600 dark:text-orange-400 font-bold mb-3 text-sm">
+                    Payment Terms:
+                  </h4>
+                  <p className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed">
+                    Payment received via {receiptData.paymentMode}. Booking confirmed upon payment.
+                  </p>
+                </div>
+              </div>
+
+              <div className="space-y-5">
+                <div className="bg-orange-500 rounded-xl py-5 px-5">
+                  <div className="flex justify-between items-center text-white">
+                    <span className="font-bold text-lg">GRAND TOTAL</span>
+                    <span className="font-bold text-xl">{formatCurrency(receiptData.totalAmount)}</span>
+                  </div>
+                </div>
+                <div className="flex items-center gap-3 py-4 px-4 bg-green-50 dark:bg-green-900/20 rounded-lg border border-green-200 dark:border-green-800">
+                  <CheckCircle2 className="h-5 w-5 text-green-600 dark:text-green-400 flex-shrink-0" />
+                  <div>
+                    <p className="text-sm font-semibold text-green-700 dark:text-green-300">
+                      Payment Status: {receiptData.paymentStatus}
+                    </p>
+                    <p className="text-sm text-green-600 dark:text-green-400">
+                      Payment Mode: {receiptData.paymentMode}
+                    </p>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
 
-          {/* Right: Totals */}
-          <div>
-            <div className="bg-orange-500 rounded-xl p-4 mb-4">
-              <div className="flex justify-between items-center text-white">
-                <span className="font-bold text-base">GRAND TOTAL</span>
-                <span className="font-bold text-lg">{formatCurrency(receiptData.totalAmount)}</span>
-              </div>
-            </div>
-            <div className="flex items-center space-x-2 mb-4 p-3 bg-green-50 dark:bg-green-900/20 rounded-lg border border-green-200 dark:border-green-800">
-              <CheckCircle2 className="h-4 w-4 text-green-600 dark:text-green-400" />
-              <div>
-                <p className="text-xs font-semibold text-green-700 dark:text-green-300">
-                  Payment Status: {receiptData.paymentStatus}
-                </p>
-                <p className="text-xs text-green-600 dark:text-green-400">
-                  Payment Mode: {receiptData.paymentMode}
-                </p>
-              </div>
-            </div>
+          {/* Spacer: fills remaining height so wave sits at bottom of popup */}
+          <div className="flex-1 min-h-[3rem]" />
+
+          {/* Wavy footer - fixed height at bottom */}
+          <div className="relative h-20 flex-shrink-0 overflow-hidden mt-4">
+            <svg className="absolute inset-0 w-full h-full" viewBox="0 0 1200 100" preserveAspectRatio="none">
+              <path d="M0,50 Q300,0 600,50 T1200,50 L1200,100 L0,100 Z" fill="rgba(249, 115, 22, 0.1)" />
+            </svg>
+            <svg className="absolute inset-0 w-full h-full" viewBox="0 0 1200 100" preserveAspectRatio="none">
+              <path d="M0,50 Q300,100 600,50 T1200,50 L1200,100 L0,100 Z" fill="rgba(249, 115, 22, 0.1)" />
+            </svg>
           </div>
         </div>
-      </div>
-
-      {/* Footer with Orange Waves - fills remaining space so no empty white at bottom */}
-      <div className="relative flex-1 min-h-[4rem] flex-shrink-0 overflow-hidden">
-        <svg className="absolute inset-0 w-full h-full" viewBox="0 0 1200 100" preserveAspectRatio="none">
-          <path d="M0,50 Q300,0 600,50 T1200,50 L1200,100 L0,100 Z" fill="rgba(249, 115, 22, 0.1)" />
-        </svg>
-        <svg className="absolute inset-0 w-full h-full" viewBox="0 0 1200 100" preserveAspectRatio="none">
-          <path d="M0,50 Q300,100 600,50 T1200,50 L1200,100 L0,100 Z" fill="rgba(249, 115, 22, 0.1)" />
-        </svg>
       </div>
     </div>
   );
