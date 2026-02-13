@@ -128,6 +128,7 @@ const App = () => {
               <Route path="/terms-of-service" element={<Navigate to="/terms-and-conditions" replace />} />
               <Route path="/contact-us" element={<ContactUs />} />
               <Route path="/contact" element={<Navigate to="/contact-us" replace />} />
+              <Route path="/cancellations-refunds" element={<Navigate to="/terms-and-conditions" replace />} />
               <Route path="/orders" element={<ProtectedRoute requireAuth={true}><Orders /></ProtectedRoute>} />
               <Route path="/my-orders" element={<ProtectedRoute requireAuth={true}><MyOrders /></ProtectedRoute>} />
               <Route path="/all-orders" element={<ProtectedRoute requireAuth={true}><AllOrders /></ProtectedRoute>} />
