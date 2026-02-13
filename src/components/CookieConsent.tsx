@@ -52,11 +52,9 @@ const CookieConsent = () => {
         const cookieConsent = response.cookieConsent || response.data?.cookieConsent || null;
         console.log('🍪 Cookie consent from database:', cookieConsent);
         
-        // Show popup if:
-        // 1. User has never given consent (null) - NEW USER or user who hasn't accepted yet
-        // 2. User has declined - show popup every time they log in
-        // Don't show if user has accepted
-        if (cookieConsent === null || cookieConsent === 'declined') {
+        // Show popup ONLY when user has never made a choice (null)
+        // Don't show if user has accepted OR declined - they can change preference from Privacy page
+        if (cookieConsent === null) {
           console.log('🍪 Showing cookie consent popup (consent:', cookieConsent, ')');
           // Delay to ensure page is fully loaded after redirect
           setTimeout(() => {
@@ -76,9 +74,10 @@ const CookieConsent = () => {
             }
             setIsLoading(false);
           }, 2000); // 2 second delay to ensure redirect is complete
-        } else if (cookieConsent === 'accepted') {
-          // User has accepted - don't show popup
-          console.log('🍪 User has accepted cookies, not showing popup');
+        } else if (cookieConsent === 'accepted' || cookieConsent === 'declined') {
+          // User has made a choice (accepted or declined) - don't show popup
+          // They can change preference from Privacy & Cookies page
+          console.log('🍪 User has made cookie choice:', cookieConsent, '- not showing popup');
           setShow(false);
           setIsLoading(false);
         } else {
@@ -87,12 +86,17 @@ const CookieConsent = () => {
           setIsLoading(false);
         }
       } else {
-        // If API call fails (e.g., 401 or user not found), treat as never consented
-        // This handles new users who don't have a consent record yet
+        // If API call fails, check localStorage - user may have already chosen
+        const localConsent = localStorage.getItem('cookieConsent');
+        if (localConsent === 'accepted' || localConsent === 'declined') {
+          console.log('🍪 API failed but localStorage has choice:', localConsent, '- not showing popup');
+          setShow(false);
+          setIsLoading(false);
+          return;
+        }
+        // New user with no consent record - show popup
         console.log('🍪 API call returned success=false, treating as never consented');
-        // For new users, always show popup if they're logged in
         setTimeout(() => {
-          // CRITICAL: Check user is still logged in before showing
           if (!isUserLoggedIn()) {
             setShow(false);
             setIsLoading(false);
@@ -107,11 +111,16 @@ const CookieConsent = () => {
       }
     } catch (error: any) {
       console.error('🍪 Error checking cookie consent:', error);
-      // If API call throws an error (401, 404, network error, etc.), treat as never consented
-      // This is important for new users who don't have a consent record yet
-      // Show popup for logged-in users (they need to accept/decline)
+      // Check localStorage first - user may have already chosen
+      const localConsent = localStorage.getItem('cookieConsent');
+      if (localConsent === 'accepted' || localConsent === 'declined') {
+        console.log('🍪 API error but localStorage has choice:', localConsent, '- not showing popup');
+        setShow(false);
+        setIsLoading(false);
+        return;
+      }
+      // New user - show popup for logged-in users
       setTimeout(() => {
-        // CRITICAL: Check user is still logged in before showing
         if (!isUserLoggedIn()) {
           setShow(false);
           setIsLoading(false);
@@ -173,26 +182,11 @@ const CookieConsent = () => {
       setIsLoading(false);
     };
 
-    // Listen for cookie consent changes - show popup if consent was withdrawn
+    // Listen for cookie consent changes - hide popup when user makes a choice
+    // Don't re-show popup when consent is withdrawn; user can change from Privacy page
     const handleCookieConsentChange = (e: CustomEvent) => {
       console.log('🍪 Cookie consent changed event:', e.detail);
-      if (!e.detail?.accepted) {
-        // Consent was withdrawn - re-check database and show popup if user is logged in
-        console.log('🍪 Consent withdrawn, re-checking database status');
-        if (isUserLoggedIn() && !excludedPaths.includes(location.pathname)) {
-          // Re-check consent status from database
-          setTimeout(() => {
-            if (isUserLoggedIn() && !excludedPaths.includes(location.pathname)) {
-              console.log('🍪 Re-checking consent after withdrawal');
-              checkAndShowConsent();
-            }
-          }, 1000);
-        }
-      } else {
-        // Consent was accepted - hide popup
-        console.log('🍪 Consent accepted, hiding popup');
-        setShow(false);
-      }
+      setShow(false); // Always hide - user made a choice (accept, decline, or changed on Privacy page)
     };
 
     // Monitor localStorage changes for logout (cross-tab)
@@ -202,23 +196,10 @@ const CookieConsent = () => {
         setShow(false);
         setIsLoading(false);
       }
-      // Also check if cookieConsent was changed
+      // cookieConsent changed in another tab - hide popup (user made choice elsewhere)
       if (e.key === 'cookieConsent') {
         console.log('🍪 CookieConsent changed in localStorage:', e.newValue);
-        if (!e.newValue || e.newValue === 'declined') {
-          // Consent was withdrawn - show popup if user is logged in
-          if (isUserLoggedIn() && !excludedPaths.includes(location.pathname)) {
-            setTimeout(() => {
-              if (isUserLoggedIn() && !excludedPaths.includes(location.pathname)) {
-                console.log('🍪 Showing popup after localStorage change (consent withdrawn)');
-                setShow(true);
-              }
-            }, 1000);
-          }
-        } else if (e.newValue === 'accepted') {
-          // Consent was accepted - hide popup
-          setShow(false);
-        }
+        setShow(false); // Don't show popup - user has made a choice
       }
     };
 
@@ -297,7 +278,7 @@ const CookieConsent = () => {
       
       // Dispatch event to notify other components
       window.dispatchEvent(new CustomEvent('cookieConsentChanged', { detail: { accepted: false } }));
-      console.log('🍪 Cookie consent declined, popup will show again on next login');
+      console.log('🍪 Cookie consent declined, popup will not show again (user can change from Privacy page)');
     } catch (error) {
       console.error('🍪 Error updating cookie consent:', error);
       // Still update localStorage as fallback
