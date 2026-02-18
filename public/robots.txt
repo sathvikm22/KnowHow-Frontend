@@ -5,7 +5,6 @@
 User-agent: *
 Allow: /
 Allow: /privacy-policy
-Allow: /shipping-policy
 Allow: /terms-and-conditions
 Allow: /contact-us
 Allow: /signup

@@ -19,7 +19,6 @@ import AdminUsers from './pages/AdminUsers';
 import AdminAddOns from './pages/AdminAddOns';
 import GoogleAuthCallback from './pages/GoogleAuthCallback';
 import PrivacyPolicy from './pages/PrivacyPolicy';
-import ShippingPolicy from './pages/ShippingPolicy';
 import TermsAndConditions from './pages/TermsAndConditions';
 import ContactUs from './pages/ContactUs';
 import Orders from './pages/Orders';
@@ -121,8 +120,8 @@ const App = () => {
               <Route path="/forgot-password" element={<ForgotPassword />} />
               <Route path="/auth/google/callback" element={<GoogleAuthCallback />} />
               <Route path="/privacy-policy" element={<PrivacyPolicy />} />
-              <Route path="/shipping-policy" element={<ShippingPolicy />} />
-              <Route path="/shipping" element={<Navigate to="/shipping-policy" replace />} />
+              <Route path="/shipping-policy" element={<Navigate to="/privacy-policy" replace />} />
+              <Route path="/shipping" element={<Navigate to="/privacy-policy" replace />} />
               <Route path="/terms-and-conditions" element={<TermsAndConditions />} />
               <Route path="/terms" element={<Navigate to="/terms-and-conditions" replace />} />
               <Route path="/terms-of-service" element={<Navigate to="/terms-and-conditions" replace />} />

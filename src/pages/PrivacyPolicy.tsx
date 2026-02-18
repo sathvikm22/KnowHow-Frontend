@@ -518,9 +518,17 @@ const PrivacyPolicy = () => {
               </ul>
             </section>
 
+            {/* Shipping & delivery */}
+            <section id="shipping">
+              <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">11. Shipping & Delivery</h2>
+              <p className="text-gray-700 dark:text-gray-300 leading-relaxed">
+                We ship physical products, DIY kits, and merchandise across India. Delivery typically takes 5–7 business days (standard) or 2–3 business days (express where available). Shipping costs are calculated at checkout. For shipping questions or to report lost or damaged packages, contact us at <strong>knowhowcafe2025@gmail.com</strong>. Workshop bookings and experiences are location-based and are not shipped.
+              </p>
+            </section>
+
             {/* Children's Privacy */}
             <section>
-              <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">11. Children's Privacy</h2>
+              <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">12. Children's Privacy</h2>
               <p className="text-gray-700 dark:text-gray-300 leading-relaxed">
                 Our services are not directed to children under 16 years of age. We do not knowingly collect personal data from children. If you are a parent or guardian and believe your child has provided us with personal data, please contact us immediately, and we will delete such information.
               </p>
@@ -528,7 +536,7 @@ const PrivacyPolicy = () => {
 
             {/* Changes to This Policy */}
             <section>
-              <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">12. Changes to This Policy</h2>
+              <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">13. Changes to This Policy</h2>
               <p className="text-gray-700 dark:text-gray-300 leading-relaxed">
                 We may update this Privacy & Cookies Policy from time to time. We will notify you of any material changes by:
               </p>
@@ -544,7 +552,7 @@ const PrivacyPolicy = () => {
 
             {/* Contact Information */}
             <section>
-              <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">13. Contact Us</h2>
+              <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">14. Contact Us</h2>
               <p className="text-gray-700 dark:text-gray-300 leading-relaxed mb-4">
                 If you have questions, concerns, or requests regarding this Privacy & Cookies Policy or your personal data, please contact us:
               </p>
