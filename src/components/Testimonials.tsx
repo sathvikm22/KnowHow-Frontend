@@ -9,21 +9,21 @@ const Testimonials = () => {
   const [api, setApi] = useState<any>()
 
   const galleryImages = [
-    { src: "/lovable-uploads/1.jpeg", alt: "Gallery image 1" },
-    { src: "/lovable-uploads/2.jpeg", alt: "Gallery image 2" },
-    { src: "/lovable-uploads/3.jpeg", alt: "Gallery image 3" },
-    { src: "/lovable-uploads/4.jpeg", alt: "Gallery image 4" },
-    { src: "/lovable-uploads/5.jpeg", alt: "Gallery image 5" },
-    { src: "/lovable-uploads/6.jpeg", alt: "Gallery image 6" },
-    { src: "/lovable-uploads/7.jpeg", alt: "Gallery image 7" },
-    { src: "/lovable-uploads/8.jpeg", alt: "Gallery image 8" },
-    { src: "/lovable-uploads/9.jpeg", alt: "Gallery image 9" },
-    { src: "/lovable-uploads/10.jpeg", alt: "Gallery image 10" },
-    { src: "/lovable-uploads/11.jpeg", alt: "Gallery image 11" },
-    { src: "/lovable-uploads/12.jpeg", alt: "Gallery image 12" },
-    { src: "/lovable-uploads/13.jpeg", alt: "Gallery image 13" },
-    { src: "/lovable-uploads/14.jpeg", alt: "Gallery image 14" },
-    { src: "/lovable-uploads/15.jpeg", alt: "Gallery image 15" },
+    { src: "/lovable-uploads/gallery-1.jpeg", alt: "Gallery image 1" },
+    { src: "/lovable-uploads/gallery-2.jpeg", alt: "Gallery image 2" },
+    { src: "/lovable-uploads/gallery-3.jpeg", alt: "Gallery image 3" },
+    { src: "/lovable-uploads/gallery-4.jpeg", alt: "Gallery image 4" },
+    { src: "/lovable-uploads/gallery-5.jpeg", alt: "Gallery image 5" },
+    { src: "/lovable-uploads/gallery-6.jpeg", alt: "Gallery image 6" },
+    { src: "/lovable-uploads/gallery-7.jpeg", alt: "Gallery image 7" },
+    { src: "/lovable-uploads/gallery-8.jpeg", alt: "Gallery image 8" },
+    { src: "/lovable-uploads/gallery-9.jpeg", alt: "Gallery image 9" },
+    { src: "/lovable-uploads/gallery-10.jpeg", alt: "Gallery image 10" },
+    { src: "/lovable-uploads/gallery-11.jpeg", alt: "Gallery image 11" },
+    { src: "/lovable-uploads/gallery-12.jpeg", alt: "Gallery image 12" },
+    { src: "/lovable-uploads/gallery-13.jpeg", alt: "Gallery image 13" },
+    { src: "/lovable-uploads/gallery-14.jpeg", alt: "Gallery image 14" },
+    { src: "/lovable-uploads/gallery-15.jpeg", alt: "Gallery image 15" },
   ];
 
   useEffect(() => {
@@ -70,12 +70,11 @@ const Testimonials = () => {
                 {galleryImages.map((image, index) => (
                   <CarouselItem key={index} className="pl-4 basis-4/5 md:basis-2/3 lg:basis-1/2 xl:basis-2/5 2xl:basis-1/3">
                     <div className="p-4">
-                      <div className="aspect-[4/3] overflow-hidden rounded-3xl shadow-2xl border-2 border-black bg-white hover:shadow-gray-400 transition-all duration-700 transform hover:scale-105">
+                      <div className="aspect-[3/4] overflow-hidden rounded-3xl shadow-2xl border-2 border-black bg-white hover:shadow-gray-400 transition-all duration-700 transform hover:scale-105">
                         <img
                           src={image.src}
                           alt={image.alt}
-                          className={`w-full h-full object-cover transition-transform duration-1000 hover:scale-110${image.src.includes('9.jpeg') || image.src.includes('15.jpeg') ? '' : ''}`}
-                          style={image.src.includes('9.jpeg') || image.src.includes('15.jpeg') ? { objectPosition: 'center 70%' } : {}}
+                          className="w-full h-full object-contain transition-transform duration-1000 hover:scale-110"
                           loading="lazy"
                         />
                       </div>
