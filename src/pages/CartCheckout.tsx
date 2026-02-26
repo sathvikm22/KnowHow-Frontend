@@ -6,9 +6,10 @@ import Navigation from '@/components/Navigation';
 interface CartCheckoutLocationState {
   cartData: {
     items: Array<{
-      kit_name: string;
-      price: number;
+      name: string;
+      unit_price: number;
       quantity: number;
+      total: number;
     }>;
     totalAmount: number;
     customerName: string;
@@ -58,12 +59,12 @@ const CartCheckout = () => {
       setIsLoading(true);
       setError(null);
 
-      // Prepare order items
+      // Prepare order items using the exact data passed from Cart.tsx
       const items = cartData.items.map(item => ({
-        name: item.kit_name,
+        name: item.name,
         quantity: item.quantity,
-        unit_price: item.price,
-        total: item.price * item.quantity
+        unit_price: item.unit_price,
+        total: item.total
       }));
 
       const orderData = {

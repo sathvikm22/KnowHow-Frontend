@@ -770,21 +770,6 @@ const AllOrders = () => {
                             </DialogContent>
                           </Dialog>
                           )}
-                          <Button
-                            variant="destructive"
-                            size="sm"
-                            onClick={() => handleCancelClick(booking)}
-                            disabled={cancellingId === booking.id || booking.status === 'cancelled'}
-                          >
-                            {cancellingId === booking.id ? (
-                              <Loader2 className="w-4 h-4 animate-spin" />
-                            ) : (
-                              <>
-                                <X className="w-4 h-4 mr-2" />
-                                Cancel
-                              </>
-                            )}
-                          </Button>
                         </>
                       )}
                     </div>
@@ -970,61 +955,6 @@ const AllOrders = () => {
         )}
       </div>
       
-      {/* Cancel Confirmation Dialog */}
-      <AlertDialog open={cancelDialogOpen} onOpenChange={setCancelDialogOpen}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Cancel Booking</AlertDialogTitle>
-            <AlertDialogDescription className="space-y-2">
-              {bookingToCancel && (
-                <>
-                  <p className="font-medium text-gray-900 dark:text-white">
-                    Are you sure you want to cancel this booking?
-                  </p>
-                  <div className="bg-gray-50 dark:bg-gray-800 p-4 rounded-lg space-y-2">
-                    <p className="text-sm">
-                      <span className="font-semibold">Activity:</span>{' '}
-                      {bookingToCancel.combo_name || bookingToCancel.activity_name}
-                    </p>
-                    <p className="text-sm">
-                      <span className="font-semibold">Date:</span>{' '}
-                      {new Date(bookingToCancel.booking_date).toLocaleDateString('en-US', {
-                        weekday: 'long',
-                        year: 'numeric',
-                        month: 'long',
-                        day: 'numeric'
-                      })}
-                    </p>
-                    <p className="text-sm">
-                      <span className="font-semibold">Time Slot:</span>{' '}
-                      {bookingToCancel.is_updated && bookingToCancel.updated_booking_time_slot
-                        ? bookingToCancel.updated_booking_time_slot
-                        : bookingToCancel.booking_time_slot}
-                    </p>
-                    <p className="text-sm">
-                      <span className="font-semibold">Participants:</span>{' '}
-                      {bookingToCancel.participants}
-                    </p>
-                  </div>
-                  <p className="text-orange-600 dark:text-orange-400 font-medium mt-2">
-                    A refund will be initiated for this booking.
-                  </p>
-                </>
-              )}
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Keep Booking</AlertDialogCancel>
-            <AlertDialogAction
-              onClick={handleCancelConfirm}
-              className="bg-red-600 hover:bg-red-700"
-            >
-              Yes, Cancel Booking
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
-
       {/* Receipt Dialog */}
       {showReceipt && receiptData && (
         <Receipt 
