@@ -196,13 +196,13 @@ const AdminDIYOrders = () => {
                     }
                     
                     return Array.isArray(itemsArray) ? itemsArray.map((item: any, index: number) => {
-                      // Get the actual DIY kit name from the item
-                      // Items are stored with 'name' field containing the kit name from cart (CartCheckout.tsx line 44: name: item.kit_name)
-                      // Primary field is 'name' which should contain the actual DIY kit name
-                      const kitName = item?.name || item?.kit_name || item?.kitName || '';
+                      // Prefer explicit DIY kit fields over generic "DIY Kit" name
+                      const primaryName = (item?.kit_name || item?.kitName || '').trim();
+                      const rawName = (item?.name || '').trim();
                       
-                      // Use the kit name if available and not empty, otherwise show fallback
-                      const displayName = kitName.trim() || 'DIY Kit';
+                      // If rawName is just the generic placeholder, ignore it in favour of primaryName
+                      const safeRawName = rawName && rawName.toLowerCase() !== 'diy kit' ? rawName : '';
+                      const displayName = primaryName || safeRawName || 'DIY Kit';
                       
                       return (
                         <div key={index}>

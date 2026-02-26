@@ -822,12 +822,13 @@ const AllOrders = () => {
                             }
                             
                             return Array.isArray(itemsArray) ? itemsArray.map((item: any, index: number) => {
-                              // Get the actual DIY kit name from the order item
-                              // Items are stored with 'name' field containing the kit name from cart
-                              const kitName = item?.name || item?.kit_name || item?.kitName || '';
+                              // Prefer explicit DIY kit fields over generic "DIY Kit" name
+                              const primaryName = (item?.kit_name || item?.kitName || '').trim();
+                              const rawName = (item?.name || '').trim();
                               
-                              // Use the kit name directly from the order (this is what the user actually ordered)
-                              const displayName = kitName.trim() || 'DIY Kit';
+                              // If rawName is just the generic placeholder, ignore it in favour of primaryName
+                              const safeRawName = rawName && rawName.toLowerCase() !== 'diy kit' ? rawName : '';
+                              const displayName = primaryName || safeRawName || 'DIY Kit';
                               
                               return (
                                 <div key={index} className="text-sm text-gray-600 dark:text-gray-400">
@@ -875,9 +876,11 @@ const AllOrders = () => {
                             customerPhone: '',
                             customerAddress: order.customer_address,
                             items: Array.isArray(itemsArray) ? itemsArray.map((item: any) => {
-                              // Use the EXACT name from the order - this is what the user actually ordered
-                              // Items are stored with 'name' field containing the kit name from cart (CartCheckout.tsx line 44)
-                              const displayName = item?.name || item?.kit_name || item?.kitName || 'DIY Kit';
+                              // Prefer explicit DIY kit fields over generic "DIY Kit" name
+                              const primaryName = (item?.kit_name || item?.kitName || '').trim();
+                              const rawName = (item?.name || '').trim();
+                              const safeRawName = rawName && rawName.toLowerCase() !== 'diy kit' ? rawName : '';
+                              const displayName = primaryName || safeRawName || 'DIY Kit';
                               
                               // Calculate prices - use the actual prices from the order
                               let unitPrice = normalizeAmount(item?.unit_price || 0);
@@ -911,7 +914,15 @@ const AllOrders = () => {
                             paymentStatus: 'Paid',
                             paymentId: order.cashfree_payment_id || order.razorpay_payment_id,
                             date: new Date(order.created_at),
-                            notes: `DIY Kit Order - ${Array.isArray(itemsArray) ? itemsArray.map((i: any) => `${i?.name || 'DIY Kit'} (Qty: ${i?.quantity || 1})`).join(', ') : 'DIY Kit'}`
+                            notes: `DIY Kit Order - ${Array.isArray(itemsArray)
+                              ? itemsArray.map((i: any) => {
+                                  const primaryName = (i?.kit_name || i?.kitName || '').trim();
+                                  const rawName = (i?.name || '').trim();
+                                  const safeRawName = rawName && rawName.toLowerCase() !== 'diy kit' ? rawName : '';
+                                  const displayName = primaryName || safeRawName || 'DIY Kit';
+                                  return `${displayName} (Qty: ${i?.quantity || 1})`;
+                                }).join(', ')
+                              : 'DIY Kit'}`
                           };
                           setReceiptData(receipt);
                           setShowReceipt(true);

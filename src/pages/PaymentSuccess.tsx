@@ -72,9 +72,11 @@ const PaymentSuccess = () => {
             customerPhone: order.customer_phone || '',
             customerAddress: order.customer_address || '',
             items: Array.isArray(order.items) ? order.items.map((item: any) => {
-              // Use the EXACT name from the order - this is what the user actually ordered
-              // Don't try to match or replace it with diyKits data
-              const displayName = item.name || item.kit_name || item.kitName || 'DIY Kit';
+              // Prefer explicit DIY kit fields over generic "DIY Kit" name
+              const primaryName = (item.kit_name || item.kitName || '').trim();
+              const rawName = (item.name || '').trim();
+              const safeRawName = rawName && rawName.toLowerCase() !== 'diy kit' ? rawName : '';
+              const displayName = primaryName || safeRawName || 'DIY Kit';
               
               // Calculate prices - use the actual prices from the order
               let unitPrice = normalizeAmount(item.unit_price || 0);
@@ -108,7 +110,15 @@ const PaymentSuccess = () => {
             paymentStatus: order.payment_status === 'paid' || order.status === 'paid' ? 'Paid' : 'Pending',
             paymentId: paymentId || undefined,
             date: new Date(order.created_at || order.updated_at || Date.now()),
-            notes: `DIY Kit Order - ${Array.isArray(order.items) ? order.items.map((i: any) => `${i.name || 'DIY Kit'} (Qty: ${i.quantity || 1})`).join(', ') : 'DIY Kit'}`
+            notes: `DIY Kit Order - ${Array.isArray(order.items)
+              ? order.items.map((i: any) => {
+                  const primaryName = (i.kit_name || i.kitName || '').trim();
+                  const rawName = (i.name || '').trim();
+                  const safeRawName = rawName && rawName.toLowerCase() !== 'diy kit' ? rawName : '';
+                  const displayName = primaryName || safeRawName || 'DIY Kit';
+                  return `${displayName} (Qty: ${i.quantity || 1})`;
+                }).join(', ')
+              : 'DIY Kit'}`
           };
           setReceiptData(receipt);
           // Only auto-show receipt if it hasn't been shown before
