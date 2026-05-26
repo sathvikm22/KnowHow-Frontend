@@ -1,0 +1,34 @@
+# robots.txt for Know-How Creative Studio
+# Allow crawling of public pages while blocking admin and protected routes
+
+# Allow all search engines to crawl public pages
+User-agent: *
+Allow: /
+Allow: /privacy-policy
+Allow: /terms-and-conditions
+Allow: /contact-us
+Allow: /signup
+Allow: /forgot-password
+Allow: /login
+
+# Avoid crawl budget on redirect-only URLs (301 to canonical)
+Disallow: /home
+
+# Block admin and protected routes
+Disallow: /admin/
+Disallow: /booking
+Disallow: /activities
+Disallow: /buy
+Disallow: /cart
+Disallow: /checkout
+Disallow: /cart-checkout
+Disallow: /orders
+Disallow: /my-orders
+Disallow: /all-orders
+Disallow: /auth/
+Disallow: /payment-processing
+Disallow: /success
+Disallow: /failed
+
+# Sitemap location
+Sitemap: https://www.knowhowindia.in/sitemap.xml

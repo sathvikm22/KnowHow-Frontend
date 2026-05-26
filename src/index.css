@@ -1,0 +1,317 @@
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 222.2 84% 4.9%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 222.2 84% 4.9%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 222.2 84% 4.9%;
+
+    --primary: 222.2 47.4% 11.2%;
+    --primary-foreground: 210 40% 98%;
+
+    --secondary: 210 40% 96.1%;
+    --secondary-foreground: 222.2 47.4% 11.2%;
+
+    --muted: 210 40% 96.1%;
+    --muted-foreground: 215.4 16.3% 46.9%;
+
+    --accent: 210 40% 96.1%;
+    --accent-foreground: 222.2 47.4% 11.2%;
+
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+    --ring: 222.2 84% 4.9%;
+
+    --radius: 0.5rem;
+
+    --sidebar-background: 0 0% 98%;
+
+    --sidebar-foreground: 240 5.3% 26.1%;
+
+    --sidebar-primary: 240 5.9% 10%;
+
+    --sidebar-primary-foreground: 0 0% 98%;
+
+    --sidebar-accent: 240 4.8% 95.9%;
+
+    --sidebar-accent-foreground: 240 5.9% 10%;
+
+    --sidebar-border: 220 13% 91%;
+
+    --sidebar-ring: 217.2 91.2% 59.8%;
+  }
+
+  .dark {
+    --background: 222.2 84% 4.9%;
+    --foreground: 210 40% 98%;
+
+    --card: 222.2 84% 4.9%;
+    --card-foreground: 210 40% 98%;
+
+    --popover: 222.2 84% 4.9%;
+    --popover-foreground: 210 40% 98%;
+
+    --primary: 210 40% 98%;
+    --primary-foreground: 222.2 47.4% 11.2%;
+
+    --secondary: 217.2 32.6% 17.5%;
+    --secondary-foreground: 210 40% 98%;
+
+    --muted: 217.2 32.6% 17.5%;
+    --muted-foreground: 215 20.2% 65.1%;
+
+    --accent: 217.2 32.6% 17.5%;
+    --accent-foreground: 210 40% 98%;
+
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 217.2 32.6% 17.5%;
+    --input: 217.2 32.6% 17.5%;
+    --ring: 212.7 26.8% 83.9%;
+    --sidebar-background: 240 5.9% 10%;
+    --sidebar-foreground: 240 4.8% 95.9%;
+    --sidebar-primary: 224.3 76.3% 48%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 240 3.7% 15.9%;
+    --sidebar-accent-foreground: 240 4.8% 95.9%;
+    --sidebar-border: 240 3.7% 15.9%;
+    --sidebar-ring: 217.2 91.2% 59.8%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+  }
+}
+
+/* 3D Card Flip Animations */
+.perspective-1000 {
+  perspective: 1000px;
+}
+
+.transform-style-preserve-3d {
+  transform-style: preserve-3d;
+}
+
+.backface-hidden {
+  backface-visibility: hidden;
+}
+
+.rotate-y-180 {
+  transform: rotateY(180deg);
+}
+
+/* Custom Scrollbar Styles for Image Adjuster */
+.custom-image-scrollbar::-webkit-scrollbar {
+  width: 14px;
+  height: 14px;
+}
+
+.custom-image-scrollbar::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 8px;
+}
+
+.custom-image-scrollbar::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 8px;
+  border: 2px solid #f1f1f1;
+}
+
+.custom-image-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+
+.dark .custom-image-scrollbar::-webkit-scrollbar-track {
+  background: #374151;
+}
+
+.dark .custom-image-scrollbar::-webkit-scrollbar-thumb {
+  background: #6b7280;
+  border: 2px solid #374151;
+}
+
+.dark .custom-image-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #9ca3af;
+}
+
+/* Firefox scrollbar */
+.custom-image-scrollbar {
+  scrollbar-width: thick;
+  scrollbar-color: #888 #f1f1f1;
+}
+
+.dark .custom-image-scrollbar {
+  scrollbar-color: #6b7280 #374151;
+}
+
+/* 3D Workshop Button Style */
+.workshop-btn {
+  --btn-bg: #f97316;
+  --btn-border: #292524;
+  --btn-outline: #fafaf9;
+
+  font-size: 1rem;
+  cursor: pointer;
+  position: relative;
+  font-family: "Rubik", sans-serif;
+  font-weight: bold;
+  line-height: 1;
+  padding: 1px;
+  transform: translate(-4px, -4px);
+  outline: 2px solid transparent;
+  outline-offset: 5px;
+  border-radius: 9999px;
+  background-color: var(--btn-border);
+  color: var(--btn-border);
+  transition:
+    transform 150ms ease,
+    box-shadow 150ms ease;
+  text-align: center;
+  box-shadow:
+    0.5px 0.5px 0 0 var(--btn-border),
+    1px 1px 0 0 var(--btn-border),
+    1.5px 1.5px 0 0 var(--btn-border),
+    2px 2px 0 0 var(--btn-border),
+    2.5px 2.5px 0 0 var(--btn-border),
+    3px 3px 0 0 var(--btn-border),
+    0 0 0 2px var(--btn-outline),
+    0.5px 0.5px 0 2px var(--btn-outline),
+    1px 1px 0 2px var(--btn-outline),
+    1.5px 1.5px 0 2px var(--btn-outline),
+    2px 2px 0 2px var(--btn-outline),
+    2.5px 2.5px 0 2px var(--btn-outline),
+    3px 3px 0 2px var(--btn-outline),
+    3.5px 3.5px 0 2px var(--btn-outline),
+    4px 4px 0 2px var(--btn-outline);
+  border: none;
+}
+
+.workshop-btn:hover {
+  transform: translate(0, 0);
+  box-shadow: 0 0 0 2px var(--btn-outline);
+}
+
+.workshop-btn:active,
+.workshop-btn:focus-visible {
+  outline-color: var(--btn-bg);
+}
+
+.workshop-btn:focus-visible {
+  outline-style: dashed;
+}
+
+.workshop-btn > div {
+  position: relative;
+  pointer-events: none;
+  background-color: var(--btn-bg);
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-radius: 9999px;
+}
+
+.workshop-btn > div::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 9999px;
+  opacity: 0.5;
+  background-image: radial-gradient(
+      rgb(255 255 255 / 80%) 20%,
+      transparent 20%
+    ),
+    radial-gradient(rgb(255 255 255 / 100%) 20%, transparent 20%);
+  background-position:
+    0 0,
+    4px 4px;
+  background-size: 8px 8px;
+  mix-blend-mode: hard-light;
+  animation: workshop-dots 0.5s infinite linear;
+}
+
+.workshop-btn > div > span {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem 2rem;
+  gap: 0.25rem;
+  filter: drop-shadow(0 -1px 0 rgba(255, 255, 255, 0.25));
+  color: black;
+  font-weight: 600;
+  font-size: 1.125rem;
+}
+
+.workshop-btn > div > span:active {
+  transform: translateY(2px);
+}
+
+@keyframes workshop-dots {
+  0% {
+    background-position:
+      0 0,
+      4px 4px;
+  }
+  100% {
+    background-position:
+      8px 0,
+      12px 4px;
+  }
+}
+
+/* Nav bar user name – bordered button style (orange) */
+.nav-user-name-btn {
+  appearance: none;
+  background-color: transparent;
+  border: 0.125em solid #fff;
+  border-radius: 0.9375em;
+  box-sizing: border-box;
+  color: #fff;
+  cursor: default;
+  display: inline-block;
+  font-family: Roobert, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+  font-size: 14px;
+  font-weight: 600;
+  line-height: normal;
+  margin: 0;
+  min-height: 2.5em;
+  min-width: 0;
+  outline: none;
+  padding: 0.5em 1.2em;
+  text-align: center;
+  text-decoration: none;
+  transition: all 300ms cubic-bezier(0.23, 1, 0.32, 1);
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: manipulation;
+  will-change: transform;
+  white-space: nowrap;
+}
+
+.nav-user-name-btn:hover {
+  color: #fff;
+  background-color: #f97316;
+  box-shadow: rgba(249, 115, 22, 0.35) 0 8px 15px;
+  transform: translateY(-2px);
+}
+
+.nav-user-name-btn:active {
+  box-shadow: none;
+  transform: translateY(0);
+}
