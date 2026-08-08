@@ -14,9 +14,11 @@ const About = () => {
             <div className="grid grid-cols-2 gap-2 sm:gap-3 lg:gap-4">
               <div className="rounded-2xl sm:rounded-3xl overflow-hidden h-32 sm:h-40 lg:h-48 transform hover:scale-105 transition-transform duration-300 relative">
                 <img 
-                  src="/lovable-uploads/td.png" 
+                  src="/lovable-uploads/td.webp" 
                   alt="Plushie heaven"
                   className="w-full h-full object-cover"
+                  loading="lazy"
+                  decoding="async"
                 />
                 <div className="absolute inset-0 bg-black bg-opacity-20 flex items-end p-2 sm:p-3 lg:p-4">
                   <h3 className="font-semibold text-white text-sm sm:text-base lg:text-lg">Plushie heaven</h3>
@@ -24,9 +26,11 @@ const About = () => {
               </div>
               <div className="rounded-2xl sm:rounded-3xl overflow-hidden h-32 sm:h-40 lg:h-48 transform hover:scale-105 transition-transform duration-300 mt-4 sm:mt-6 lg:mt-8 relative">
                 <img 
-                  src="/lovable-uploads/684d6c8c-1895-47c7-b7be-e2d7a44e6c96.png" 
+                  src="/lovable-uploads/684d6c8c-1895-47c7-b7be-e2d7a44e6c96.webp" 
                   alt="noted"
                   className="w-full h-full object-cover"
+                  loading="lazy"
+                  decoding="async"
                 />
                 <div className="absolute inset-0 bg-black bg-opacity-20 flex items-end p-2 sm:p-3 lg:p-4">
                   <h3 className="font-semibold text-white text-sm sm:text-base lg:text-lg">Noted</h3>
@@ -34,9 +38,11 @@ const About = () => {
               </div>
               <div className="rounded-2xl sm:rounded-3xl overflow-hidden h-32 sm:h-40 lg:h-48 transform hover:scale-105 transition-transform duration-300 -mt-4 sm:-mt-6 lg:-mt-8 relative">
                 <img 
-                  src="/lovable-uploads/e4b0cebd-ad63-46df-ab86-93e5e7e2c162.png" 
+                  src="/lovable-uploads/e4b0cebd-ad63-46df-ab86-93e5e7e2c162.webp" 
                   alt="Eco Printing"
                   className="w-full h-full object-cover"
+                  loading="lazy"
+                  decoding="async"
                 />
                 <div className="absolute inset-0 bg-black bg-opacity-20 flex items-end p-2 sm:p-3 lg:p-4">
                   <h3 className="font-semibold text-white text-sm sm:text-base lg:text-lg">Eco Printing</h3>
@@ -44,9 +50,11 @@ const About = () => {
               </div>
               <div className="rounded-2xl sm:rounded-3xl overflow-hidden h-32 sm:h-40 lg:h-48 transform hover:scale-105 transition-transform duration-300 relative">
                 <img 
-                  src="/lovable-uploads/887b2e15-4db6-4df9-abf1-52f7eb21589b.png" 
+                  src="/lovable-uploads/887b2e15-4db6-4df9-abf1-52f7eb21589b.webp" 
                   alt="protector"
                   className="w-full h-full object-cover"
+                  loading="lazy"
+                  decoding="async"
                 />
                 <div className="absolute inset-0 bg-black bg-opacity-20 flex items-end p-2 sm:p-3 lg:p-4">
                   <h3 className="font-semibold text-white text-sm sm:text-base lg:text-lg">Protector</h3>

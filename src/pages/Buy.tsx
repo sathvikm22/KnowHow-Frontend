@@ -227,6 +227,8 @@ const Buy = () => {
                             src={getImagePath(kit)}
                             alt={kit.name}
                             className="w-full h-full object-cover"
+                            loading="lazy"
+                            decoding="async"
                             onError={(e) => {
                               const target = e.target as HTMLImageElement;
                               target.style.display = 'none';

@@ -13,7 +13,8 @@ const CANONICAL_PATH_MAPPINGS: Record<string, string> = {
   '/shipping-policy': '/privacy-policy',
   '/terms': '/terms-and-conditions',
   '/terms-of-service': '/terms-and-conditions',
-  '/contact': '/contact-us'
+  '/contact': '/contact-us',
+  '/cancellations-refunds': '/terms-and-conditions'
 };
 
 /**
@@ -93,5 +94,41 @@ export const setMetaTags = (title?: string, description?: string, path: string =
     }
     metaDescription.setAttribute('content', description);
   }
-};
 
+  // Keep share previews aligned with the page that Google is indexing.
+  if (title) {
+    let ogTitle = document.querySelector('meta[property="og:title"]');
+    if (!ogTitle) {
+      ogTitle = document.createElement('meta');
+      ogTitle.setAttribute('property', 'og:title');
+      document.head.appendChild(ogTitle);
+    }
+    ogTitle.setAttribute('content', title);
+
+    let twitterTitle = document.querySelector('meta[name="twitter:title"]');
+    if (!twitterTitle) {
+      twitterTitle = document.createElement('meta');
+      twitterTitle.setAttribute('name', 'twitter:title');
+      document.head.appendChild(twitterTitle);
+    }
+    twitterTitle.setAttribute('content', title);
+  }
+
+  if (description) {
+    let ogDescription = document.querySelector('meta[property="og:description"]');
+    if (!ogDescription) {
+      ogDescription = document.createElement('meta');
+      ogDescription.setAttribute('property', 'og:description');
+      document.head.appendChild(ogDescription);
+    }
+    ogDescription.setAttribute('content', description);
+
+    let twitterDescription = document.querySelector('meta[name="twitter:description"]');
+    if (!twitterDescription) {
+      twitterDescription = document.createElement('meta');
+      twitterDescription.setAttribute('name', 'twitter:description');
+      document.head.appendChild(twitterDescription);
+    }
+    twitterDescription.setAttribute('content', description);
+  }
+};

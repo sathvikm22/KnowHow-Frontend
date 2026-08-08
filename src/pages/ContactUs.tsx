@@ -2,13 +2,17 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Navigation from '../components/Navigation';
 import { Instagram, Phone, Mail, MapPin } from 'lucide-react';
-import { setCanonicalTag } from '../utils/seo';
+import { setMetaTags } from '../utils/seo';
 
 const ContactUs = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    setCanonicalTag('/contact-us');
+    setMetaTags(
+      'Contact Know How Café | Workshops in Bangalore',
+      'Contact Know How Café in Jayanagar, Bangalore for workshop bookings, creative events and DIY kit support.',
+      '/contact-us'
+    );
   }, []);
   const [formData, setFormData] = useState({
     name: '',
@@ -307,4 +311,3 @@ const ContactUs = () => {
 };
 
 export default ContactUs;
-

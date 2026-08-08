@@ -9,21 +9,21 @@ const Testimonials = () => {
   const [api, setApi] = useState<any>()
 
   const galleryImages = [
-    { src: "/lovable-uploads/gallery-1.jpeg", alt: "Gallery image 1" },
-    { src: "/lovable-uploads/gallery-2.jpeg", alt: "Gallery image 2" },
-    { src: "/lovable-uploads/gallery-3.jpeg", alt: "Gallery image 3" },
-    { src: "/lovable-uploads/gallery-4.jpeg", alt: "Gallery image 4" },
-    { src: "/lovable-uploads/gallery-5.jpeg", alt: "Gallery image 5" },
-    { src: "/lovable-uploads/gallery-6.jpeg", alt: "Gallery image 6" },
-    { src: "/lovable-uploads/gallery-7.jpeg", alt: "Gallery image 7" },
-    { src: "/lovable-uploads/gallery-8.jpeg", alt: "Gallery image 8" },
-    { src: "/lovable-uploads/gallery-9.jpeg", alt: "Gallery image 9" },
-    { src: "/lovable-uploads/gallery-10.jpeg", alt: "Gallery image 10" },
-    { src: "/lovable-uploads/gallery-11.jpeg", alt: "Gallery image 11" },
-    { src: "/lovable-uploads/gallery-12.jpeg", alt: "Gallery image 12" },
-    { src: "/lovable-uploads/gallery-13.jpeg", alt: "Gallery image 13" },
-    { src: "/lovable-uploads/gallery-14.jpeg", alt: "Gallery image 14" },
-    { src: "/lovable-uploads/gallery-15.jpeg", alt: "Gallery image 15" },
+    { src: "/lovable-uploads/gallery-1.webp", alt: "Gallery image 1" },
+    { src: "/lovable-uploads/gallery-2.webp", alt: "Gallery image 2" },
+    { src: "/lovable-uploads/gallery-3.webp", alt: "Gallery image 3" },
+    { src: "/lovable-uploads/gallery-4.webp", alt: "Gallery image 4" },
+    { src: "/lovable-uploads/gallery-5.webp", alt: "Gallery image 5" },
+    { src: "/lovable-uploads/gallery-6.webp", alt: "Gallery image 6" },
+    { src: "/lovable-uploads/gallery-7.webp", alt: "Gallery image 7" },
+    { src: "/lovable-uploads/gallery-8.webp", alt: "Gallery image 8" },
+    { src: "/lovable-uploads/gallery-9.webp", alt: "Gallery image 9" },
+    { src: "/lovable-uploads/gallery-10.webp", alt: "Gallery image 10" },
+    { src: "/lovable-uploads/gallery-11.webp", alt: "Gallery image 11" },
+    { src: "/lovable-uploads/gallery-12.webp", alt: "Gallery image 12" },
+    { src: "/lovable-uploads/gallery-13.webp", alt: "Gallery image 13" },
+    { src: "/lovable-uploads/gallery-14.webp", alt: "Gallery image 14" },
+    { src: "/lovable-uploads/gallery-15.webp", alt: "Gallery image 15" },
   ];
 
   useEffect(() => {
@@ -76,6 +76,7 @@ const Testimonials = () => {
                           alt={image.alt}
                           className="w-full h-full object-contain transition-transform duration-1000 hover:scale-110"
                           loading="lazy"
+                          decoding="async"
                         />
                       </div>
                     </div>

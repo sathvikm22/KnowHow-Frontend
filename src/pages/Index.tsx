@@ -7,7 +7,7 @@ import Testimonials from '../components/Testimonials';
 import Location from '../components/Location';
 import Contact from '../components/Contact';
 import Navigation from '../components/Navigation';
-import { setCanonicalTag } from '../utils/seo';
+import { setMetaTags } from '../utils/seo';
 import React from 'react';
 
 const EventsSection = () => {
@@ -93,7 +93,11 @@ const EventsSection = () => {
 
 const Index = () => {
   useEffect(() => {
-    setCanonicalTag('/');
+    setMetaTags(
+      'DIY Workshops & Craft Kits in Bangalore | Know How Café',
+      'Discover hands-on art workshops, creative events and DIY craft kits at Know How Café in Jayanagar, Bangalore.',
+      '/'
+    );
   }, []);
 
   return (

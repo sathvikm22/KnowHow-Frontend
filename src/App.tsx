@@ -1,40 +1,43 @@
-import { useEffect } from 'react';
+import { lazy, Suspense, useEffect } from 'react';
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import Index from "./pages/Index";
-import NotFound from "./pages/NotFound";
-import Booking from "./pages/Booking";
-import Activities from "./pages/Activities";
-import Login from "./pages/Login";
-import SignUp from "./pages/SignUp";
-import Buy from "./pages/Buy";
-import Cart from "./pages/Cart";
-import Checkout from "./pages/Checkout";
-import ForgotPassword from "./pages/ForgotPassword";
-import AdminBookings from './pages/AdminBookings';
-import AdminUsers from './pages/AdminUsers';
-import AdminAddOns from './pages/AdminAddOns';
-import GoogleAuthCallback from './pages/GoogleAuthCallback';
-import PrivacyPolicy from './pages/PrivacyPolicy';
-import TermsAndConditions from './pages/TermsAndConditions';
-import ContactUs from './pages/ContactUs';
-import Orders from './pages/Orders';
-import MyOrders from './pages/MyOrders';
-import AllOrders from './pages/AllOrders';
-import CartCheckout from './pages/CartCheckout';
-import AdminDIYOrders from './pages/AdminDIYOrders';
-import PaymentProcessing from './pages/PaymentProcessing';
-import PaymentSuccess from './pages/PaymentSuccess';
-import PaymentFailed from './pages/PaymentFailed';
 import CookieConsent from './components/CookieConsent';
 import { initializeCookieConsent } from './utils/cookieConsent';
 import { CartProvider } from './contexts/CartContext';
 import { clearLocalAuthState, restoreSessionFromCookies } from './utils/auth';
 import ProtectedRoute from './components/ProtectedRoute';
 import { api } from './lib/api';
+
+// Keep the landing page immediately available and defer route code until a visitor needs it.
+// This preserves all existing routes and UI while reducing the initial JavaScript download.
+const NotFound = lazy(() => import('./pages/NotFound'));
+const Booking = lazy(() => import('./pages/Booking'));
+const Activities = lazy(() => import('./pages/Activities'));
+const Login = lazy(() => import('./pages/Login'));
+const SignUp = lazy(() => import('./pages/SignUp'));
+const Buy = lazy(() => import('./pages/Buy'));
+const Cart = lazy(() => import('./pages/Cart'));
+const Checkout = lazy(() => import('./pages/Checkout'));
+const ForgotPassword = lazy(() => import('./pages/ForgotPassword'));
+const AdminBookings = lazy(() => import('./pages/AdminBookings'));
+const AdminUsers = lazy(() => import('./pages/AdminUsers'));
+const AdminAddOns = lazy(() => import('./pages/AdminAddOns'));
+const GoogleAuthCallback = lazy(() => import('./pages/GoogleAuthCallback'));
+const PrivacyPolicy = lazy(() => import('./pages/PrivacyPolicy'));
+const TermsAndConditions = lazy(() => import('./pages/TermsAndConditions'));
+const ContactUs = lazy(() => import('./pages/ContactUs'));
+const Orders = lazy(() => import('./pages/Orders'));
+const MyOrders = lazy(() => import('./pages/MyOrders'));
+const AllOrders = lazy(() => import('./pages/AllOrders'));
+const CartCheckout = lazy(() => import('./pages/CartCheckout'));
+const AdminDIYOrders = lazy(() => import('./pages/AdminDIYOrders'));
+const PaymentProcessing = lazy(() => import('./pages/PaymentProcessing'));
+const PaymentSuccess = lazy(() => import('./pages/PaymentSuccess'));
+const PaymentFailed = lazy(() => import('./pages/PaymentFailed'));
 
 const queryClient = new QueryClient();
 
@@ -88,7 +91,8 @@ const App = () => {
           <Toaster />
           <Sonner />
           <Router>
-            <Routes>
+            <Suspense fallback={null}>
+              <Routes>
               <Route path="/" element={<Index />} />
               <Route path="/home" element={<Navigate to="/" replace />} />
               <Route path="/login" element={<Login />} />
@@ -121,7 +125,8 @@ const App = () => {
               <Route path="/admin/dashboard/users" element={<AdminRoute><AdminUsers /></AdminRoute>} />
               <Route path="/admin/dashboard/addons" element={<AdminRoute><AdminAddOns /></AdminRoute>} />
               <Route path="*" element={<NotFound />} />
-            </Routes>
+              </Routes>
+            </Suspense>
             <CookieConsent />
           </Router>
         </CartProvider>

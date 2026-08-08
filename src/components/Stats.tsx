@@ -103,6 +103,8 @@ const Stats = () => {
                   src={getImagePath(kit)}
                   alt={kit.name}
                   className="w-full h-full object-cover"
+                  loading="lazy"
+                  decoding="async"
                   onError={(e) => {
                     // Show placeholder icon if image doesn't exist
                     const target = e.target as HTMLImageElement;

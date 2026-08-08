@@ -10,7 +10,9 @@ export default defineConfig(({ mode }) => ({
     port: 8080,
     proxy: {
       "/api": {
-        target: "http://localhost:3000",
+        // Use IPv4 explicitly: on some macOS setups `localhost` resolves to IPv6
+        // first while the local Express process is bound to IPv4.
+        target: "http://127.0.0.1:3000",
         changeOrigin: true,
       },
     },

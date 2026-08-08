@@ -1,13 +1,17 @@
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Navigation from '../components/Navigation';
-import { setCanonicalTag } from '../utils/seo';
+import { setMetaTags } from '../utils/seo';
 
 const TermsAndConditions = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    setCanonicalTag('/terms-and-conditions');
+    setMetaTags(
+      'Terms and Conditions | Know How Café',
+      'Read the terms governing bookings, purchases and use of Know How Café services.',
+      '/terms-and-conditions'
+    );
   }, []);
 
   return (
@@ -22,7 +26,7 @@ const TermsAndConditions = () => {
             </h1>
             <div className="mx-auto mb-4 w-40 h-1 rounded-full bg-gradient-to-r from-pink-400 via-orange-300 via-yellow-300 via-green-400 to-blue-400"></div>
             <p className="text-gray-600 text-lg">
-              Last updated: {new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
+              Last updated: August 8, 2026
             </p>
           </div>
 
@@ -268,4 +272,3 @@ const TermsAndConditions = () => {
 };
 
 export default TermsAndConditions;
-
