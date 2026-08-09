@@ -30,7 +30,7 @@ const ProtectedRoute = ({
         const response = await api.getCurrentUser();
         if (response.success && response.user) {
           setIsAuthenticated(true);
-          setIsAdmin(localStorage.getItem('isAdmin') === 'true');
+          setIsAdmin(response.isAdmin === true);
         } else {
           clearLocalAuthState();
           setIsAuthenticated(false);

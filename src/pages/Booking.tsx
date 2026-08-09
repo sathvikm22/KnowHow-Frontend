@@ -1,8 +1,10 @@
 import { useState, useEffect, useMemo } from 'react';
-import { ArrowLeft, Calendar, Clock, CreditCard, Smartphone, QrCode, Check, ChevronDown, ChevronUp } from 'lucide-react';
+import { ArrowLeft, Calendar, Clock, CreditCard, Smartphone, QrCode, Check, ChevronDown, ChevronUp, ChevronLeft, ChevronRight } from 'lucide-react';
 import Navigation from '../components/Navigation';
 import { useNavigate } from 'react-router-dom';
 import { api } from '@/lib/api';
+import GuestLoginPrompt from '@/components/GuestLoginPrompt';
+import GuestContactVerification from '@/components/GuestContactVerification';
 
 interface Activity {
   id: string;
@@ -13,6 +15,8 @@ interface Activity {
   price?: number;
 }
 
+const ACTIVITIES_PER_PAGE = 12;
+
 const Booking = () => {
   const [selectedActivityName, setSelectedActivityName] = useState<string | null>(null);
   const [selectedDate, setSelectedDate] = useState('');
@@ -22,6 +26,7 @@ const Booking = () => {
   const navigate = useNavigate();
   const [activities, setActivities] = useState<Activity[]>([]);
   const [loadingActivities, setLoadingActivities] = useState(true);
+  const [activityPage, setActivityPage] = useState(0);
   const [addOns, setAddOns] = useState<Array<{activity: Activity; date: string; timeSlot: string}>>([]);
   const [availableSlotsForAddOn, setAvailableSlotsForAddOn] = useState<Record<string, string[]>>({});
   const [loadingAddOnSlots, setLoadingAddOnSlots] = useState<Record<string, boolean>>({});
@@ -40,6 +45,25 @@ const Booking = () => {
     countryCode: '+91',
     address: ''
   });
+  const [guestVerificationToken, setGuestVerificationToken] = useState('');
+  const [isLoggedIn, setIsLoggedIn] = useState(() => Boolean(localStorage.getItem('userName')));
+
+  useEffect(() => {
+    const loadSession = async () => {
+      try {
+        const response = await api.getCurrentUser();
+        if (response.success && response.user) {
+          setIsLoggedIn(true);
+          setUserDetails((current) => ({ ...current, name: response.user!.name, email: response.user!.email }));
+        } else {
+          setIsLoggedIn(false);
+        }
+      } catch {
+        setIsLoggedIn(false);
+      }
+    };
+    loadSession();
+  }, []);
 
   const paymentMethods = [
     { id: 'card', name: 'Credit/Debit Card', icon: CreditCard },
@@ -118,6 +142,7 @@ const Booking = () => {
           ?? activities.find(a => a && a.name && a.name.toLowerCase() === activityName.toLowerCase());
         if (activity) {
           setSelectedActivityName(activity.name);
+          setActivityPage(Math.floor(activities.indexOf(activity) / ACTIVITIES_PER_PAGE));
         }
       }
     } catch (error) {
@@ -130,6 +155,16 @@ const Booking = () => {
     if (!selectedActivityName || !activities.length) return null;
     return activities.find(a => a.name === selectedActivityName) ?? null;
   }, [selectedActivityName, activities]);
+
+  const totalActivityPages = Math.max(1, Math.ceil(activities.length / ACTIVITIES_PER_PAGE));
+  const visibleActivities = useMemo(
+    () => activities.slice(activityPage * ACTIVITIES_PER_PAGE, (activityPage + 1) * ACTIVITIES_PER_PAGE),
+    [activities, activityPage]
+  );
+
+  useEffect(() => {
+    setActivityPage((currentPage) => Math.min(currentPage, totalActivityPages - 1));
+  }, [totalActivityPages]);
 
   const bookingTotal = useMemo(() => {
     if (!selectedActivity) return 0;
@@ -169,6 +204,11 @@ const Booking = () => {
 
     if (!selectedActivity) {
       alert('Please select an activity.');
+      return;
+    }
+
+    if (!isLoggedIn && !guestVerificationToken) {
+      alert('Please verify your email before continuing to payment.');
       return;
     }
 
@@ -235,6 +275,7 @@ const Booking = () => {
         price: getAddOnPrice(a.activity)
       })),
       notes: `Booking for ${selectedDate} at ${selectedTimeSlot}${addOns.length > 0 ? ` with ${addOns.length} add-on(s)` : ''}`,
+      guestVerificationToken: isLoggedIn ? undefined : guestVerificationToken,
     };
 
     // Navigate to checkout page
@@ -320,6 +361,7 @@ const Booking = () => {
   return (
     <div className="min-h-screen transition-colors duration-300" style={{ backgroundColor: '#FAF9F6' }}>
       <Navigation />
+      {!isLoggedIn && <GuestLoginPrompt />}
       <div className="max-w-6xl mx-auto py-12 px-4">
         <br></br>
         <div className="bg-white dark:bg-gray-800 rounded-3xl shadow-xl overflow-hidden border border-black">
@@ -399,6 +441,15 @@ const Booking = () => {
                     placeholder="Enter your address (optional)"
                   />
                 </div>
+                {!isLoggedIn && (
+                  <GuestContactVerification
+                    name={userDetails.name}
+                    email={userDetails.email}
+                    phone={userDetails.phone}
+                    verified={Boolean(guestVerificationToken)}
+                    onVerified={setGuestVerificationToken}
+                  />
+                )}
               </div>
             </div>
             
@@ -415,25 +466,52 @@ const Booking = () => {
                   <p className="mt-2 text-gray-600 dark:text-gray-400">Loading activities...</p>
                 </div>
               ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {activities.map((activity) => {
-                    const isSelected = selectedActivityName === activity.name;
-                    const price = activity.price != null && activity.price > 0 ? activity.price : 0;
-                    return (
-                      <div
-                        key={activity.id}
-                        onClick={() => handleSelectActivity(activity.name)}
-                        className={`p-4 rounded-xl border cursor-pointer transition-all hover:shadow-md ${
-                          isSelected
-                            ? 'border-orange-500 bg-orange-50 dark:bg-orange-900/30 shadow-md'
-                            : 'border border-black dark:border-black hover:border-orange-300 dark:hover:border-orange-400 bg-white dark:bg-gray-700'
-                        }`}
-                      >
-                        <h3 className="font-semibold text-gray-800 dark:text-white">{activity.name}</h3>
-                        <p className="text-lg font-bold text-orange-600 dark:text-orange-400 mt-1">₹{price}</p>
-                      </div>
-                    );
-                  })}
+                <div>
+                  {activities.length > ACTIVITIES_PER_PAGE && (
+                    <p className="mb-3 text-right text-sm text-gray-500 dark:text-gray-400">
+                      Activities {activityPage * ACTIVITIES_PER_PAGE + 1}-{Math.min((activityPage + 1) * ACTIVITIES_PER_PAGE, activities.length)} of {activities.length}
+                    </p>
+                  )}
+                  <div className="flex items-center gap-2 sm:gap-3">
+                    <button
+                      type="button"
+                      onClick={() => setActivityPage((page) => Math.max(0, page - 1))}
+                      disabled={activityPage === 0}
+                      aria-label="Show previous activities"
+                      className="shrink-0 rounded-full border border-orange-300 bg-white p-2 text-orange-600 shadow-sm transition hover:bg-orange-50 disabled:cursor-not-allowed disabled:opacity-40 dark:bg-gray-800"
+                    >
+                      <ChevronLeft className="h-6 w-6" />
+                    </button>
+                    <div className="grid flex-1 grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
+                      {visibleActivities.map((activity) => {
+                        const isSelected = selectedActivityName === activity.name;
+                        const price = activity.price != null && activity.price > 0 ? activity.price : 0;
+                        return (
+                          <div
+                            key={activity.id}
+                            onClick={() => handleSelectActivity(activity.name)}
+                            className={`p-4 rounded-xl border cursor-pointer transition-all hover:shadow-md ${
+                              isSelected
+                                ? 'border-orange-500 bg-orange-50 dark:bg-orange-900/30 shadow-md'
+                                : 'border border-black dark:border-black hover:border-orange-300 dark:hover:border-orange-400 bg-white dark:bg-gray-700'
+                            }`}
+                          >
+                            <h3 className="font-semibold text-gray-800 dark:text-white">{activity.name}</h3>
+                            <p className="text-lg font-bold text-orange-600 dark:text-orange-400 mt-1">₹{price}</p>
+                          </div>
+                        );
+                      })}
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => setActivityPage((page) => Math.min(totalActivityPages - 1, page + 1))}
+                      disabled={activityPage === totalActivityPages - 1}
+                      aria-label="Show next activities"
+                      className="shrink-0 rounded-full border border-orange-300 bg-white p-2 text-orange-600 shadow-sm transition hover:bg-orange-50 disabled:cursor-not-allowed disabled:opacity-40 dark:bg-gray-800"
+                    >
+                      <ChevronRight className="h-6 w-6" />
+                    </button>
+                  </div>
                 </div>
               )}
             </div>

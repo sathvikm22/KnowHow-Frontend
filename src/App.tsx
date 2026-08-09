@@ -97,11 +97,11 @@ const App = () => {
               <Route path="/home" element={<Navigate to="/" replace />} />
               <Route path="/login" element={<Login />} />
               <Route path="/signup" element={<SignUp />} />
-              <Route path="/booking" element={<ProtectedRoute requireAuth={true}><Booking /></ProtectedRoute>} />
-              <Route path="/activities" element={<ProtectedRoute requireAuth={true}><Activities /></ProtectedRoute>} />
-              <Route path="/buy" element={<ProtectedRoute requireAuth={true}><Buy /></ProtectedRoute>} />
-              <Route path="/cart" element={<ProtectedRoute requireAuth={true}><Cart /></ProtectedRoute>} />
-              <Route path="/checkout" element={<ProtectedRoute requireAuth={true}><Checkout /></ProtectedRoute>} />
+              <Route path="/booking" element={<Booking />} />
+              <Route path="/activities" element={<Activities />} />
+              <Route path="/buy" element={<Buy />} />
+              <Route path="/cart" element={<Cart />} />
+              <Route path="/checkout" element={<Checkout />} />
               <Route path="/forgot-password" element={<ForgotPassword />} />
               <Route path="/auth/google/callback" element={<GoogleAuthCallback />} />
               <Route path="/privacy-policy" element={<PrivacyPolicy />} />
@@ -116,7 +116,7 @@ const App = () => {
               <Route path="/orders" element={<ProtectedRoute requireAuth={true}><Orders /></ProtectedRoute>} />
               <Route path="/my-orders" element={<ProtectedRoute requireAuth={true}><MyOrders /></ProtectedRoute>} />
               <Route path="/all-orders" element={<ProtectedRoute requireAuth={true}><AllOrders /></ProtectedRoute>} />
-              <Route path="/cart-checkout" element={<ProtectedRoute requireAuth={true}><CartCheckout /></ProtectedRoute>} />
+              <Route path="/cart-checkout" element={<CartCheckout />} />
               <Route path="/payment-processing" element={<PaymentProcessing />} />
               <Route path="/success" element={<PaymentSuccess />} />
               <Route path="/failed" element={<PaymentFailed />} />

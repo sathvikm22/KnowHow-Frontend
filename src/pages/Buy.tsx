@@ -3,6 +3,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { ChevronLeft, ChevronRight, ShoppingCart, ArrowLeft } from 'lucide-react';
 import Navigation from '@/components/Navigation';
+import GuestLoginPrompt from '@/components/GuestLoginPrompt';
 import { api } from '@/lib/api';
 import { useCart } from '@/contexts/CartContext';
 
@@ -109,6 +110,7 @@ const Buy = () => {
   return (
     <div className="min-h-screen transition-colors duration-300 w-full" style={{ backgroundColor: '#acf1e5' }}>
       <Navigation />
+      {!localStorage.getItem('userName') && <GuestLoginPrompt />}
       <div className="w-full px-4 sm:px-6 lg:px-8 py-6 sm:py-8 pt-20 sm:pt-24">
         <div className="max-w-7xl mx-auto">
           

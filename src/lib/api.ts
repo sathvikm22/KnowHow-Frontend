@@ -54,6 +54,7 @@ export interface ApiResponse<T = any> {
   verified?: boolean;
   expiresIn?: number;
   isAdmin?: boolean;
+  guestVerificationToken?: string;
 }
 
 class ApiClient {
@@ -247,6 +248,20 @@ class ApiClient {
     });
   }
 
+  async sendGuestVerificationOtp(email: string, name: string): Promise<ApiResponse> {
+    return this.request('/auth/guest/send-otp', {
+      method: 'POST',
+      body: JSON.stringify({ email, name }),
+    });
+  }
+
+  async verifyGuestVerificationOtp(email: string, otp: string): Promise<ApiResponse<{ guestVerificationToken: string }>> {
+    return this.request('/auth/guest/verify-otp', {
+      method: 'POST',
+      body: JSON.stringify({ email, otp }),
+    });
+  }
+
   async completeSignup(
     email: string,
     name: string,
@@ -309,6 +324,8 @@ class ApiClient {
       if (response.success && response.user) {
         localStorage.setItem('userName', response.user.name);
         localStorage.setItem('userEmail', response.user.email);
+        // Remove the legacy, client-controlled admin flag. The server response is authoritative.
+        localStorage.removeItem('isAdmin');
         // DO NOT store phone/address in localStorage - fetch from backend when needed
       }
 
@@ -428,9 +445,8 @@ class ApiClient {
     });
   }
 
-  async getMyBookings(email?: string): Promise<ApiResponse<{ bookings: any[] }>> {
-    const query = email ? `?email=${encodeURIComponent(email)}` : '';
-    return this.request(`/my-bookings${query}`, {
+  async getMyBookings(): Promise<ApiResponse<{ bookings: any[] }>> {
+    return this.request('/my-bookings', {
       method: 'GET',
     });
   }
@@ -484,9 +500,8 @@ class ApiClient {
     });
   }
 
-  async getMyDIYOrders(email?: string): Promise<ApiResponse<{ orders: any[] }>> {
-    const query = email ? `?email=${encodeURIComponent(email)}` : '';
-    return this.request(`/my-diy-orders${query}`, {
+  async getMyDIYOrders(): Promise<ApiResponse<{ orders: any[] }>> {
+    return this.request('/my-diy-orders', {
       method: 'GET',
     });
   }
@@ -551,4 +566,3 @@ export const API_BASE = getBackendBaseUrl;
 
 export const logout = () => api.logout();
 export const getCurrentUser = () => api.getCurrentUser();
-

@@ -58,13 +58,6 @@ const GoogleAuthCallback = () => {
           return;
         }
 
-        const user = result.user;
-        if (user.email?.toLowerCase() === 'knowhowcafe2025@gmail.com') {
-          localStorage.setItem('isAdmin', 'true');
-        } else {
-          localStorage.removeItem('isAdmin');
-        }
-
         const session = await verifySessionAfterAuth();
         if (!session.ok) {
           setStatus('Session could not be saved. Redirecting...');
@@ -79,7 +72,7 @@ const GoogleAuthCallback = () => {
         setStatus('Signed in! Redirecting...');
 
         setTimeout(() => {
-          if (localStorage.getItem('isAdmin') === 'true') {
+          if (session.isAdmin) {
             navigate('/admin/dashboard/bookings', { replace: true });
           } else {
             navigate('/', { replace: true });
@@ -107,4 +100,3 @@ const GoogleAuthCallback = () => {
 };
 
 export default GoogleAuthCallback;
-

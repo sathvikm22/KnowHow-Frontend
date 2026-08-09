@@ -21,6 +21,7 @@ interface CheckoutLocationState {
     bookingTimeSlot?: string;
     selectedActivities?: string[];
     notes?: string;
+    guestVerificationToken?: string;
   };
 }
 
@@ -70,6 +71,7 @@ const Checkout = () => {
       customerEmail: orderData.customerEmail,
       customerPhone: orderData.customerPhone,
       customerAddress: orderData.customerAddress,
+      guestVerificationToken: orderData.guestVerificationToken,
         bookingDate: orderData.bookingDate,
         bookingTimeSlot: orderData.bookingTimeSlot,
         selectedActivities: orderData.selectedActivities || [],

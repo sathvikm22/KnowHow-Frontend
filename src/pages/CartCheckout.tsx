@@ -16,6 +16,7 @@ interface CartCheckoutLocationState {
     customerEmail: string;
     customerPhone: string;
     customerAddress: string;
+    guestVerificationToken?: string;
   };
 }
 
@@ -72,6 +73,7 @@ const CartCheckout = () => {
         customerEmail: cartData.customerEmail,
         customerPhone: cartData.customerPhone,
         customerAddress: cartData.customerAddress,
+        guestVerificationToken: cartData.guestVerificationToken,
         items: items,
         subtotal: cartData.totalAmount,
         totalAmount: cartData.totalAmount
@@ -300,4 +302,3 @@ const CartCheckout = () => {
 };
 
 export default CartCheckout;
-

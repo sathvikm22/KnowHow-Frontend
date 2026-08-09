@@ -119,17 +119,9 @@ const AllOrders = () => {
     try {
       setLoading(true);
       setError(null);
-      // Get current user email so backend can match bookings/orders (cookie + email fallback for cross-origin)
-      let userEmail: string | null = null;
-      try {
-        const me = await api.getCurrentUser();
-        userEmail = (me as any)?.user?.email || (me as any)?.data?.user?.email || localStorage.getItem('userEmail') || null;
-      } catch {
-        userEmail = typeof localStorage !== 'undefined' ? localStorage.getItem('userEmail') : null;
-      }
       const [bookingsRes, ordersRes] = await Promise.all([
-        api.getMyBookings(userEmail || undefined),
-        api.getMyDIYOrders(userEmail || undefined)
+        api.getMyBookings(),
+        api.getMyDIYOrders()
       ]);
       
       console.log('Bookings response:', JSON.stringify(bookingsRes, null, 2));
@@ -980,4 +972,3 @@ const AllOrders = () => {
 };
 
 export default AllOrders;
-

@@ -4,9 +4,6 @@ import { useNavigate, useSearchParams, useLocation } from 'react-router-dom';
 import { api, getGoogleAuthStartUrl } from '@/lib/api';
 import { clearLocalAuthState, verifySessionAfterAuth } from '@/utils/auth';
 
-const ADMIN_EMAIL = 'knowhowcafe2025@gmail.com';
-const ADMIN_PASSWORD = 'password';
-
 // Email domain validation - only allow specific domains
 const isValidEmailDomain = (email: string): boolean => {
   const allowedDomains = ['gmail.com', 'yahoo.com', 'rediff.com', 'outlook.com'];
@@ -92,8 +89,7 @@ const Login = () => {
           const response = await api.getCurrentUser();
           if (response.success && response.user) {
             // User is authenticated, redirect to home
-            const isAdmin = localStorage.getItem('isAdmin') === 'true';
-            if (isAdmin) {
+            if (response.isAdmin) {
               navigate('/admin/dashboard/bookings', { replace: true });
             } else {
               navigate('/', { replace: true });
@@ -108,14 +104,15 @@ const Login = () => {
     checkExistingAuth();
 
     // Listen for auth changes from other tabs
-    const handleStorageChange = (e: StorageEvent) => {
+    const handleStorageChange = async (e: StorageEvent) => {
       if (e.key === 'userName' && e.newValue) {
-        // User logged in from another tab, redirect
-        const isAdmin = localStorage.getItem('isAdmin') === 'true';
-        if (isAdmin) {
-          navigate('/admin/dashboard/bookings', { replace: true });
-        } else {
-          navigate('/', { replace: true });
+        try {
+          const response = await api.getCurrentUser();
+          if (response.success && response.user) {
+            navigate(response.isAdmin ? '/admin/dashboard/bookings' : '/', { replace: true });
+          }
+        } catch {
+          clearLocalAuthState();
         }
       }
     };
@@ -173,12 +170,6 @@ const Login = () => {
       console.log('🔵 Login response:', { success: response.success, hasUser: !!response.user, hasToken: !!response.token });
       
       if (response.success) {
-        if (response.isAdmin || loginData.email.toLowerCase() === ADMIN_EMAIL.toLowerCase()) {
-          localStorage.setItem('isAdmin', 'true');
-        } else {
-          localStorage.removeItem('isAdmin');
-        }
-
         const session = await verifySessionAfterAuth();
         if (!session.ok) {
           setLoginError(session.message);
@@ -189,7 +180,7 @@ const Login = () => {
         setUserName(session.user.name);
         setIsLoggedIn(true);
 
-        if (localStorage.getItem('isAdmin') === 'true') {
+        if (session.isAdmin) {
           navigate('/admin/dashboard/bookings', { replace: true });
           return;
         }
@@ -800,4 +791,3 @@ const Login = () => {
 };
 
 export default Login;
-

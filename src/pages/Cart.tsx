@@ -5,6 +5,8 @@ import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { X, ShoppingBag, CreditCard, ArrowLeft } from 'lucide-react';
 import Navigation from '@/components/Navigation';
+import GuestLoginPrompt from '@/components/GuestLoginPrompt';
+import GuestContactVerification from '@/components/GuestContactVerification';
 import { useCart } from '@/contexts/CartContext';
 import { api } from '@/lib/api';
 
@@ -43,13 +45,9 @@ const Cart = () => {
   const [loadingActivities, setLoadingActivities] = useState(true);
 
   useEffect(() => {
-    const storedUser = localStorage.getItem('userName');
-    if (!storedUser) {
-      navigate('/');
-    }
     fetchDIYKits();
     fetchActivities();
-  }, [navigate]);
+  }, []);
 
   const fetchDIYKits = async () => {
     try {
@@ -185,20 +183,30 @@ const Cart = () => {
     await removeFromCart(kitName);
   };
 
+  const [customerName, setCustomerName] = useState(() => localStorage.getItem('userName') || '');
+  const [customerEmail, setCustomerEmail] = useState(() => localStorage.getItem('userEmail') || '');
   const [customerAddress, setCustomerAddress] = useState('');
   const [customerPhone, setCustomerPhone] = useState('');
+  const [guestVerificationToken, setGuestVerificationToken] = useState('');
   const [showCheckoutForm, setShowCheckoutForm] = useState(false);
 
   // Don't auto-fill from localStorage - let users enter their own values
   // Values will still be saved to localStorage after checkout for future reference
 
   const handleCheckout = async () => {
-    // Get user details from localStorage
-    const userName = localStorage.getItem('userName') || '';
-    const userEmail = localStorage.getItem('userEmail') || '';
-    
-    if (!customerAddress || !customerPhone) {
-      alert('Please enter delivery address and phone number');
+    if (!customerName.trim() || !customerEmail.trim() || !customerAddress || !customerPhone) {
+      alert('Please enter your name, email, delivery address and phone number');
+      return;
+    }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(customerEmail.trim())) {
+      alert('Please enter a valid email address');
+      return;
+    }
+
+    if (!localStorage.getItem('userName') && !guestVerificationToken) {
+      alert('Please verify your email before proceeding to payment');
       return;
     }
 
@@ -232,10 +240,11 @@ const Cart = () => {
       ],
       subtotal: totalPrice,
       totalAmount: totalPrice,
-      customerName: userName,
-      customerEmail: userEmail,
+      customerName: customerName.trim(),
+      customerEmail: customerEmail.trim(),
       customerPhone: customerPhone,
-      customerAddress: customerAddress
+      customerAddress: customerAddress,
+      guestVerificationToken: guestVerificationToken || undefined
     };
 
     // Navigate to cart checkout
@@ -264,6 +273,7 @@ const Cart = () => {
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 w-full">
       <Navigation />
+      {!localStorage.getItem('userName') && <GuestLoginPrompt />}
       <div className="w-full px-4 sm:px-6 lg:px-8 py-6 sm:py-8 pt-20">
         <div className="max-w-6xl mx-auto">
           {/* Header */}
@@ -537,6 +547,32 @@ const Cart = () => {
                     <h3 className="font-semibold text-gray-800 dark:text-white">Delivery Details</h3>
                     <div>
                       <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                        Full Name *
+                      </label>
+                      <Input
+                        value={customerName}
+                        onChange={(e) => setCustomerName(e.target.value)}
+                        placeholder="Enter your full name"
+                        autoComplete="name"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                        Email Address *
+                      </label>
+                      <Input
+                        type="email"
+                        value={customerEmail}
+                        onChange={(e) => {
+                          setCustomerEmail(e.target.value);
+                          setGuestVerificationToken('');
+                        }}
+                        placeholder="Enter your email address"
+                        autoComplete="email"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                         Delivery Address *
                       </label>
                       <textarea
@@ -562,6 +598,15 @@ const Cart = () => {
                         required
                       />
                     </div>
+                    {!localStorage.getItem('userName') && (
+                      <GuestContactVerification
+                        name={customerName}
+                        email={customerEmail}
+                        phone={customerPhone}
+                        verified={Boolean(guestVerificationToken)}
+                        onVerified={setGuestVerificationToken}
+                      />
+                    )}
                   </div>
 
                   {/* No Return or Exchange Notice */}
@@ -601,4 +646,3 @@ const Cart = () => {
 };
 
 export default Cart;
-

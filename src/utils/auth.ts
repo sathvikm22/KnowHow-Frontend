@@ -20,13 +20,13 @@ export const clearLocalAuthState = (): void => {
  * After login/signup/OAuth, confirm cookies work by calling /me before redirecting.
  */
 export const verifySessionAfterAuth = async (): Promise<
-  | { ok: true; user: { id: string; email: string; name: string } }
+  | { ok: true; user: { id: string; email: string; name: string }; isAdmin: boolean }
   | { ok: false; message: string }
 > => {
   try {
     const response = await api.getCurrentUser();
     if (response.success && response.user) {
-      return { ok: true, user: response.user };
+      return { ok: true, user: response.user, isAdmin: response.isAdmin === true };
     }
     clearLocalAuthState();
     return { ok: false, message: SESSION_NOT_PERSISTED_MESSAGE };

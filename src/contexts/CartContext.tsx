@@ -8,6 +8,15 @@ interface CartItem {
   quantity: number;
 }
 
+const GUEST_CART_KEY = 'guestCart';
+const readGuestCart = (): CartItem[] => {
+  try {
+    return JSON.parse(localStorage.getItem(GUEST_CART_KEY) || '[]');
+  } catch {
+    return [];
+  }
+};
+
 interface CartContextType {
   cart: CartItem[];
   cartCount: number;
@@ -31,7 +40,7 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
       // Actual auth is verified by backend via HttpOnly cookies
       const userName = localStorage.getItem('userName');
       if (!userName) {
-        setCart([]);
+        setCart(readGuestCart());
         setLoading(false);
         return;
       }
@@ -65,6 +74,17 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
   }, []);
 
   const addToCart = async (kitName: string, price: number, quantity: number = 1) => {
+    if (!localStorage.getItem('userName')) {
+      setCart((current) => {
+        const existing = current.find((item) => item.kit_name === kitName);
+        const next = existing
+          ? current.map((item) => item.kit_name === kitName ? { ...item, quantity: item.quantity + quantity } : item)
+          : [...current, { id: `guest-${kitName}`, kit_name: kitName, price, quantity }];
+        localStorage.setItem(GUEST_CART_KEY, JSON.stringify(next));
+        return next;
+      });
+      return;
+    }
     try {
       const response = await api.addToCart(kitName, price, quantity);
       if (response.success) {
@@ -77,6 +97,14 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const updateCartItem = async (kitName: string, quantity: number) => {
+    if (!localStorage.getItem('userName')) {
+      setCart((current) => {
+        const next = quantity <= 0 ? current.filter((item) => item.kit_name !== kitName) : current.map((item) => item.kit_name === kitName ? { ...item, quantity } : item);
+        localStorage.setItem(GUEST_CART_KEY, JSON.stringify(next));
+        return next;
+      });
+      return;
+    }
     try {
       const response = await api.updateCartItem(kitName, quantity);
       if (response.success) {
@@ -89,6 +117,14 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const removeFromCart = async (kitName: string) => {
+    if (!localStorage.getItem('userName')) {
+      setCart((current) => {
+        const next = current.filter((item) => item.kit_name !== kitName);
+        localStorage.setItem(GUEST_CART_KEY, JSON.stringify(next));
+        return next;
+      });
+      return;
+    }
     try {
       const response = await api.removeFromCart(kitName);
       if (response.success) {
@@ -101,6 +137,11 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const clearCart = async () => {
+    if (!localStorage.getItem('userName')) {
+      localStorage.removeItem(GUEST_CART_KEY);
+      setCart([]);
+      return;
+    }
     try {
       const response = await api.clearCart();
       if (response.success) {
@@ -139,4 +180,3 @@ export const useCart = () => {
   }
   return context;
 };
-

@@ -9,6 +9,7 @@ import { api } from '@/lib/api';
 import { Loader2 } from 'lucide-react';
 import { useCart } from '@/contexts/CartContext';
 import { diyKits } from '@/data/diyKits';
+import GuestLoginPrompt from '@/components/GuestLoginPrompt';
 
 const PaymentSuccess = () => {
   const navigate = useNavigate();
@@ -205,6 +206,7 @@ const PaymentSuccess = () => {
     return (
       <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
         <Navigation />
+        {!localStorage.getItem('userName') && <GuestLoginPrompt postPayment />}
         <Receipt 
           receiptData={receiptData} 
           open={showReceipt}
@@ -229,6 +231,7 @@ const PaymentSuccess = () => {
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       <Navigation />
+      {!localStorage.getItem('userName') && <GuestLoginPrompt postPayment />}
       <div className="flex items-center justify-center min-h-[calc(100vh-4rem)] px-4">
         <div className="max-w-md w-full bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-8 text-center">
           <div className="flex justify-center mb-6">
@@ -292,4 +295,3 @@ const PaymentSuccess = () => {
 };
 
 export default PaymentSuccess;
-
