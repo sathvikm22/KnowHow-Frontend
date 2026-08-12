@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useNavigate, useSearchParams, useLocation } from 'react-router-dom';
 import { api } from '@/lib/api';
 import Navigation from '@/components/Navigation';
@@ -13,6 +13,8 @@ const PaymentProcessing = () => {
   const orderId = searchParams.get('order_id') || (location.state as any)?.orderId;
   const paymentId = searchParams.get('payment_id') || (location.state as any)?.paymentId; // Cashfree payment ID
   const orderType = searchParams.get('type') || (location.state as any)?.type || 'booking'; // 'booking' or 'diy'
+  const pollingTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const isPollingActiveRef = useRef(true);
 
   const verifyPaymentDirectly = async (orderId: string, paymentId: string) => {
     try {
@@ -53,10 +55,13 @@ const PaymentProcessing = () => {
     
     try {
       // Poll for payment status
-      const maxAttempts = 30; // 30 attempts = 30 seconds
+      // Cashfree webhooks update the database. Poll with backoff as a fallback
+      // instead of issuing a payment-status request every second.
+      const maxAttempts = 12;
       let attempts = 0;
 
       const pollStatus = async (): Promise<void> => {
+        if (!isPollingActiveRef.current) return;
         attempts++;
         
         try {
@@ -114,7 +119,8 @@ const PaymentProcessing = () => {
 
           // If not confirmed yet and haven't exceeded max attempts, try again
           if (attempts < maxAttempts) {
-            setTimeout(pollStatus, 1000); // Check every second
+            const delay = Math.min(8000, 2000 * 2 ** Math.floor((attempts - 1) / 3));
+            pollingTimerRef.current = setTimeout(pollStatus, delay);
           } else {
             // Timeout - redirect based on order type
             navigate('/all-orders', { 
@@ -126,7 +132,8 @@ const PaymentProcessing = () => {
         } catch (error) {
           console.error('Error checking payment status:', error);
           if (attempts < maxAttempts) {
-            setTimeout(pollStatus, 1000);
+            const delay = Math.min(8000, 2000 * 2 ** Math.floor((attempts - 1) / 3));
+            pollingTimerRef.current = setTimeout(pollStatus, delay);
           } else {
             navigate('/all-orders', { 
               state: { 
@@ -138,7 +145,7 @@ const PaymentProcessing = () => {
       };
 
       // Start polling after a short delay
-      setTimeout(pollStatus, 2000);
+      pollingTimerRef.current = setTimeout(pollStatus, 2000);
     } catch (error) {
       console.error('Error in payment processing:', error);
       if (orderType === 'diy') {
@@ -158,13 +165,16 @@ const PaymentProcessing = () => {
   };
 
   useEffect(() => {
+    isPollingActiveRef.current = true;
     if (!orderId) {
       if (orderType === 'diy') {
         navigate('/cart');
       } else {
         navigate('/booking');
       }
-      return;
+      return () => {
+        isPollingActiveRef.current = false;
+      };
     }
 
     // If payment_id is present, verify payment immediately
@@ -175,6 +185,10 @@ const PaymentProcessing = () => {
 
     // Otherwise, poll for payment status
     checkPaymentStatus();
+    return () => {
+      isPollingActiveRef.current = false;
+      if (pollingTimerRef.current) clearTimeout(pollingTimerRef.current);
+    };
   }, [orderId, orderType, paymentId, navigate]);
 
   return (

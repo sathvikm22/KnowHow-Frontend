@@ -39,6 +39,7 @@ const NO_SESSION_REFRESH_PREFIXES = [
   '/auth/forgot-password/',
   '/auth/google/complete',
   '/auth/refresh',
+  '/auth/me',
 ];
 
 export interface ApiResponse<T = any> {
@@ -58,8 +59,49 @@ export interface ApiResponse<T = any> {
 }
 
 class ApiClient {
+  // Catalogue data is public and changes only through the admin dashboard. Keeping
+  // it briefly in memory prevents the home, booking, cart and shop routes from
+  // repeatedly waiting on the same Render → Supabase request during one visit.
+  private readonly catalogCacheTtlMs = 5 * 60 * 1000;
+  private catalogCache = new Map<string, {
+    data?: ApiResponse<any>;
+    expiresAt?: number;
+    inFlight?: Promise<ApiResponse<any>>;
+  }>();
+
   private get baseUrl(): string {
     return getApiBaseUrl();
+  }
+
+  private async getCachedPublicCatalog<T>(endpoint: string): Promise<ApiResponse<T>> {
+    const existing = this.catalogCache.get(endpoint);
+    if (existing?.data && (existing.expiresAt || 0) > Date.now()) {
+      return existing.data as ApiResponse<T>;
+    }
+
+    if (existing?.inFlight) {
+      return existing.inFlight as Promise<ApiResponse<T>>;
+    }
+
+    const inFlight = this.request<T>(endpoint, { method: 'GET' })
+      .then((data) => {
+        this.catalogCache.set(endpoint, {
+          data,
+          expiresAt: Date.now() + this.catalogCacheTtlMs,
+        });
+        return data;
+      })
+      .catch((error) => {
+        this.catalogCache.delete(endpoint);
+        throw error;
+      });
+
+    this.catalogCache.set(endpoint, { ...existing, inFlight });
+    return inFlight;
+  }
+
+  invalidatePublicCatalog(): void {
+    this.catalogCache.clear();
   }
 
   private shouldAttemptSessionRefresh(endpoint: string): boolean {
@@ -94,12 +136,13 @@ class ApiClient {
     // This prevents XSS token theft
 
     try {
-      console.log('API Request:', { 
-        method: options.method || 'GET', 
-        url, 
-        baseUrl: this.baseUrl,
-        body: options.body ? JSON.parse(options.body) : undefined
-      });
+      if (import.meta.env.DEV) {
+        console.log('API Request:', {
+          method: options.method || 'GET',
+          url,
+          baseUrl: this.baseUrl,
+        });
+      }
       
       // Add timeout for mobile browsers (30 seconds)
       const controller = new AbortController();
@@ -120,14 +163,15 @@ class ApiClient {
         throw new Error(text || `HTTP ${response.status}: ${response.statusText}`);
       }
       
-      console.log('API Response:', { 
-        status: response.status, 
-        statusText: response.statusText,
-        success: data.success, 
-        message: data.message,
-        hasData: !!data.data,
-        fullResponse: JSON.stringify(data, null, 2)
-      });
+      if (import.meta.env.DEV) {
+        console.log('API Response:', {
+          status: response.status,
+          statusText: response.statusText,
+          success: data.success,
+          message: data.message,
+          hasData: !!data.data,
+        });
+      }
       
       // For 400 errors, return the data so frontend can check response.success
       // This allows proper error handling for validation errors, duplicate emails, etc.
@@ -542,21 +586,15 @@ class ApiClient {
 
   // Add Ons endpoints
   async getActivities(): Promise<ApiResponse<{ activities: any[] }>> {
-    return this.request('/addons/activities', {
-      method: 'GET',
-    });
+    return this.getCachedPublicCatalog('/addons/activities');
   }
 
   async getDIYKits(): Promise<ApiResponse<{ kits: any[] }>> {
-    return this.request('/addons/diy-kits', {
-      method: 'GET',
-    });
+    return this.getCachedPublicCatalog('/addons/diy-kits');
   }
 
   async getDIYKitByName(name: string): Promise<ApiResponse<{ kit: any }>> {
-    return this.request(`/addons/diy-kits/name/${encodeURIComponent(name)}`, {
-      method: 'GET',
-    });
+    return this.getCachedPublicCatalog(`/addons/diy-kits/name/${encodeURIComponent(name)}`);
   }
 }
 

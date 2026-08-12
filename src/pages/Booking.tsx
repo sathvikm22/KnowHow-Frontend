@@ -15,7 +15,8 @@ interface Activity {
   price?: number;
 }
 
-const ACTIVITIES_PER_PAGE = 12;
+// Two-column layouts use four compact rows; three-column desktop layouts use four rows.
+const getActivitiesPerPage = () => (typeof window !== 'undefined' && window.innerWidth < 1024 ? 8 : 12);
 
 const Booking = () => {
   const [selectedActivityName, setSelectedActivityName] = useState<string | null>(null);
@@ -27,6 +28,7 @@ const Booking = () => {
   const [activities, setActivities] = useState<Activity[]>([]);
   const [loadingActivities, setLoadingActivities] = useState(true);
   const [activityPage, setActivityPage] = useState(0);
+  const [activitiesPerPage, setActivitiesPerPage] = useState(getActivitiesPerPage);
   const [addOns, setAddOns] = useState<Array<{activity: Activity; date: string; timeSlot: string}>>([]);
   const [availableSlotsForAddOn, setAvailableSlotsForAddOn] = useState<Record<string, string[]>>({});
   const [loadingAddOnSlots, setLoadingAddOnSlots] = useState<Record<string, boolean>>({});
@@ -50,6 +52,13 @@ const Booking = () => {
 
   useEffect(() => {
     const loadSession = async () => {
+      // Guests can make a booking, so do not make an authenticated request when
+      // the browser has no indication of an existing signed-in session.
+      if (!localStorage.getItem('userName')) {
+        setIsLoggedIn(false);
+        return;
+      }
+
       try {
         const response = await api.getCurrentUser();
         if (response.success && response.user) {
@@ -63,6 +72,12 @@ const Booking = () => {
       }
     };
     loadSession();
+  }, []);
+
+  useEffect(() => {
+    const updateActivitiesPerPage = () => setActivitiesPerPage(getActivitiesPerPage());
+    window.addEventListener('resize', updateActivitiesPerPage);
+    return () => window.removeEventListener('resize', updateActivitiesPerPage);
   }, []);
 
   const paymentMethods = [
@@ -142,13 +157,13 @@ const Booking = () => {
           ?? activities.find(a => a && a.name && a.name.toLowerCase() === activityName.toLowerCase());
         if (activity) {
           setSelectedActivityName(activity.name);
-          setActivityPage(Math.floor(activities.indexOf(activity) / ACTIVITIES_PER_PAGE));
+          setActivityPage(Math.floor(activities.indexOf(activity) / activitiesPerPage));
         }
       }
     } catch (error) {
       console.error('❌ Error in activity pre-selection:', error);
     }
-  }, [loadingActivities, activities]);
+  }, [loadingActivities, activities, activitiesPerPage]);
 
   // Selected activity object (single activity, direct selection)
   const selectedActivity = useMemo(() => {
@@ -156,10 +171,10 @@ const Booking = () => {
     return activities.find(a => a.name === selectedActivityName) ?? null;
   }, [selectedActivityName, activities]);
 
-  const totalActivityPages = Math.max(1, Math.ceil(activities.length / ACTIVITIES_PER_PAGE));
+  const totalActivityPages = Math.max(1, Math.ceil(activities.length / activitiesPerPage));
   const visibleActivities = useMemo(
-    () => activities.slice(activityPage * ACTIVITIES_PER_PAGE, (activityPage + 1) * ACTIVITIES_PER_PAGE),
-    [activities, activityPage]
+    () => activities.slice(activityPage * activitiesPerPage, (activityPage + 1) * activitiesPerPage),
+    [activities, activityPage, activitiesPerPage]
   );
 
   useEffect(() => {
@@ -467,9 +482,9 @@ const Booking = () => {
                 </div>
               ) : (
                 <div>
-                  {activities.length > ACTIVITIES_PER_PAGE && (
+                  {activities.length > activitiesPerPage && (
                     <p className="mb-3 text-right text-sm text-gray-500 dark:text-gray-400">
-                      Activities {activityPage * ACTIVITIES_PER_PAGE + 1}-{Math.min((activityPage + 1) * ACTIVITIES_PER_PAGE, activities.length)} of {activities.length}
+                      Activities {activityPage * activitiesPerPage + 1}-{Math.min((activityPage + 1) * activitiesPerPage, activities.length)} of {activities.length}
                     </p>
                   )}
                   <div className="flex items-center gap-2 sm:gap-3">
@@ -478,11 +493,11 @@ const Booking = () => {
                       onClick={() => setActivityPage((page) => Math.max(0, page - 1))}
                       disabled={activityPage === 0}
                       aria-label="Show previous activities"
-                      className="shrink-0 rounded-full border border-orange-300 bg-white p-2 text-orange-600 shadow-sm transition hover:bg-orange-50 disabled:cursor-not-allowed disabled:opacity-40 dark:bg-gray-800"
+                      className="shrink-0 rounded-full border border-orange-300 bg-white p-1.5 text-orange-600 shadow-sm transition hover:bg-orange-50 disabled:cursor-not-allowed disabled:opacity-40 dark:bg-gray-800 sm:p-2"
                     >
-                      <ChevronLeft className="h-6 w-6" />
+                      <ChevronLeft className="h-5 w-5 sm:h-6 sm:w-6" />
                     </button>
-                    <div className="grid flex-1 grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
+                    <div className="grid flex-1 grid-cols-2 gap-2 sm:gap-3 lg:grid-cols-3 lg:gap-4">
                       {visibleActivities.map((activity) => {
                         const isSelected = selectedActivityName === activity.name;
                         const price = activity.price != null && activity.price > 0 ? activity.price : 0;
@@ -490,14 +505,14 @@ const Booking = () => {
                           <div
                             key={activity.id}
                             onClick={() => handleSelectActivity(activity.name)}
-                            className={`p-4 rounded-xl border cursor-pointer transition-all hover:shadow-md ${
+                            className={`min-h-[108px] rounded-xl border p-3 cursor-pointer transition-all hover:shadow-md sm:min-h-[118px] sm:p-4 ${
                               isSelected
                                 ? 'border-orange-500 bg-orange-50 dark:bg-orange-900/30 shadow-md'
                                 : 'border border-black dark:border-black hover:border-orange-300 dark:hover:border-orange-400 bg-white dark:bg-gray-700'
                             }`}
                           >
-                            <h3 className="font-semibold text-gray-800 dark:text-white">{activity.name}</h3>
-                            <p className="text-lg font-bold text-orange-600 dark:text-orange-400 mt-1">₹{price}</p>
+                            <h3 className="break-words text-sm font-semibold leading-snug text-gray-800 dark:text-white sm:text-base">{activity.name}</h3>
+                            <p className="mt-1 text-base font-bold text-orange-600 dark:text-orange-400 sm:text-lg">₹{price}</p>
                           </div>
                         );
                       })}
@@ -507,9 +522,9 @@ const Booking = () => {
                       onClick={() => setActivityPage((page) => Math.min(totalActivityPages - 1, page + 1))}
                       disabled={activityPage === totalActivityPages - 1}
                       aria-label="Show next activities"
-                      className="shrink-0 rounded-full border border-orange-300 bg-white p-2 text-orange-600 shadow-sm transition hover:bg-orange-50 disabled:cursor-not-allowed disabled:opacity-40 dark:bg-gray-800"
+                      className="shrink-0 rounded-full border border-orange-300 bg-white p-1.5 text-orange-600 shadow-sm transition hover:bg-orange-50 disabled:cursor-not-allowed disabled:opacity-40 dark:bg-gray-800 sm:p-2"
                     >
-                      <ChevronRight className="h-6 w-6" />
+                      <ChevronRight className="h-5 w-5 sm:h-6 sm:w-6" />
                     </button>
                   </div>
                 </div>

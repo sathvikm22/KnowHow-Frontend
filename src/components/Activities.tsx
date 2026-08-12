@@ -30,13 +30,6 @@ const Activities = () => {
 
   useEffect(() => {
     fetchActivities();
-    
-    // Refresh activities every 30 seconds to catch updates
-    const interval = setInterval(() => {
-      fetchActivities();
-    }, 30000);
-    
-    return () => clearInterval(interval);
   }, []);
 
   const fetchActivities = async () => {
