@@ -22,7 +22,7 @@ const isValidPassword = (password: string): boolean => {
   // Must contain at least one number
   const hasNumber = /[0-9]/.test(password);
   // Must contain at least one symbol (special character)
-  const hasSymbol = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password);
+  const hasSymbol = [...password].some((character) => '!@#$%^&*()_+-=[]{};\':"\\|,.<>/?'.includes(character));
   
   return hasLetter && hasNumber && hasSymbol;
 };
@@ -550,4 +550,3 @@ const SignUp = () => {
 };
 
 export default SignUp;
-

@@ -32,6 +32,7 @@ import {
 import Receipt from '@/components/Receipt';
 import type { ReceiptData } from '@/components/Receipt';
 import { diyKits } from '@/data/diyKits';
+import PaginationControls from '@/components/PaginationControls';
 
 interface Booking {
   id: string;
@@ -94,6 +95,10 @@ const AllOrders = () => {
   const navigate = useNavigate();
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [diyOrders, setDiyOrders] = useState<DIYOrder[]>([]);
+  const [bookingPage, setBookingPage] = useState(1);
+  const [bookingTotalPages, setBookingTotalPages] = useState(1);
+  const [orderPage, setOrderPage] = useState(1);
+  const [orderTotalPages, setOrderTotalPages] = useState(1);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<'bookings' | 'orders'>('bookings');
@@ -113,19 +118,16 @@ const AllOrders = () => {
 
   useEffect(() => {
     fetchData();
-  }, []);
+  }, [bookingPage, orderPage]);
 
   const fetchData = async () => {
     try {
       setLoading(true);
       setError(null);
       const [bookingsRes, ordersRes] = await Promise.all([
-        api.getMyBookings(),
-        api.getMyDIYOrders()
+        api.getMyBookings(bookingPage),
+        api.getMyDIYOrders(orderPage)
       ]);
-      
-      console.log('Bookings response:', JSON.stringify(bookingsRes, null, 2));
-      console.log('Orders response:', JSON.stringify(ordersRes, null, 2));
       
       // Handle bookings
       if (bookingsRes.success !== false) {
@@ -139,7 +141,7 @@ const AllOrders = () => {
           bookingsData = bookingsRes.data;
         }
         setBookings(bookingsData);
-        console.log('Parsed bookings:', bookingsData);
+        setBookingTotalPages(bookingsRes.pagination?.totalPages || 1);
       } else {
         console.error('Failed to fetch bookings:', bookingsRes);
         setBookings([]);
@@ -160,7 +162,7 @@ const AllOrders = () => {
           ordersData = ordersRes.data;
         }
         setDiyOrders(ordersData);
-        console.log('Parsed orders:', ordersData);
+        setOrderTotalPages(ordersRes.pagination?.totalPages || 1);
       } else {
         console.error('Failed to fetch orders:', ordersRes);
         setDiyOrders([]);
@@ -768,6 +770,11 @@ const AllOrders = () => {
                   </div>
                 </div>
               ))}
+              <PaginationControls
+                page={bookingPage}
+                totalPages={bookingTotalPages}
+                onPageChange={setBookingPage}
+              />
             </div>
           )
         ) : (
@@ -951,6 +958,11 @@ const AllOrders = () => {
                   </div>
                 </div>
               ))}
+              <PaginationControls
+                page={orderPage}
+                totalPages={orderTotalPages}
+                onPageChange={setOrderPage}
+              />
             </div>
           )
         )}

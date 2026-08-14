@@ -23,7 +23,7 @@ const isValidPassword = (password: string): boolean => {
   // Must contain at least one number
   const hasNumber = /[0-9]/.test(password);
   // Must contain at least one symbol (special character)
-  const hasSymbol = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password);
+  const hasSymbol = [...password].some((character) => '!@#$%^&*()_+-=[]{};\':"\\|,.<>/?'.includes(character));
   
   return hasLetter && hasNumber && hasSymbol;
 };
@@ -185,7 +185,10 @@ const Login = () => {
           return;
         }
 
-        const from = (location.state as { from?: { pathname?: string } })?.from?.pathname || '/';
+        const requestedPath = (location.state as { from?: { pathname?: string } })?.from?.pathname;
+        const from = requestedPath?.startsWith('/') && !requestedPath.startsWith('//') && !requestedPath.includes('\\')
+          ? requestedPath
+          : '/';
         navigate(from, { replace: true });
       } else {
         const errorMsg = response.message || 'Invalid email or password';

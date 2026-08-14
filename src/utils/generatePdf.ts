@@ -175,7 +175,7 @@ export const generateReceiptPDF = async (receiptData: ReceiptData) => {
   yPos += 10;
 
   // Summary Section
-  let summaryY = yPos;
+  const summaryY = yPos;
   const leftColumnX = 20;
   const rightColumnX = pageWidth - 80;
 
@@ -246,4 +246,3 @@ export const generateReceiptPDF = async (receiptData: ReceiptData) => {
   const fileName = `receipt_${receiptData.orderId}.pdf`;
   doc.save(fileName);
 };
-

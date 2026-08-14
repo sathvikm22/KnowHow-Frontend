@@ -36,26 +36,11 @@ const Activities = () => {
     try {
       setLoading(true);
       const response = await api.getActivities();
-      console.log('📥 Activities API response:', response);
       const activitiesList = response.data?.activities ?? (response as { activities?: Activity[] }).activities ?? [];
-      console.log('   Response structure:', {
-        success: response.success,
-        hasActivities: !!activitiesList.length,
-        hasData: !!response.data,
-        fullResponse: JSON.stringify(response, null, 2)
-      });
 
       const activities = activitiesList;
       
       if (response.success && activities.length > 0) {
-        console.log('✅ Activities fetched:', activities.length);
-        // Log image URLs for debugging
-        activities.forEach((activity: Activity) => {
-          console.log(`  - ${activity.name}: image_url = ${activity.image_url || 'NULL'}`);
-          if (activity.image_url) {
-            console.log(`     Full URL: ${activity.image_url}`);
-          }
-        });
         setActivities(activities);
       } else {
         console.warn('⚠️ No activities in response:', response);
@@ -76,13 +61,10 @@ const Activities = () => {
   const getImageUrl = (activity: Activity) => {
     // Check if image_url exists and is not empty/null
     if (activity.image_url && activity.image_url.trim() !== '') {
-      const url = activity.image_url.trim();
-      console.log(`🖼️ Using image_url for ${activity.name}:`, url);
-      return url;
+      return activity.image_url.trim();
     }
     // Use placeholder instead of guessing filename (files have UUID-based names)
-    console.log(`⚠️ No image_url for ${activity.name}, using placeholder`);
-    return '/lovable-uploads/placeholder.svg';
+    return '/placeholder.svg';
   };
 
   if (loading) {
@@ -145,12 +127,8 @@ const Activities = () => {
                           console.error(`❌ Image failed to load for ${activity.name}:`, imageUrl);
                           // Always use placeholder on error (don't try fallback - files have UUID names)
                           if (!target.src.includes('placeholder')) {
-                            console.log(`   Using placeholder for ${activity.name}`);
-                            target.src = '/lovable-uploads/placeholder.svg';
+                            target.src = '/placeholder.svg';
                           }
-                        }}
-                        onLoad={() => {
-                          console.log(`✅ Image loaded successfully for ${activity.name}:`, imageUrl);
                         }}
                       />
                     );

@@ -4,6 +4,7 @@ import { Package, Truck, CheckCircle, Clock, Loader2 } from 'lucide-react';
 import Navigation from '@/components/Navigation';
 import { api } from '@/lib/api';
 import { Button } from '@/components/ui/button';
+import PaginationControls from '@/components/PaginationControls';
 
 interface Order {
   id: string;
@@ -29,17 +30,20 @@ const MyOrders = () => {
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
 
   useEffect(() => {
     fetchOrders();
-  }, []);
+  }, [page]);
 
   const fetchOrders = async () => {
     try {
       setLoading(true);
-      const response = await api.getMyDIYOrders();
-      if (response.success && response.data) {
-        setOrders(response.data.orders || []);
+      const response = await api.getMyDIYOrders(page);
+      if (response.success) {
+        setOrders(response.orders || response.data?.orders || []);
+        setTotalPages(response.pagination?.totalPages || 1);
       } else {
         setError('Failed to load orders');
       }
@@ -140,6 +144,7 @@ const MyOrders = () => {
             </Button>
           </div>
         ) : (
+          <>
           <div className="space-y-4">
             {orders.map((order) => (
               <div
@@ -204,6 +209,8 @@ const MyOrders = () => {
               </div>
             ))}
           </div>
+          <PaginationControls page={page} totalPages={totalPages} onPageChange={setPage} />
+          </>
         )}
       </div>
     </div>
@@ -211,4 +218,3 @@ const MyOrders = () => {
 };
 
 export default MyOrders;
-

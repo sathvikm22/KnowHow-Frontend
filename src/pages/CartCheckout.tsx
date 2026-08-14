@@ -80,11 +80,6 @@ const CartCheckout = () => {
       };
 
       // Create order on backend
-      console.log('Creating DIY order with:', { 
-        amount: cartData.totalAmount, 
-        orderData: JSON.stringify(orderData, null, 2)
-      });
-      
       let order_id: string;
       let payment_session_id: string;
       let amount: number;
@@ -92,8 +87,6 @@ const CartCheckout = () => {
       
       try {
         const response = await api.createDIYOrder(cartData.totalAmount, orderData);
-        console.log('Create DIY order response:', JSON.stringify(response, null, 2));
-
         if (!response) {
           throw new Error('No response from server. Please check if backend is running.');
         }
@@ -115,9 +108,9 @@ const CartCheckout = () => {
         payment_session_id = responseData.payment_session_id;
         amount = responseData.amount;
         currency = responseData.currency || 'INR';
-        
-        console.log('Order details extracted:', { order_id, payment_session_id, amount, currency });
-        console.log('Full response structure:', JSON.stringify(response, null, 2));
+        if (responseData.order_access_token) {
+          sessionStorage.setItem(`orderAccess:${order_id}`, responseData.order_access_token);
+        }
         
         if (!payment_session_id) {
           console.error('Missing payment_session_id in response:', JSON.stringify(response, null, 2));

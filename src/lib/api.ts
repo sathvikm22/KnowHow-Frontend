@@ -56,6 +56,7 @@ export interface ApiResponse<T = any> {
   expiresIn?: number;
   isAdmin?: boolean;
   guestVerificationToken?: string;
+  pagination?: { page: number; pageSize: number; total: number; totalPages: number };
 }
 
 class ApiClient {
@@ -63,6 +64,11 @@ class ApiClient {
   // it briefly in memory prevents the home, booking, cart and shop routes from
   // repeatedly waiting on the same Render → Supabase request during one visit.
   private readonly catalogCacheTtlMs = 5 * 60 * 1000;
+
+  private getOrderAccessHeaders(orderId: string): HeadersInit {
+    const token = sessionStorage.getItem(`orderAccess:${orderId}`);
+    return token ? { 'X-Order-Access-Token': token } : {};
+  }
   private catalogCache = new Map<string, {
     data?: ApiResponse<any>;
     expiresAt?: number;
@@ -466,7 +472,7 @@ class ApiClient {
   }
 
   // Payment endpoints
-  async createOrder(amount: number, slotDetails: any): Promise<ApiResponse<{ order_id: string; payment_session_id: string; amount: number; currency: string }>> {
+  async createOrder(amount: number, slotDetails: any): Promise<ApiResponse<{ order_id: string; payment_session_id: string; amount: number; currency: string; order_access_token: string }>> {
     return this.request('/create-order', {
       method: 'POST',
       body: JSON.stringify({ amount, slotDetails }),
@@ -476,6 +482,7 @@ class ApiClient {
   async verifyPayment(orderId: string, paymentId: string): Promise<ApiResponse> {
     return this.request('/verify-payment', {
       method: 'POST',
+      headers: this.getOrderAccessHeaders(orderId),
       body: JSON.stringify({
         cashfree_order_id: orderId,
         cashfree_payment_id: paymentId,
@@ -486,11 +493,12 @@ class ApiClient {
   async checkPaymentStatus(orderId: string): Promise<ApiResponse<{ payment_status: string; booking_status: string; booking: any }>> {
     return this.request(`/check-payment-status/${orderId}`, {
       method: 'GET',
+      headers: this.getOrderAccessHeaders(orderId),
     });
   }
 
-  async getMyBookings(): Promise<ApiResponse<{ bookings: any[] }>> {
-    return this.request('/my-bookings', {
+  async getMyBookings(page = 1, pageSize = 24): Promise<ApiResponse<{ bookings: any[] }>> {
+    return this.request(`/my-bookings?page=${page}&pageSize=${pageSize}`, {
       method: 'GET',
     });
   }
@@ -527,7 +535,7 @@ class ApiClient {
   }
 
   // DIY Orders endpoints
-  async createDIYOrder(amount: number, orderData: any): Promise<ApiResponse<{ order_id: string; payment_session_id: string; amount: number; currency: string }>> {
+  async createDIYOrder(amount: number, orderData: any): Promise<ApiResponse<{ order_id: string; payment_session_id: string; amount: number; currency: string; order_access_token: string }>> {
     return this.request('/create-diy-order', {
       method: 'POST',
       body: JSON.stringify({ amount, orderData }),
@@ -537,6 +545,7 @@ class ApiClient {
   async verifyDIYPayment(orderId: string, paymentId: string): Promise<ApiResponse> {
     return this.request('/verify-diy-payment', {
       method: 'POST',
+      headers: this.getOrderAccessHeaders(orderId),
       body: JSON.stringify({
         cashfree_order_id: orderId,
         cashfree_payment_id: paymentId,
@@ -544,14 +553,14 @@ class ApiClient {
     });
   }
 
-  async getMyDIYOrders(): Promise<ApiResponse<{ orders: any[] }>> {
-    return this.request('/my-diy-orders', {
+  async getMyDIYOrders(page = 1, pageSize = 24): Promise<ApiResponse<{ orders: any[] }>> {
+    return this.request(`/my-diy-orders?page=${page}&pageSize=${pageSize}`, {
       method: 'GET',
     });
   }
 
-  async getAllDIYOrders(): Promise<ApiResponse<{ orders: any[] }>> {
-    return this.request('/all-diy-orders', {
+  async getAllDIYOrders(page = 1, pageSize = 24): Promise<ApiResponse<{ orders: any[] }>> {
+    return this.request(`/all-diy-orders?page=${page}&pageSize=${pageSize}`, {
       method: 'GET',
     });
   }
@@ -566,20 +575,22 @@ class ApiClient {
   async checkDIYPaymentStatus(orderId: string): Promise<ApiResponse<{ payment_status: string; order: any }>> {
     return this.request(`/check-diy-payment-status/${orderId}`, {
       method: 'GET',
+      headers: this.getOrderAccessHeaders(orderId),
     });
   }
 
   // Note: Cashfree doesn't use signature verification like Razorpay
   // Payment verification is done server-side using payment_id
 
-  async getAllUsers(): Promise<ApiResponse<{ users: any[] }>> {
-    return this.request('/auth/all-users', {
+  async getAllUsers(page = 1, pageSize = 24, search = ''): Promise<ApiResponse<{ users: any[] }>> {
+    const searchParam = search ? `&search=${encodeURIComponent(search)}` : '';
+    return this.request(`/auth/all-users?page=${page}&pageSize=${pageSize}${searchParam}`, {
       method: 'GET',
     });
   }
 
-  async getAllBookings(): Promise<ApiResponse<{ bookings: any[] }>> {
-    return this.request('/all-bookings', {
+  async getAllBookings(page = 1, pageSize = 24): Promise<ApiResponse<{ bookings: any[] }>> {
+    return this.request(`/all-bookings?page=${page}&pageSize=${pageSize}`, {
       method: 'GET',
     });
   }

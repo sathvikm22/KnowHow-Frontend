@@ -224,7 +224,7 @@ const TermsAndConditions = () => {
             <section>
               <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">13. Governing Law</h2>
               <p className="text-gray-700 dark:text-gray-300 leading-relaxed">
-                These Terms shall be governed by and construed in accordance with the laws of India, without regard to its conflict of law provisions. Any disputes arising from these Terms or your use of our services shall be subject to the exclusive jurisdiction of the courts in [Your City/State], India.
+                These Terms shall be governed by and construed in accordance with the laws of India, without regard to its conflict of law provisions. Any disputes arising from these Terms or your use of our services shall be subject to the exclusive jurisdiction of the courts in Bengaluru, Karnataka, India.
               </p>
             </section>
 

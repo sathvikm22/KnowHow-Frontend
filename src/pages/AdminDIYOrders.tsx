@@ -3,6 +3,7 @@ import AdminLayout from '../components/AdminLayout';
 import { api } from '@/lib/api';
 import { Loader2, Package, CheckCircle, Truck } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import PaginationControls from '@/components/PaginationControls';
 
 interface Order {
   id: string;
@@ -46,23 +47,26 @@ const AdminDIYOrders = () => {
   const [updatingOrderId, setUpdatingOrderId] = useState<string | null>(null);
   const [selectedStatus, setSelectedStatus] = useState<Record<string, string>>({});
   const [selectedTime, setSelectedTime] = useState<Record<string, string>>({});
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
 
   useEffect(() => {
     fetchOrders();
-  }, []);
+  }, [page]);
 
   const fetchOrders = async () => {
     try {
       setLoading(true);
       setError(null);
       console.log('Fetching DIY orders...');
-      const response = await api.getAllDIYOrders();
+      const response = await api.getAllDIYOrders(page);
       console.log('Orders response:', response);
       if (response.success) {
         // Backend returns { success: true, orders: [...] }
         const ordersData = response.orders || response.data?.orders || [];
         console.log('Orders data:', ordersData);
         setOrders(ordersData);
+        setTotalPages(response.pagination?.totalPages || 1);
         // Initialize selected status and time
         const statusMap: Record<string, string> = {};
         const timeMap: Record<string, string> = {};
@@ -155,6 +159,7 @@ const AdminDIYOrders = () => {
           <p className="text-sm text-gray-500 mt-2">Orders will appear here once customers make purchases.</p>
         </div>
       ) : !error ? (
+        <>
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {orders.map((order) => (
             <div
@@ -314,10 +319,11 @@ const AdminDIYOrders = () => {
             </div>
           ))}
         </div>
+        <PaginationControls page={page} totalPages={totalPages} onPageChange={setPage} />
+        </>
       ) : null}
     </AdminLayout>
   );
 };
 
 export default AdminDIYOrders;
-

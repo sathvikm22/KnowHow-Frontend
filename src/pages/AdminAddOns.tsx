@@ -24,6 +24,36 @@ interface DIYKit {
   updated_at: string;
 }
 
+const optimiseImageForUpload = async (file: File): Promise<File> => {
+  // SVG/GIF files are deliberately left untouched: drawing them to canvas can
+  // remove vector data or animation. JPEG/PNG/WebP photos become a smaller WebP.
+  if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type)) return file;
+
+  const objectUrl = URL.createObjectURL(file);
+  try {
+    const image = await new Promise<HTMLImageElement>((resolve, reject) => {
+      const element = new Image();
+      element.onload = () => resolve(element);
+      element.onerror = reject;
+      element.src = objectUrl;
+    });
+    const maxDimension = 1600;
+    const scale = Math.min(1, maxDimension / Math.max(image.naturalWidth, image.naturalHeight));
+    const canvas = document.createElement('canvas');
+    canvas.width = Math.max(1, Math.round(image.naturalWidth * scale));
+    canvas.height = Math.max(1, Math.round(image.naturalHeight * scale));
+    const context = canvas.getContext('2d');
+    if (!context) return file;
+    context.drawImage(image, 0, 0, canvas.width, canvas.height);
+    const blob = await new Promise<Blob | null>((resolve) => canvas.toBlob(resolve, 'image/webp', 0.82));
+    if (!blob) return file;
+    const baseName = file.name.replace(/\.[^.]+$/, '') || 'image';
+    return new File([blob], `${baseName}.webp`, { type: 'image/webp' });
+  } finally {
+    URL.revokeObjectURL(objectUrl);
+  }
+};
+
 const AdminAddOns = () => {
   const [activeTab, setActiveTab] = useState<'activities' | 'diy-kits'>('activities');
   const [activities, setActivities] = useState<Activity[]>([]);
@@ -176,78 +206,56 @@ const AdminAddOns = () => {
       setUploadingImage(true);
       setError(null);
 
-      // Convert file to base64
-      const reader = new FileReader();
-      reader.onloadend = async () => {
-        try {
-          const base64Image = reader.result as string;
+      const optimizedFile = await optimiseImageForUpload(selectedImageFile);
+      if (optimizedFile.size > 5 * 1024 * 1024) {
+        throw new Error('Image is still larger than 5MB after optimisation. Please choose a smaller image.');
+      }
 
-          const response = await fetch(`${getBackendBaseUrl()}/api/upload/image`, {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              // NO Authorization header - tokens are in HttpOnly cookies
-            },
-            credentials: 'include',
-            body: JSON.stringify({
-              image: base64Image,
-              folder: folder,
-              filename: selectedImageFile.name
-            })
-          });
+      const signResponse = await fetch(`${getBackendBaseUrl()}/api/upload/sign`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({
+          folder,
+          filename: optimizedFile.name,
+          contentType: optimizedFile.type,
+          size: optimizedFile.size,
+        }),
+      });
+      const signedUpload = await signResponse.json();
+      if (!signResponse.ok || !signedUpload.success || !signedUpload.signedUploadUrl) {
+        throw new Error(signedUpload.message || 'Could not prepare image upload');
+      }
 
-          const data = await response.json();
+      const uploadResponse = await fetch(signedUpload.signedUploadUrl, {
+        method: 'PUT',
+        // Each upload gets a unique file name, so it is safe for browsers and
+        // the CDN to keep the optimized image for a long time.
+        headers: {
+          'Content-Type': optimizedFile.type,
+          'cache-control': 'public, max-age=31536000, immutable',
+        },
+        body: optimizedFile,
+      });
+      if (!uploadResponse.ok) {
+        throw new Error('Image upload to storage failed. Please try again.');
+      }
 
-          if (data.success && data.imageUrl) {
-            console.log('✅ Image uploaded successfully!');
-            console.log('   URL:', data.imageUrl);
-            console.log('   File name:', data.fileName);
-            
-            // Verify it's a URL, not base64
-            if (data.imageUrl.startsWith('data:image')) {
-              console.error('❌ Upload returned base64 instead of URL!');
-              setError('Image upload failed. Please try again.');
-              return;
-            }
-            
-            // Update the form with the uploaded image URL
-            if (activeTab === 'activities') {
-              const updatedForm = { ...activityForm, image_url: data.imageUrl };
-              console.log('   Updated activity form:', updatedForm);
-              setActivityForm(updatedForm);
-              setImagePreview(data.imageUrl); // Set to URL, not base64
-            } else {
-              const updatedForm = { ...diyKitForm, image_url: data.imageUrl };
-              console.log('   Updated DIY kit form:', updatedForm);
-              setDiyKitForm(updatedForm);
-              setImagePreview(data.imageUrl); // Set to URL, not base64
-            }
-            setSelectedImageFile(null);
-            // Reset file input
-            const fileInputActivity = document.getElementById('image-upload-activity') as HTMLInputElement;
-            const fileInputDIY = document.getElementById('image-upload-diy') as HTMLInputElement;
-            if (fileInputActivity) fileInputActivity.value = '';
-            if (fileInputDIY) fileInputDIY.value = '';
-          } else {
-            setError(data.message || 'Failed to upload image');
-          }
-        } catch (err: any) {
-          console.error('Error uploading image:', err);
-          setError(err.message || 'Failed to upload image');
-        } finally {
-          setUploadingImage(false);
-        }
-      };
-
-      reader.onerror = () => {
-        setError('Failed to read image file');
-        setUploadingImage(false);
-      };
-
-      reader.readAsDataURL(selectedImageFile);
+      if (activeTab === 'activities') {
+        setActivityForm((current) => ({ ...current, image_url: signedUpload.imageUrl }));
+      } else {
+        setDiyKitForm((current) => ({ ...current, image_url: signedUpload.imageUrl }));
+      }
+      setImagePreview(signedUpload.imageUrl);
+      setSelectedImageFile(null);
+      const fileInputActivity = document.getElementById('image-upload-activity') as HTMLInputElement;
+      const fileInputDIY = document.getElementById('image-upload-diy') as HTMLInputElement;
+      if (fileInputActivity) fileInputActivity.value = '';
+      if (fileInputDIY) fileInputDIY.value = '';
     } catch (err: any) {
       console.error('Error processing image:', err);
       setError(err.message || 'Failed to process image');
+    } finally {
       setUploadingImage(false);
     }
   };
@@ -1223,4 +1231,3 @@ const AdminAddOns = () => {
 };
 
 export default AdminAddOns;
-

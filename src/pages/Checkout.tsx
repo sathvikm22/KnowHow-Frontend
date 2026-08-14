@@ -90,8 +90,6 @@ const Checkout = () => {
       };
 
       // Create order on backend
-      console.log('Creating order with:', { amount: orderData.totalAmount, slotDetails });
-      
       let order_id: string;
       let payment_session_id: string;
       let amount: number;
@@ -99,8 +97,6 @@ const Checkout = () => {
       
       try {
         const response = await api.createOrder(orderData.totalAmount, slotDetails);
-        console.log('Create order response:', JSON.stringify(response, null, 2));
-
         if (!response) {
           throw new Error('No response from server. Please check if backend is running.');
         }
@@ -122,8 +118,9 @@ const Checkout = () => {
         payment_session_id = responseData.payment_session_id;
         amount = responseData.amount;
         currency = responseData.currency || 'INR';
-        
-        console.log('Extracted payment details:', { order_id, payment_session_id, amount, currency });
+        if (responseData.order_access_token) {
+          sessionStorage.setItem(`orderAccess:${order_id}`, responseData.order_access_token);
+        }
         
         if (!payment_session_id) {
           console.error('Missing payment_session_id in response:', JSON.stringify(response, null, 2));

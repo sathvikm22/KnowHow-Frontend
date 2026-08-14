@@ -5,6 +5,7 @@ import Navigation from '@/components/Navigation';
 import { api } from '@/lib/api';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
+import PaginationControls from '@/components/PaginationControls';
 import {
   Dialog,
   DialogContent,
@@ -66,18 +67,21 @@ const Orders = () => {
   const [currentBooking, setCurrentBooking] = useState<Booking | null>(null);
   const [cancelDialogOpen, setCancelDialogOpen] = useState(false);
   const [bookingToCancel, setBookingToCancel] = useState<Booking | null>(null);
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
   const { toast } = useToast();
 
   useEffect(() => {
     fetchBookings();
-  }, []);
+  }, [page]);
 
   const fetchBookings = async () => {
     try {
       setLoading(true);
-      const response = await api.getMyBookings();
-      if (response.success && response.data) {
-        setBookings(response.data.bookings || []);
+      const response = await api.getMyBookings(page);
+      if (response.success) {
+        setBookings(response.bookings || response.data?.bookings || []);
+        setTotalPages(response.pagination?.totalPages || 1);
       } else {
         setError('Failed to load bookings');
       }
@@ -287,6 +291,7 @@ const Orders = () => {
             </Button>
           </div>
         ) : (
+          <>
           <div className="space-y-4">
             {bookings.map((booking) => (
               <div
@@ -464,6 +469,8 @@ const Orders = () => {
               </div>
             ))}
           </div>
+          <PaginationControls page={page} totalPages={totalPages} onPageChange={setPage} />
+          </>
         )}
       </div>
 
@@ -526,4 +533,3 @@ const Orders = () => {
 };
 
 export default Orders;
-

@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import AdminLayout from '../components/AdminLayout';
 import { api } from '@/lib/api';
 import { Loader2, Calendar, Clock, Mail, Phone } from 'lucide-react';
+import PaginationControls from '@/components/PaginationControls';
 
 interface Booking {
   id: string;
@@ -32,21 +33,24 @@ const AdminBookings = () => {
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
 
   useEffect(() => {
     fetchBookings();
-  }, []);
+  }, [page]);
 
   const fetchBookings = async () => {
     try {
       setLoading(true);
       setError(null);
       console.log('Fetching bookings...');
-      const response = await api.getAllBookings();
+      const response = await api.getAllBookings(page);
       console.log('Bookings response:', response);
       if (response.success) {
         // Backend returns { success: true, bookings: [...] }
         setBookings(response.bookings || response.data?.bookings || []);
+        setTotalPages(response.pagination?.totalPages || 1);
       } else {
         setError(response.message || 'Failed to load bookings');
       }
@@ -115,6 +119,7 @@ const AdminBookings = () => {
           <p className="text-sm text-gray-500 mt-2">Bookings will appear here once customers make reservations.</p>
         </div>
       ) : !error ? (
+        <>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {bookings.map((booking) => (
             <div
@@ -179,9 +184,11 @@ const AdminBookings = () => {
             </div>
           ))}
         </div>
+        <PaginationControls page={page} totalPages={totalPages} onPageChange={setPage} />
+        </>
       ) : null}
     </AdminLayout>
   );
 };
 
-export default AdminBookings; 
+export default AdminBookings;

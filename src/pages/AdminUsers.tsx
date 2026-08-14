@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import AdminLayout from '../components/AdminLayout';
 import { api } from '@/lib/api';
 import { Loader2 } from 'lucide-react';
+import PaginationControls from '@/components/PaginationControls';
 
 interface User {
   id: string;
@@ -15,21 +16,24 @@ const AdminUsers = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [search, setSearch] = useState('');
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
 
   useEffect(() => {
     fetchUsers();
-  }, []);
+  }, [page, search]);
 
   const fetchUsers = async () => {
     try {
       setLoading(true);
       setError(null);
       console.log('Fetching users...');
-      const response = await api.getAllUsers();
+      const response = await api.getAllUsers(page, 24, search);
       console.log('Users response:', response);
       if (response.success) {
         // Backend returns { success: true, users: [...] }
         setUsers(response.users || response.data?.users || []);
+        setTotalPages(response.pagination?.totalPages || 1);
       } else {
         setError(response.message || 'Failed to load users');
       }
@@ -40,11 +44,6 @@ const AdminUsers = () => {
       setLoading(false);
     }
   };
-
-  const filtered = users.filter(u =>
-    u.name.toLowerCase().includes(search.toLowerCase()) ||
-    u.email.toLowerCase().includes(search.toLowerCase())
-  );
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
@@ -80,22 +79,23 @@ const AdminUsers = () => {
           type="text"
           placeholder="Search by name or email..."
           value={search}
-          onChange={e => setSearch(e.target.value)}
+          onChange={e => { setSearch(e.target.value); setPage(1); }}
           className="w-full max-w-xs px-4 py-2 rounded-lg border-2 border-orange-200 focus:border-orange-500 outline-none transition-colors shadow-sm"
         />
       </div>
 
-      {!error && users.length === 0 ? (
+      {!error && users.length === 0 && !search ? (
         <div className="bg-white rounded-xl shadow-lg p-8 text-center">
           <p className="text-gray-600">No users found.</p>
         </div>
-      ) : !error && filtered.length === 0 && users.length > 0 ? (
+      ) : !error && users.length === 0 && search ? (
         <div className="bg-white rounded-xl shadow-lg p-8 text-center">
           <p className="text-gray-600">No users match your search.</p>
         </div>
       ) : !error ? (
+        <>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filtered.map(u => (
+          {users.map(u => (
             <div
               key={u.id}
               className="bg-white rounded-xl shadow-lg p-6 flex flex-col space-y-2 border border-purple-100 hover:shadow-2xl transition-shadow duration-200"
@@ -106,6 +106,8 @@ const AdminUsers = () => {
             </div>
           ))}
         </div>
+        <PaginationControls page={page} totalPages={totalPages} onPageChange={setPage} />
+        </>
       ) : null}
     </AdminLayout>
   );

@@ -57,14 +57,9 @@ const Stats = () => {
   const getImagePath = (kit: DIYKit) => {
     // Check if image_url exists and is not empty/null
     if (kit.image_url && kit.image_url.trim() !== '') {
-      const url = kit.image_url.trim();
-      console.log(`🖼️ Using image_url for ${kit.name}:`, url);
-      return url;
+      return kit.image_url.trim();
     }
-    const imageName = kit.name.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
-    const fallbackUrl = `/lovable-uploads/diy-kits/${imageName}.jpg`;
-    console.log(`⚠️ No image_url for ${kit.name}, using fallback:`, fallbackUrl);
-    return fallbackUrl;
+    return '/placeholder.svg';
   };
 
   // Show 6 kits on mobile, 10 on larger screens when not showing all

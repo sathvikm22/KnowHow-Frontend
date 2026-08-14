@@ -1,6 +1,18 @@
 {
   "rewrites": [
     {
+      "source": "/privacy-policy",
+      "destination": "/privacy-policy/index.html"
+    },
+    {
+      "source": "/terms-and-conditions",
+      "destination": "/terms-and-conditions/index.html"
+    },
+    {
+      "source": "/contact-us",
+      "destination": "/contact-us/index.html"
+    },
+    {
       "source": "/api/:path*",
       "destination": "https://knowhow-backend-d2gs.onrender.com/api/:path*"
     },
