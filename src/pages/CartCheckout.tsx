@@ -17,6 +17,7 @@ interface CartCheckoutLocationState {
     customerPhone: string;
     customerAddress: string;
     guestVerificationToken?: string;
+    idempotencyKey: string;
   };
 }
 
@@ -86,7 +87,7 @@ const CartCheckout = () => {
       let currency: string;
       
       try {
-        const response = await api.createDIYOrder(cartData.totalAmount, orderData);
+        const response = await api.createDIYOrder(cartData.totalAmount, orderData, cartData.idempotencyKey);
         if (!response) {
           throw new Error('No response from server. Please check if backend is running.');
         }

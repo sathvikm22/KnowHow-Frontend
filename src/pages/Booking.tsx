@@ -5,6 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import { api } from '@/lib/api';
 import GuestLoginPrompt from '@/components/GuestLoginPrompt';
 import GuestContactVerification from '@/components/GuestContactVerification';
+import { createPaymentAttemptId } from '@/utils/paymentAttempt';
 
 interface Activity {
   id: string;
@@ -291,6 +292,7 @@ const Booking = () => {
       })),
       notes: `Booking for ${selectedDate} at ${selectedTimeSlot}${addOns.length > 0 ? ` with ${addOns.length} add-on(s)` : ''}`,
       guestVerificationToken: isLoggedIn ? undefined : guestVerificationToken,
+      idempotencyKey: createPaymentAttemptId(),
     };
 
     // Navigate to checkout page

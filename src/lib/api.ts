@@ -472,9 +472,10 @@ class ApiClient {
   }
 
   // Payment endpoints
-  async createOrder(amount: number, slotDetails: any): Promise<ApiResponse<{ order_id: string; payment_session_id: string; amount: number; currency: string; order_access_token: string }>> {
+  async createOrder(amount: number, slotDetails: any, idempotencyKey: string): Promise<ApiResponse<{ order_id: string; payment_session_id: string; amount: number; currency: string; order_access_token: string }>> {
     return this.request('/create-order', {
       method: 'POST',
+      headers: { 'X-Idempotency-Key': idempotencyKey },
       body: JSON.stringify({ amount, slotDetails }),
     });
   }
@@ -535,9 +536,10 @@ class ApiClient {
   }
 
   // DIY Orders endpoints
-  async createDIYOrder(amount: number, orderData: any): Promise<ApiResponse<{ order_id: string; payment_session_id: string; amount: number; currency: string; order_access_token: string }>> {
+  async createDIYOrder(amount: number, orderData: any, idempotencyKey: string): Promise<ApiResponse<{ order_id: string; payment_session_id: string; amount: number; currency: string; order_access_token: string }>> {
     return this.request('/create-diy-order', {
       method: 'POST',
+      headers: { 'X-Idempotency-Key': idempotencyKey },
       body: JSON.stringify({ amount, orderData }),
     });
   }

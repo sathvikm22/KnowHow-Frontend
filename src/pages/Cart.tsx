@@ -7,6 +7,7 @@ import { X, ShoppingBag, CreditCard, ArrowLeft } from 'lucide-react';
 import Navigation from '@/components/Navigation';
 import GuestLoginPrompt from '@/components/GuestLoginPrompt';
 import GuestContactVerification from '@/components/GuestContactVerification';
+import { createPaymentAttemptId } from '@/utils/paymentAttempt';
 import { useCart } from '@/contexts/CartContext';
 import { api } from '@/lib/api';
 
@@ -244,7 +245,8 @@ const Cart = () => {
       customerEmail: customerEmail.trim(),
       customerPhone: customerPhone,
       customerAddress: customerAddress,
-      guestVerificationToken: guestVerificationToken || undefined
+      guestVerificationToken: guestVerificationToken || undefined,
+      idempotencyKey: createPaymentAttemptId()
     };
 
     // Navigate to cart checkout

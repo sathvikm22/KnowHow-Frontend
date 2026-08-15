@@ -22,6 +22,8 @@ interface CheckoutLocationState {
     selectedActivities?: string[];
     notes?: string;
     guestVerificationToken?: string;
+    idempotencyKey: string;
+    addOns?: Array<{ activityName: string; date: string; timeSlot: string; price: number }>;
   };
 }
 
@@ -86,7 +88,8 @@ const Checkout = () => {
         )?.name,
         participants: orderData.items.reduce((sum, item) => sum + item.quantity, 0),
         items: orderData.items,
-        notes: orderData.notes
+        notes: orderData.notes,
+        addOns: orderData.addOns
       };
 
       // Create order on backend
@@ -96,7 +99,7 @@ const Checkout = () => {
       let currency: string;
       
       try {
-        const response = await api.createOrder(orderData.totalAmount, slotDetails);
+        const response = await api.createOrder(orderData.totalAmount, slotDetails, orderData.idempotencyKey);
         if (!response) {
           throw new Error('No response from server. Please check if backend is running.');
         }
