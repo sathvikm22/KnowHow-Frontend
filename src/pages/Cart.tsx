@@ -1,9 +1,15 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { X, ShoppingBag, CreditCard, ArrowLeft } from 'lucide-react';
+import {
+  ShoppingBag,
+  CreditCard,
+  ArrowLeft,
+  ChevronLeft,
+  ChevronRight,
+} from 'lucide-react';
 import Navigation from '@/components/Navigation';
 import GuestLoginPrompt from '@/components/GuestLoginPrompt';
 import GuestContactVerification from '@/components/GuestContactVerification';
@@ -45,6 +51,22 @@ const Cart = () => {
   const [loading, setLoading] = useState(true);
   const [loadingActivities, setLoadingActivities] = useState(true);
 
+  const addOnsScrollRef = useRef<HTMLDivElement>(null);
+
+  const scrollAddOns = (direction: 'left' | 'right') => {
+    if (!addOnsScrollRef.current) return;
+
+    const amount = Math.min(
+      420,
+      addOnsScrollRef.current.clientWidth * 0.8
+    );
+
+    addOnsScrollRef.current.scrollBy({
+      left: direction === 'right' ? amount : -amount,
+      behavior: 'smooth',
+    });
+  };
+
   useEffect(() => {
     fetchDIYKits();
     fetchActivities();
@@ -70,7 +92,9 @@ const Cart = () => {
       const response = await api.getActivities();
       if (response.success && response.activities) {
         // Filter only activities with prices
-        const activitiesWithPrice = response.activities.filter((activity: Activity) => activity.price && activity.price > 0);
+        const activitiesWithPrice = response.activities.filter(
+          (activity: Activity) => activity.price && activity.price > 0
+        );
         setActivities(activitiesWithPrice);
       }
     } catch (error) {
@@ -98,7 +122,10 @@ const Cart = () => {
       return url;
     }
     // Fallback to old path structure
-    const imageName = kit.name.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
+    const imageName = kit.name
+      .toLowerCase()
+      .replace(/\s+/g, '-')
+      .replace(/[^a-z0-9-]/g, '');
     return `/lovable-uploads/diy-kits/${imageName}.jpg`;
   };
 
@@ -123,53 +150,64 @@ const Cart = () => {
   };
 
   // Get cart items with kit details
-  const cartItems = cart.map(item => {
-    const kit = diyKits.find(k => k.name === item.kit_name);
+  const cartItems = cart.map((item) => {
+    const kit = diyKits.find((k) => k.name === item.kit_name);
     return {
       ...item,
-      kit: kit || null
+      kit: kit || null,
     };
   });
 
-  const cartTotalPrice = cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-  const addOnsTotalPrice = selectedAddOns.reduce((sum, addOn) => sum + (addOn.price * addOn.quantity), 0);
+  const cartTotalPrice = cartItems.reduce(
+    (sum, item) => sum + item.price * item.quantity,
+    0
+  );
+  const addOnsTotalPrice = selectedAddOns.reduce(
+    (sum, addOn) => sum + addOn.price * addOn.quantity,
+    0
+  );
   const totalPrice = cartTotalPrice + addOnsTotalPrice;
 
   const handleAddOnToggle = (activity: Activity) => {
-    setSelectedAddOns(prev => {
-      const existing = prev.find(a => a.id === activity.id);
+    setSelectedAddOns((prev) => {
+      const existing = prev.find((a) => a.id === activity.id);
       if (existing) {
         // Remove if already selected
-        return prev.filter(a => a.id !== activity.id);
+        return prev.filter((a) => a.id !== activity.id);
       } else {
         // Add with quantity 1
-        return [...prev, {
-          id: activity.id,
-          name: activity.name,
-          price: activity.price || 0,
-          quantity: 1
-        }];
+        return [
+          ...prev,
+          {
+            id: activity.id,
+            name: activity.name,
+            price: activity.price || 0,
+            quantity: 1,
+          },
+        ];
       }
     });
   };
 
   const handleAddOnQuantityChange = (addOnId: string, change: number) => {
-    setSelectedAddOns(prev => {
-      return prev.map(addOn => {
-        if (addOn.id === addOnId) {
-          const newQuantity = addOn.quantity + change;
-          if (newQuantity <= 0) {
-            return null;
+    setSelectedAddOns((prev) => {
+      return prev
+        .map((addOn) => {
+          if (addOn.id === addOnId) {
+            const newQuantity = addOn.quantity + change;
+            if (newQuantity <= 0) {
+              return null;
+            }
+            return { ...addOn, quantity: newQuantity };
           }
-          return { ...addOn, quantity: newQuantity };
-        }
-        return addOn;
-      }).filter((addOn): addOn is SelectedAddOn => addOn !== null);
+          return addOn;
+        })
+        .filter((addOn): addOn is SelectedAddOn => addOn !== null);
     });
   };
 
   const handleUpdateQuantity = async (kitName: string, change: number) => {
-    const cartItem = cart.find(item => item.kit_name === kitName);
+    const cartItem = cart.find((item) => item.kit_name === kitName);
     if (cartItem) {
       const newQuantity = cartItem.quantity + change;
       if (newQuantity <= 0) {
@@ -184,18 +222,24 @@ const Cart = () => {
     await removeFromCart(kitName);
   };
 
-  const [customerName, setCustomerName] = useState(() => localStorage.getItem('userName') || '');
-  const [customerEmail, setCustomerEmail] = useState(() => localStorage.getItem('userEmail') || '');
+  const [customerName, setCustomerName] = useState(
+    () => localStorage.getItem('userName') || ''
+  );
+  const [customerEmail, setCustomerEmail] = useState(
+    () => localStorage.getItem('userEmail') || ''
+  );
   const [customerAddress, setCustomerAddress] = useState('');
   const [customerPhone, setCustomerPhone] = useState('');
   const [guestVerificationToken, setGuestVerificationToken] = useState('');
   const [showCheckoutForm, setShowCheckoutForm] = useState(false);
 
-  // Don't auto-fill from localStorage - let users enter their own values
-  // Values will still be saved to localStorage after checkout for future reference
-
   const handleCheckout = async () => {
-    if (!customerName.trim() || !customerEmail.trim() || !customerAddress || !customerPhone) {
+    if (
+      !customerName.trim() ||
+      !customerEmail.trim() ||
+      !customerAddress ||
+      !customerPhone
+    ) {
       alert('Please enter your name, email, delivery address and phone number');
       return;
     }
@@ -218,26 +262,21 @@ const Cart = () => {
       return;
     }
 
-    // DO NOT store PII in localStorage - fetch from backend when needed
-    // For now, pass directly to checkout (will be stored securely on backend)
-    // localStorage.setItem('deliveryAddress', customerAddress); // REMOVED - security
-    // localStorage.setItem('deliveryPhone', customerPhone); // REMOVED - security
-
     // Prepare cart data
     const cartData = {
       items: [
-        ...cartItems.map(item => ({
-        name: item.kit_name,
-        quantity: item.quantity,
-        unit_price: item.price,
-        total: item.price * item.quantity
-      })),
-        ...selectedAddOns.map(addOn => ({
+        ...cartItems.map((item) => ({
+          name: item.kit_name,
+          quantity: item.quantity,
+          unit_price: item.price,
+          total: item.price * item.quantity,
+        })),
+        ...selectedAddOns.map((addOn) => ({
           name: addOn.name,
           quantity: addOn.quantity,
           unit_price: addOn.price,
-          total: addOn.price * addOn.quantity
-        }))
+          total: addOn.price * addOn.quantity,
+        })),
       ],
       subtotal: totalPrice,
       totalAmount: totalPrice,
@@ -246,7 +285,7 @@ const Cart = () => {
       customerPhone: customerPhone,
       customerAddress: customerAddress,
       guestVerificationToken: guestVerificationToken || undefined,
-      idempotencyKey: createPaymentAttemptId()
+      idempotencyKey: createPaymentAttemptId(),
     };
 
     // Navigate to cart checkout
@@ -254,9 +293,9 @@ const Cart = () => {
   };
 
   const handleBrowseDIYKits = () => {
-      navigate('/');
+    navigate('/');
     // Wait for page to load and then scroll to DIY kits section
-      setTimeout(() => {
+    setTimeout(() => {
       const element = document.getElementById('shop-diy-kits');
       if (element) {
         element.scrollIntoView({ behavior: 'smooth' });
@@ -273,20 +312,22 @@ const Cart = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 w-full">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 w-full flex flex-col">
       <Navigation />
       {!localStorage.getItem('userName') && <GuestLoginPrompt />}
-      <div className="w-full px-4 sm:px-6 lg:px-8 py-6 sm:py-8 pt-20">
+
+      <main className="flex-1 w-full px-4 sm:px-6 lg:px-8 py-6 sm:py-8 pt-20">
         <div className="max-w-6xl mx-auto">
           {/* Header */}
           <div className="mb-6">
             <button
               onClick={() => navigate('/')}
-              className="flex items-center text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 mb-4"
+              className="flex items-center text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 mb-4 transition-colors"
             >
               <ArrowLeft className="mr-2 h-5 w-5" />
               Continue Shopping
             </button>
+
             <div className="flex items-center space-x-3">
               <ShoppingBag className="h-8 w-8 text-orange-600" />
               <h1 className="text-3xl sm:text-4xl font-bold text-gray-800 dark:text-white">
@@ -313,200 +354,305 @@ const Cart = () => {
               </Button>
             </div>
           ) : (
-            /* Cart with Items */
+            /* Cart Grid */
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-              {/* Left Column - Cart Items */}
-              <div className="lg:col-span-2 space-y-4">
-                {cartItems.map((item) => (
-                  <div
-                    key={item.id}
-                    className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-4 sm:p-6"
-                  >
-                    <div className="flex gap-4">
-                      {/* Product Image - Square */}
-                      <div className="w-24 h-24 sm:w-32 sm:h-32 bg-gray-100 dark:bg-gray-700 rounded-lg overflow-hidden flex-shrink-0">
-                        {loading ? (
-                          <div className="w-full h-full flex items-center justify-center">
-                            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-orange-600"></div>
-                          </div>
-                        ) : (
-                          <img 
-                            src={getImagePath(item.kit)}
-                            alt={item.kit_name}
-                            className="w-full h-full object-cover"
-                            onError={(e) => {
-                              const target = e.target as HTMLImageElement;
-                              target.style.display = 'none';
-                              const parent = target.parentElement;
-                              if (parent && !parent.querySelector('.placeholder-icon')) {
-                                const placeholder = document.createElement('div');
-                                placeholder.className = 'placeholder-icon w-full h-full flex items-center justify-center text-gray-400';
-                                placeholder.innerHTML = `
-                                  <svg class="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
-                                  </svg>
-                                `;
-                                parent.appendChild(placeholder);
-                              }
-                            }}
-                          />
-                        )}
-                      </div>
-
-                      {/* Product Details - Long rectangle format */}
-                      <div className="flex-1 flex flex-col sm:flex-row sm:justify-between gap-4">
-                        <div className="flex-1">
-                          <h3 className="text-base sm:text-lg font-semibold text-gray-800 dark:text-white mb-1">
-                            {item.kit_name}
-                          </h3>
-                          <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 mb-2">
-                            Price: ₹{item.price} each
-                          </p>
-                          <p className="text-xs sm:text-sm text-green-600 dark:text-green-400 mb-3">
-                            In Stock
-                          </p>
-                          
-                          {/* Quantity Controls */}
-                          <div className="flex items-center space-x-2 mb-3">
-                            <span className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">Quantity:</span>
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              onClick={() => handleUpdateQuantity(item.kit_name, -1)}
-                              className="h-7 w-7 p-0 text-xs"
-                            >
-                              -
-                            </Button>
-                            <input
-                              type="number"
-                              value={item.quantity}
-                              readOnly
-                              className="w-12 h-7 text-center border border-gray-300 dark:border-gray-600 rounded text-sm font-medium"
+              {/* Left Column - Cart Items & Add-ons */}
+              <div className="lg:col-span-2 space-y-6">
+                {/* Cart Items List */}
+                <div className="space-y-4">
+                  {cartItems.map((item) => (
+                    <div
+                      key={item.id}
+                      className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-4 sm:p-6"
+                    >
+                      <div className="flex gap-4">
+                        {/* Product Image */}
+                        <div className="w-24 h-24 sm:w-32 sm:h-32 bg-gray-100 dark:bg-gray-700 rounded-lg overflow-hidden flex-shrink-0">
+                          {loading ? (
+                            <div className="w-full h-full flex items-center justify-center">
+                              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-orange-600"></div>
+                            </div>
+                          ) : (
+                            <img
+                              src={getImagePath(item.kit)}
+                              alt={item.kit_name}
+                              className="w-full h-full object-cover"
+                              onError={(e) => {
+                                const target = e.target as HTMLImageElement;
+                                target.style.display = 'none';
+                                const parent = target.parentElement;
+                                if (
+                                  parent &&
+                                  !parent.querySelector('.placeholder-icon')
+                                ) {
+                                  const placeholder =
+                                    document.createElement('div');
+                                  placeholder.className =
+                                    'placeholder-icon w-full h-full flex items-center justify-center text-gray-400';
+                                  placeholder.innerHTML = `
+                                    <svg class="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                                    </svg>
+                                  `;
+                                  parent.appendChild(placeholder);
+                                }
+                              }}
                             />
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              onClick={() => handleUpdateQuantity(item.kit_name, 1)}
-                              className="h-7 w-7 p-0 text-xs"
-                            >
-                              +
-                            </Button>
-                          </div>
-
-                          {/* Action Links */}
-                          <div className="flex flex-wrap gap-3 text-xs sm:text-sm">
-                            
-                            <button
-                              onClick={() => handleRemoveItem(item.kit_name)}
-                              className="text-red-600 hover:text-red-700 font-medium"
-                            >
-                              Remove
-                            </button>
-                          </div>
+                          )}
                         </div>
 
-                        {/* Price Section - Right aligned */}
-                        <div className="flex sm:flex-col sm:items-end justify-between sm:justify-start gap-4 sm:gap-0">
-                          <div className="text-right sm:text-left">
-                            <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 mb-1">Each</p>
-                            <p className="text-base sm:text-lg font-semibold text-gray-800 dark:text-white mb-3 sm:mb-4">
-                              ₹{item.price}
+                        {/* Product Details */}
+                        <div className="flex-1 flex flex-col sm:flex-row sm:justify-between gap-4">
+                          <div className="flex-1">
+                            <h3 className="text-base sm:text-lg font-semibold text-gray-800 dark:text-white mb-1">
+                              {item.kit_name}
+                            </h3>
+                            <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 mb-2">
+                              Price: ₹{item.price} each
                             </p>
-                            <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 mb-1">Total</p>
-                            <p className="text-lg sm:text-xl font-bold text-orange-600">
-                              ₹{item.price * item.quantity}
+                            <p className="text-xs sm:text-sm text-green-600 dark:text-green-400 mb-3">
+                              In Stock
                             </p>
+
+                            {/* Quantity Controls */}
+                            <div className="flex items-center space-x-2 mb-3">
+                              <span className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">
+                                Quantity:
+                              </span>
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() =>
+                                  handleUpdateQuantity(item.kit_name, -1)
+                                }
+                                className="h-7 w-7 p-0 text-xs"
+                              >
+                                -
+                              </Button>
+                              <input
+                                type="number"
+                                value={item.quantity}
+                                readOnly
+                                className="w-12 h-7 text-center border border-gray-300 dark:border-gray-600 rounded text-sm font-medium bg-transparent dark:text-white"
+                              />
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() =>
+                                  handleUpdateQuantity(item.kit_name, 1)
+                                }
+                                className="h-7 w-7 p-0 text-xs"
+                              >
+                                +
+                              </Button>
+                            </div>
+
+                            {/* Action Links */}
+                            <div className="flex flex-wrap gap-3 text-xs sm:text-sm">
+                              <button
+                                onClick={() => handleRemoveItem(item.kit_name)}
+                                className="text-red-600 hover:text-red-700 font-medium"
+                              >
+                                Remove
+                              </button>
+                            </div>
                           </div>
+
+                          {/* Price Section */}
+                          {/* Price Section */}
+<div className="flex items-center gap-8 sm:gap-10">
+  <div className="text-center">
+    <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 mb-1">
+      Each
+    </p>
+    <p className="text-base sm:text-lg font-semibold text-gray-800 dark:text-white">
+      ₹{item.price}
+    </p>
+  </div>
+
+  <div className="text-center">
+    <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 mb-1">
+      Total
+    </p>
+    <p className="text-lg sm:text-xl font-bold text-orange-600">
+      ₹{item.price * item.quantity}
+    </p>
+  </div>
+</div>
                         </div>
                       </div>
                     </div>
-                  </div>
-                ))}
+                  ))}
+                </div>
 
-                {/* Add Ons Section */}
+                {/* Add-ons Horizontal Slider */}
                 {activities.length > 0 && (
-                <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-4 sm:p-6">
-                    <h3 className="text-xl font-bold text-gray-800 dark:text-white mb-4">
-                      Add Ons
-                    </h3>
-                    <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
-                      Add additional activities to your order
-                    </p>
-                    <div className="space-y-3">
+                  <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-4 sm:p-6">
+                    {/* Header with Navigation Controls */}
+                    <div className="flex items-center justify-between mb-4">
+                      <div>
+                        <h3 className="text-xl font-bold text-gray-800 dark:text-white">
+                          Add-ons & Activities
+                        </h3>
+                        <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">
+                          Enhance your order with fun studio experiences
+                        </p>
+                      </div>
+
+                      <div className="flex items-center space-x-2">
+                        <Button
+                          variant="outline"
+                          size="icon"
+                          onClick={() => scrollAddOns('left')}
+                          className="h-8 w-8 rounded-full border-gray-300 dark:border-gray-600"
+                          aria-label="Scroll left"
+                        >
+                          <ChevronLeft className="h-4 w-4" />
+                        </Button>
+
+                        <Button
+                          variant="outline"
+                          size="icon"
+                          onClick={() => scrollAddOns('right')}
+                          className="h-8 w-8 rounded-full border-gray-300 dark:border-gray-600"
+                          aria-label="Scroll right"
+                        >
+                          <ChevronRight className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </div>
+
+                    {/* Horizontal Scrolling Track */}
+                    <div
+                      ref={addOnsScrollRef}
+                      className="flex gap-4 overflow-x-auto pb-4 pt-1 snap-x snap-mandatory scrollbar-none scroll-smooth [scrollbar-width:none] [-ms-overflow-style:none]"
+                      style={{
+                        WebkitOverflowScrolling: 'touch',
+                      }}
+                    >
                       {activities.map((activity) => {
-                        const isSelected = selectedAddOns.some(a => a.id === activity.id);
-                        const selectedAddOn = selectedAddOns.find(a => a.id === activity.id);
+                        const isSelected = selectedAddOns.some(
+                          (a) => a.id === activity.id
+                        );
+                        const selectedAddOn = selectedAddOns.find(
+                          (a) => a.id === activity.id
+                        );
+
                         return (
                           <div
                             key={activity.id}
-                            className={`border rounded-lg p-3 transition-all ${
+                            className={`flex-shrink-0 w-[260px] sm:w-[280px] snap-start border rounded-xl p-4 flex flex-col justify-between transition-all bg-white dark:bg-gray-800 ${
                               isSelected
-                                ? 'border-orange-500 bg-orange-50 dark:bg-orange-900/20'
+                                ? 'border-orange-500 ring-2 ring-orange-500/20 bg-orange-50/30 dark:bg-orange-900/10'
                                 : 'border-gray-200 dark:border-gray-700 hover:border-orange-300'
                             }`}
                           >
-                            <div className="flex items-start justify-between gap-3">
-                              <div className="flex-1">
-                                <div className="flex items-center gap-2 mb-1">
-                                  <input
-                                    type="checkbox"
-                                    checked={isSelected}
-                                    onChange={() => handleAddOnToggle(activity)}
-                                    className="w-4 h-4 text-orange-600 border-gray-300 rounded focus:ring-orange-500"
-                                  />
-                                  <label className="font-semibold text-gray-800 dark:text-white cursor-pointer">
-                                    {activity.name}
-                                  </label>
-                                </div>
-                                {activity.description && (
-                                  <p className="text-xs text-gray-600 dark:text-gray-400 ml-6 mb-2">
-                                    {activity.description.substring(0, 100)}
-                                    {activity.description.length > 100 ? '...' : ''}
-                                  </p>
-                                )}
-                                {isSelected && selectedAddOn && (
-                                  <div className="flex items-center space-x-2 ml-6 mt-2">
-                                    <span className="text-xs text-gray-600 dark:text-gray-400">Quantity:</span>
-                                    <Button
-                                      variant="outline"
-                                      size="sm"
-                                      onClick={() => handleAddOnQuantityChange(activity.id, -1)}
-                                      className="h-6 w-6 p-0 text-xs"
-                                    >
-                                      -
-                                    </Button>
-                                    <span className="w-8 text-center text-sm font-medium">
-                                      {selectedAddOn.quantity}
-                    </span>
-                                    <Button
-                                      variant="outline"
-                                      size="sm"
-                                      onClick={() => handleAddOnQuantityChange(activity.id, 1)}
-                                      className="h-6 w-6 p-0 text-xs"
-                                    >
-                                      +
-                                    </Button>
-                                    <span className="text-sm font-semibold text-orange-600 ml-2">
-                                      ₹{selectedAddOn.price * selectedAddOn.quantity}
-                    </span>
-                                  </div>
-                                )}
+                            <div>
+                              {/* Thumbnail */}
+                              <div className="w-full h-32 bg-gray-100 dark:bg-gray-700 rounded-lg overflow-hidden mb-3">
+                                <img
+                                  src={getActivityImagePath(activity)}
+                                  alt={activity.name}
+                                  className="w-full h-full object-cover"
+                                  onError={(e) => {
+                                    const target = e.target as HTMLImageElement;
+                                    target.src = '/placeholder.svg';
+                                  }}
+                                />
                               </div>
-                              <div className="text-right">
-                                <p className="text-sm font-semibold text-gray-800 dark:text-white">
-                                  ₹{activity.price}
+
+                              {/* Title & Checkbox */}
+                              <div className="flex items-start space-x-2 mb-2">
+                                <input
+                                  type="checkbox"
+                                  id={`activity-${activity.id}`}
+                                  checked={isSelected}
+                                  onChange={() => handleAddOnToggle(activity)}
+                                  className="mt-1 w-4 h-4 text-orange-600 border-gray-300 rounded focus:ring-orange-500 cursor-pointer"
+                                />
+                                <label
+                                  htmlFor={`activity-${activity.id}`}
+                                  className="font-semibold text-gray-800 dark:text-white text-sm line-clamp-1 cursor-pointer"
+                                >
+                                  {activity.name}
+                                </label>
+                              </div>
+
+                              {/* Description */}
+                              {activity.description && (
+                                <p className="text-xs text-gray-600 dark:text-gray-400 line-clamp-2 mb-3">
+                                  {activity.description}
                                 </p>
+                              )}
+                            </div>
+
+                            {/* Price & Quantity Footer */}
+                            <div className="pt-3 border-t border-gray-100 dark:border-gray-700/60 mt-2">
+                              <div className="flex items-center justify-between mb-2">
+                                <span className="text-xs text-gray-500 dark:text-gray-400">
+                                  Price
+                                </span>
+                                <span className="text-sm font-bold text-gray-800 dark:text-white">
+                                  ₹{activity.price}
+                                </span>
                               </div>
+
+                              {isSelected && selectedAddOn && (
+                                <div className="flex items-center space-x-2 pt-2 bg-orange-50 dark:bg-orange-950/40 p-2 rounded-lg">
+                                  <Button
+                                    variant="outline"
+                                    size="sm"
+                                    onClick={() =>
+                                      handleAddOnQuantityChange(
+                                        activity.id,
+                                        -1
+                                      )
+                                    }
+                                    className="h-7 w-7 p-0"
+                                  >
+                                    -
+                                  </Button>
+
+                                  <span className="w-6 text-center text-sm font-semibold text-gray-800 dark:text-white">
+                                    {selectedAddOn.quantity}
+                                  </span>
+
+                                  <Button
+                                    variant="outline"
+                                    size="sm"
+                                    onClick={() =>
+                                      handleAddOnQuantityChange(
+                                        activity.id,
+                                        1
+                                      )
+                                    }
+                                    className="h-7 w-7 p-0"
+                                  >
+                                    +
+                                  </Button>
+
+                                  <span className="ml-auto text-sm font-bold text-orange-600">
+                                    ₹
+                                    {selectedAddOn.price *
+                                      selectedAddOn.quantity}
+                                  </span>
+                                </div>
+                              )}
                             </div>
                           </div>
                         );
                       })}
                     </div>
+
+                    {/* MOBILE SCROLL HINT */}
+                    <p className="mt-3 text-center text-xs text-gray-400 sm:hidden">
+                      Swipe sideways or use the arrows to view more activities
+                    </p>
                   </div>
                 )}
               </div>
 
-              {/* Right Column - Order Summary */}
+              {/* Right Column - Order Summary & Delivery */}
               <div className="lg:col-span-1">
                 <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 sticky top-24">
                   <h2 className="text-xl font-bold text-gray-800 dark:text-white mb-6">
@@ -520,7 +666,7 @@ const Cart = () => {
                     </div>
                     {selectedAddOns.length > 0 && (
                       <div className="flex justify-between text-gray-700 dark:text-gray-300 text-sm">
-                        <span className="ml-4">Add Ons</span>
+                        <span className="ml-4">Add-ons</span>
                         <span>₹{addOnsTotalPrice}</span>
                       </div>
                     )}
@@ -546,7 +692,9 @@ const Cart = () => {
 
                   {/* Delivery Details Form */}
                   <div className="mb-6 p-4 bg-gray-50 dark:bg-gray-700 rounded-lg space-y-4">
-                    <h3 className="font-semibold text-gray-800 dark:text-white">Delivery Details</h3>
+                    <h3 className="font-semibold text-gray-800 dark:text-white">
+                      Delivery Details
+                    </h3>
                     <div>
                       <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                         Full Name *
@@ -593,7 +741,11 @@ const Cart = () => {
                       <input
                         type="tel"
                         value={customerPhone}
-                        onChange={(e) => setCustomerPhone(e.target.value.replace(/\D/g, '').slice(0, 10))}
+                        onChange={(e) =>
+                          setCustomerPhone(
+                            e.target.value.replace(/\D/g, '').slice(0, 10)
+                          )
+                        }
                         placeholder="Enter 10-digit phone number"
                         className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 dark:bg-gray-800 dark:text-white"
                         maxLength={10}
@@ -624,12 +776,16 @@ const Cart = () => {
                     size="lg"
                   >
                     <CreditCard className="mr-2 h-5 w-5" />
-                    {showCheckoutForm ? 'Proceed to Payment' : 'Proceed to Payment'}
+                    {showCheckoutForm
+                      ? 'Proceed to Payment'
+                      : 'Proceed to Payment'}
                   </Button>
 
                   <button
                     onClick={async () => {
-                      if (confirm('Are you sure you want to clear your cart?')) {
+                      if (
+                        confirm('Are you sure you want to clear your cart?')
+                      ) {
                         await clearCart();
                       }
                     }}
@@ -642,7 +798,7 @@ const Cart = () => {
             </div>
           )}
         </div>
-      </div>
+      </main>
     </div>
   );
 };
