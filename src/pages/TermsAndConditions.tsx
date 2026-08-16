@@ -119,7 +119,9 @@ const TermsAndConditions = () => {
 
               <h3 className="text-xl font-semibold text-gray-900 dark:text-white mt-6 mb-3">5.3 Cancellation Policy</h3>
               <p className="text-gray-700 dark:text-gray-300 leading-relaxed">
-                Cancellation terms and refund procedures are subject to our booking policies. For specific cancellation requests, please contact us directly at knowhowcafe2025@gmail.com or call 95910 32562.
+                Our cancellation terms and refund procedures are set out in our{' '}
+                <button onClick={() => navigate('/cancellations-refunds')} className="text-blue-600 hover:underline">Cancellation &amp; Refund Policy</button>.
+                {' '}For specific cancellation requests, please contact us directly at knowhowcafe2025@gmail.com or call 95910 32562.
               </p>
             </section>
 
@@ -143,6 +145,10 @@ const TermsAndConditions = () => {
               <h3 className="text-xl font-semibold text-gray-900 dark:text-white mt-6 mb-3">6.3 Order Acceptance</h3>
               <p className="text-gray-700 dark:text-gray-300 leading-relaxed">
                 Your order is an offer to purchase. We reserve the right to accept or reject any order for any reason, including product availability, pricing errors, or suspected fraudulent activity.
+              </p>
+              <p className="text-gray-700 dark:text-gray-300 leading-relaxed mt-4">
+                Delivery of physical DIY kits is governed by our{' '}
+                <button onClick={() => navigate('/shipping-policy')} className="text-blue-600 hover:underline">Shipping Policy</button>.
               </p>
             </section>
 

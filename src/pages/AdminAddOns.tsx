@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useMemo, useState, useEffect } from 'react';
 import AdminLayout from '../components/AdminLayout';
 import { api, getBackendBaseUrl } from '@/lib/api';
-import { Loader2, Plus, Edit, Trash2, Save, X, Upload } from 'lucide-react';
+import { Loader2, Plus, Edit, Trash2, Save, X, Upload, Search } from 'lucide-react';
 
 interface Activity {
   id: string;
@@ -62,6 +62,9 @@ const AdminAddOns = () => {
   const [error, setError] = useState<string | null>(null);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [isAdding, setIsAdding] = useState(false);
+  const [searchInput, setSearchInput] = useState('');
+  const [saving, setSaving] = useState(false);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
 
   // Form states
   const [activityForm, setActivityForm] = useState({
@@ -100,7 +103,7 @@ const AdminAddOns = () => {
       setError(null);
       
       if (activeTab === 'activities') {
-        const response = await fetch(`${getBackendBaseUrl()}/api/addons/activities`, {
+        const response = await fetch(`${getBackendBaseUrl()}/api/addons/activities?admin=1`, {
           credentials: 'include',
           headers: {
             'Content-Type': 'application/json'
@@ -120,7 +123,7 @@ const AdminAddOns = () => {
           setError(data.message || 'Failed to fetch activities');
         }
       } else {
-        const response = await fetch(`${getBackendBaseUrl()}/api/addons/diy-kits`, {
+        const response = await fetch(`${getBackendBaseUrl()}/api/addons/diy-kits?admin=1`, {
           credentials: 'include',
           headers: {
             // NO Authorization header - tokens are in HttpOnly cookies
@@ -146,6 +149,20 @@ const AdminAddOns = () => {
       setLoading(false);
     }
   };
+
+  const matchesSearch = (name: string, price: number | undefined) => {
+    const query = searchInput.trim().toLowerCase();
+    return !query || `${name} ${price ?? ''}`.toLowerCase().includes(query);
+  };
+
+  const filteredActivities = useMemo(
+    () => activities.filter((activity) => matchesSearch(activity.name, activity.price)),
+    [activities, searchInput]
+  );
+  const filteredDIYKits = useMemo(
+    () => diyKits.filter((kit) => matchesSearch(kit.name, kit.price)),
+    [diyKits, searchInput]
+  );
 
   const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>, type: 'activities' | 'diy-kits') => {
     const file = e.target.files?.[0];
@@ -305,6 +322,7 @@ const AdminAddOns = () => {
 
   const handleSaveActivity = async () => {
     try {
+      setSaving(true);
       setError(null);
       
       // Ensure image_url is included in the request
@@ -358,6 +376,9 @@ const AdminAddOns = () => {
       });
 
       const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data.message || 'Failed to save activity');
+      }
       
       console.log('📥 Save response:', data);
       if (data.success && data.activity) {
@@ -369,9 +390,7 @@ const AdminAddOns = () => {
       }
       
       if (data.success) {
-        // Small delay to ensure database is updated
-        await new Promise(resolve => setTimeout(resolve, 500));
-        // Refresh data to get updated activities
+        api.invalidatePublicCatalog();
         await fetchData();
         setEditingId(null);
         setIsAdding(false);
@@ -391,11 +410,17 @@ const AdminAddOns = () => {
     } catch (err: any) {
       console.error('Error saving activity:', err);
       setError(err.message || 'Failed to save activity');
+    } finally {
+      setSaving(false);
     }
   };
 
   const handleDeleteActivity = async (id: string) => {
+    const activity = activities.find((item) => item.id === id);
+    if (!window.confirm(`Delete “${activity?.name || 'this workshop'}”? This cannot be undone.`)) return;
+
     try {
+      setDeletingId(id);
       setError(null);
       const response = await fetch(`${getBackendBaseUrl()}/api/addons/activities/${id}`, {
         method: 'DELETE',
@@ -406,8 +431,13 @@ const AdminAddOns = () => {
       });
 
       const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data.message || 'Failed to delete activity');
+      }
       
       if (data.success) {
+        setActivities((current) => current.filter((item) => item.id !== id));
+        api.invalidatePublicCatalog();
         await fetchData();
       } else {
         setError(data.message || 'Failed to delete activity');
@@ -415,6 +445,8 @@ const AdminAddOns = () => {
     } catch (err: any) {
       console.error('Error deleting activity:', err);
       setError(err.message || 'Failed to delete activity');
+    } finally {
+      setDeletingId(null);
     }
   };
 
@@ -461,6 +493,7 @@ const AdminAddOns = () => {
 
   const handleSaveDIYKit = async () => {
     try {
+      setSaving(true);
       setError(null);
       
       // Ensure image_url is included in the request
@@ -510,6 +543,9 @@ const AdminAddOns = () => {
       });
 
       const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data.message || 'Failed to save DIY kit');
+      }
       
       console.log('📥 Save response:', data);
       if (data.success && (data.kit || data.diyKit)) {
@@ -522,9 +558,7 @@ const AdminAddOns = () => {
       }
       
       if (data.success) {
-        // Small delay to ensure database is updated
-        await new Promise(resolve => setTimeout(resolve, 500));
-        // Refresh data to get updated DIY kits
+        api.invalidatePublicCatalog();
         await fetchData();
         setEditingId(null);
         setIsAdding(false);
@@ -543,11 +577,17 @@ const AdminAddOns = () => {
     } catch (err: any) {
       console.error('Error saving DIY kit:', err);
       setError(err.message || 'Failed to save DIY kit');
+    } finally {
+      setSaving(false);
     }
   };
 
   const handleDeleteDIYKit = async (id: string) => {
+    const kit = diyKits.find((item) => item.id === id);
+    if (!window.confirm(`Delete “${kit?.name || 'this DIY kit'}”? This cannot be undone.`)) return;
+
     try {
+      setDeletingId(id);
       setError(null);
       const response = await fetch(`${getBackendBaseUrl()}/api/addons/diy-kits/${id}`, {
         method: 'DELETE',
@@ -558,8 +598,13 @@ const AdminAddOns = () => {
       });
 
       const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data.message || 'Failed to delete DIY kit');
+      }
       
       if (data.success) {
+        setDiyKits((current) => current.filter((item) => item.id !== id));
+        api.invalidatePublicCatalog();
         await fetchData();
       } else {
         setError(data.message || 'Failed to delete DIY kit');
@@ -567,6 +612,8 @@ const AdminAddOns = () => {
     } catch (err: any) {
       console.error('Error deleting DIY kit:', err);
       setError(err.message || 'Failed to delete DIY kit');
+    } finally {
+      setDeletingId(null);
     }
   };
 
@@ -591,26 +638,33 @@ const AdminAddOns = () => {
     setImagePosition({ x: 0, y: 0 });
   };
 
-  if (loading) {
-    return (
-      <AdminLayout>
-        <div className="flex items-center justify-center h-screen">
-          <Loader2 className="w-8 h-8 animate-spin text-orange-600" />
-        </div>
-      </AdminLayout>
-    );
-  }
-
   return (
     <AdminLayout>
-      <div className="p-8">
-        <h1 className="text-4xl font-bold text-gray-800 dark:text-white mb-8">Add Ons Management</h1>
+      <div className="p-3 sm:p-6 md:p-8">
+        <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <h1 className="text-2xl sm:text-4xl font-bold text-gray-800 dark:text-white">Add Ons Management</h1>
+          <label className="relative block w-full sm:w-80">
+            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
+            <input
+              value={searchInput}
+              onChange={(event) => setSearchInput(event.target.value)}
+              placeholder="Search name or price"
+              className="w-full rounded-lg border border-gray-300 bg-white py-2.5 pl-10 pr-3 text-sm text-gray-900 outline-none transition focus:border-orange-500 focus:ring-2 focus:ring-orange-200"
+            />
+          </label>
+        </div>
+        {loading && (
+          <div className="mb-4 flex items-center gap-2 text-sm text-gray-500">
+            <Loader2 className="h-4 w-4 animate-spin text-orange-600" /> Loading add-ons…
+          </div>
+        )}
 
         {/* Tabs */}
         <div className="flex space-x-4 mb-6 border-b border-gray-300 dark:border-gray-700">
           <button
             onClick={() => {
               setActiveTab('activities');
+              setSearchInput('');
               cancelEdit();
             }}
             className={`px-6 py-3 font-semibold transition-colors ${
@@ -624,6 +678,7 @@ const AdminAddOns = () => {
           <button
             onClick={() => {
               setActiveTab('diy-kits');
+              setSearchInput('');
               cancelEdit();
             }}
             className={`px-6 py-3 font-semibold transition-colors ${
@@ -866,10 +921,11 @@ const AdminAddOns = () => {
                 <div className="flex space-x-4 mt-4">
                   <button
                     onClick={handleSaveActivity}
-                    className="flex items-center space-x-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+                    disabled={saving || uploadingImage}
+                    className="flex items-center space-x-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors disabled:cursor-not-allowed disabled:opacity-60"
                   >
-                    <Save className="w-5 h-5" />
-                    <span>Save</span>
+                    {saving ? <Loader2 className="w-5 h-5 animate-spin" /> : <Save className="w-5 h-5" />}
+                    <span>{saving ? 'Saving…' : 'Save'}</span>
                   </button>
                   <button
                     onClick={cancelEdit}
@@ -883,45 +939,52 @@ const AdminAddOns = () => {
             )}
 
             {/* Activities List */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {activities.map((activity) => (
+            {filteredActivities.length === 0 && !loading ? (
+              <p className="rounded-lg bg-white p-6 text-center text-sm text-gray-500 shadow">No workshops match this search.</p>
+            ) : (
+            <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-6">
+              {filteredActivities.map((activity) => (
                 <div
                   key={activity.id}
-                  className="bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden"
+                  className="min-w-0 bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden"
                 >
                   {activity.image_url && (
                     <img
                       src={activity.image_url}
                       alt={activity.name}
-                      className="w-full h-48 object-cover"
+                      className="w-full h-28 sm:h-48 object-cover"
                       onError={(e) => {
                         (e.target as HTMLImageElement).style.display = 'none';
                       }}
                     />
                   )}
-                  <div className="p-4">
+                  <div className="p-3 sm:p-4">
                     <div className="flex items-center justify-between mb-2">
-                      <h3 className="text-lg font-semibold text-gray-800 dark:text-white">
+                      <h3 className="min-w-0 truncate pr-1 text-sm sm:text-lg font-semibold text-gray-800 dark:text-white" title={activity.name}>
                         {activity.name}
                       </h3>
                       {editingId !== activity.id && (
                         <div className="flex space-x-2">
                           <button
                             onClick={() => handleEditActivity(activity)}
-                            className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                            disabled={saving || deletingId !== null}
+                            aria-label={`Edit ${activity.name}`}
+                            className="p-1.5 sm:p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors disabled:cursor-not-allowed disabled:opacity-50"
                           >
                             <Edit className="w-4 h-4" />
                           </button>
                           <button
                             onClick={() => handleDeleteActivity(activity.id)}
-                            className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                            disabled={saving || deletingId !== null}
+                            aria-label={`Delete ${activity.name}`}
+                            className="p-1.5 sm:p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors disabled:cursor-not-allowed disabled:opacity-50"
                           >
-                            <Trash2 className="w-4 h-4" />
+                            {deletingId === activity.id ? <Loader2 className="w-4 h-4 animate-spin" /> : <Trash2 className="w-4 h-4" />}
                           </button>
                         </div>
                       )}
                     </div>
-                    <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">
+                    <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 mb-2 line-clamp-3">
                       {activity.description}
                     </p>
                     <div className="flex items-center justify-end mt-2">
@@ -933,6 +996,7 @@ const AdminAddOns = () => {
                 </div>
               ))}
             </div>
+            )}
           </div>
         )}
 
@@ -1160,10 +1224,11 @@ const AdminAddOns = () => {
                 <div className="flex space-x-4 mt-4">
                   <button
                     onClick={handleSaveDIYKit}
-                    className="flex items-center space-x-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+                    disabled={saving || uploadingImage}
+                    className="flex items-center space-x-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors disabled:cursor-not-allowed disabled:opacity-60"
                   >
-                    <Save className="w-5 h-5" />
-                    <span>Save</span>
+                    {saving ? <Loader2 className="w-5 h-5 animate-spin" /> : <Save className="w-5 h-5" />}
+                    <span>{saving ? 'Saving…' : 'Save'}</span>
                   </button>
                   <button
                     onClick={cancelEdit}
@@ -1177,52 +1242,60 @@ const AdminAddOns = () => {
             )}
 
             {/* DIY Kits List */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {diyKits.map((kit) => (
+            {filteredDIYKits.length === 0 && !loading ? (
+              <p className="rounded-lg bg-white p-6 text-center text-sm text-gray-500 shadow">No DIY kits match this search.</p>
+            ) : (
+            <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-6">
+              {filteredDIYKits.map((kit) => (
                 <div
                   key={kit.id}
-                  className="bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden"
+                  className="min-w-0 bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden"
                 >
                   {kit.image_url && (
                     <img
                       src={kit.image_url}
                       alt={kit.name}
-                      className="w-full h-48 object-cover"
+                      className="w-full h-28 sm:h-48 object-cover"
                       onError={(e) => {
                         (e.target as HTMLImageElement).style.display = 'none';
                       }}
                     />
                   )}
-                  <div className="p-4">
+                  <div className="p-3 sm:p-4">
                     <div className="flex items-center justify-between mb-2">
-                      <h3 className="text-lg font-semibold text-gray-800 dark:text-white">
+                      <h3 className="min-w-0 truncate pr-1 text-sm sm:text-lg font-semibold text-gray-800 dark:text-white" title={kit.name}>
                         {kit.name}
                       </h3>
                       {editingId !== kit.id && (
                         <div className="flex space-x-2">
                           <button
                             onClick={() => handleEditDIYKit(kit)}
-                            className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                            disabled={saving || deletingId !== null}
+                            aria-label={`Edit ${kit.name}`}
+                            className="p-1.5 sm:p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors disabled:cursor-not-allowed disabled:opacity-50"
                           >
                             <Edit className="w-4 h-4" />
                           </button>
                           <button
                             onClick={() => handleDeleteDIYKit(kit.id)}
-                            className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                            disabled={saving || deletingId !== null}
+                            aria-label={`Delete ${kit.name}`}
+                            className="p-1.5 sm:p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors disabled:cursor-not-allowed disabled:opacity-50"
                           >
-                            <Trash2 className="w-4 h-4" />
+                            {deletingId === kit.id ? <Loader2 className="w-4 h-4 animate-spin" /> : <Trash2 className="w-4 h-4" />}
                           </button>
                         </div>
                       )}
                     </div>
-                    <p className="text-xl font-bold text-orange-600 mb-2">₹{kit.price}</p>
-                    <p className="text-sm text-gray-600 dark:text-gray-400 line-clamp-3">
+                    <p className="text-base sm:text-xl font-bold text-orange-600 mb-2">₹{kit.price}</p>
+                    <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 line-clamp-3">
                       {kit.description}
                     </p>
                   </div>
                 </div>
               ))}
             </div>
+            )}
           </div>
         )}
       </div>

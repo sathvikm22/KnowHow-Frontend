@@ -1,7 +1,7 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import AdminLayout from '../components/AdminLayout';
 import { api } from '@/lib/api';
-import { Loader2, Package, CheckCircle, Truck } from 'lucide-react';
+import { Loader2, Package, CheckCircle, Truck, Search } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import PaginationControls from '@/components/PaginationControls';
 
@@ -49,17 +49,30 @@ const AdminDIYOrders = () => {
   const [selectedTime, setSelectedTime] = useState<Record<string, string>>({});
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
+  const [searchInput, setSearchInput] = useState('');
+  const [search, setSearch] = useState('');
+  const requestId = useRef(0);
+
+  useEffect(() => {
+    const timeout = window.setTimeout(() => {
+      setSearch(searchInput.trim());
+      setPage(1);
+    }, 250);
+    return () => window.clearTimeout(timeout);
+  }, [searchInput]);
 
   useEffect(() => {
     fetchOrders();
-  }, [page]);
+  }, [page, search]);
 
   const fetchOrders = async () => {
+    const currentRequest = ++requestId.current;
     try {
       setLoading(true);
       setError(null);
       console.log('Fetching DIY orders...');
-      const response = await api.getAllDIYOrders(page);
+      const response = await api.getAllDIYOrders(page, 24, search);
+      if (currentRequest !== requestId.current) return;
       console.log('Orders response:', response);
       if (response.success) {
         // Backend returns { success: true, orders: [...] }
@@ -80,10 +93,11 @@ const AdminDIYOrders = () => {
         setError(response.message || 'Failed to load orders');
       }
     } catch (err: any) {
+      if (currentRequest !== requestId.current) return;
       console.error('Error fetching orders:', err);
       setError(err.message || 'Failed to load orders. Please check if you are logged in as admin.');
     } finally {
-      setLoading(false);
+      if (currentRequest === requestId.current) setLoading(false);
     }
   };
 
@@ -132,19 +146,20 @@ const AdminDIYOrders = () => {
     });
   };
 
-  if (loading) {
-    return (
-      <AdminLayout>
-        <div className="flex items-center justify-center h-64">
-          <Loader2 className="w-8 h-8 animate-spin text-purple-600" />
-        </div>
-      </AdminLayout>
-    );
-  }
-
   return (
     <AdminLayout>
-      <h1 className="text-2xl font-bold mb-6 text-purple-700">DIY Orders</h1>
+      <div className="flex flex-col gap-4 mb-6 sm:flex-row sm:items-center sm:justify-between">
+        <h1 className="text-2xl font-bold text-purple-700">DIY Orders</h1>
+        <label className="relative block w-full sm:w-96">
+          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
+          <input
+            value={searchInput}
+            onChange={(event) => setSearchInput(event.target.value)}
+            placeholder="Search name, order ID, email or phone"
+            className="w-full rounded-lg border border-gray-300 bg-white py-2.5 pl-10 pr-3 text-sm text-gray-900 outline-none transition focus:border-purple-500 focus:ring-2 focus:ring-purple-200"
+          />
+        </label>
+      </div>
 
       {error && (
         <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
@@ -152,7 +167,11 @@ const AdminDIYOrders = () => {
         </div>
       )}
 
-      {!error && orders.length === 0 ? (
+      {loading && orders.length === 0 ? (
+        <div className="flex items-center justify-center h-64">
+          <Loader2 className="w-8 h-8 animate-spin text-purple-600" />
+        </div>
+      ) : !error && orders.length === 0 ? (
         <div className="bg-white rounded-xl shadow-lg p-8 text-center">
           <Package className="w-16 h-16 text-gray-400 mx-auto mb-4" />
           <p className="text-gray-600">No orders found.</p>
@@ -160,28 +179,28 @@ const AdminDIYOrders = () => {
         </div>
       ) : !error ? (
         <>
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className={`grid grid-cols-2 gap-3 sm:gap-5 transition-opacity ${loading ? 'opacity-60' : 'opacity-100'}`}>
           {orders.map((order) => (
             <div
               key={order.id}
-              className="bg-white rounded-xl shadow-lg p-6 flex flex-col space-y-4 border border-purple-100 hover:shadow-2xl transition-shadow duration-200"
+              className="min-w-0 bg-white rounded-xl shadow-lg p-3 sm:p-5 flex flex-col space-y-3 sm:space-y-4 border border-purple-100 hover:shadow-2xl transition-shadow duration-200"
             >
               {/* Order Header */}
               <div className="flex items-center justify-between mb-2">
-                <span className="font-semibold text-lg text-purple-800">
+                <span className="min-w-0 truncate pr-2 font-semibold text-sm sm:text-lg text-purple-800" title={order.customer_name}>
                   {order.customer_name}
                 </span>
-                <span className="text-xs text-gray-500 font-mono">
+                <span className="shrink-0 text-[10px] sm:text-xs text-gray-500 font-mono">
                   {order.internal_bill_id}
                 </span>
               </div>
 
               {/* Customer Info */}
-              <div className="text-sm text-gray-600 space-y-1">
-                <p><span className="font-medium">Email:</span> {order.customer_email}</p>
-                <p><span className="font-medium">Phone:</span> {order.customer_phone}</p>
-                <p><span className="font-medium">Address:</span> {order.customer_address}</p>
-                <p><span className="font-medium">Order Date:</span> {formatDate(order.created_at)}</p>
+              <div className="text-xs sm:text-sm text-gray-600 space-y-1">
+                <p className="truncate" title={order.customer_email}><span className="font-medium">Email:</span> {order.customer_email}</p>
+                <p className="truncate"><span className="font-medium">Phone:</span> {order.customer_phone}</p>
+                <p className="line-clamp-2"><span className="font-medium">Address:</span> {order.customer_address}</p>
+                <p><span className="font-medium">Order:</span> {formatDate(order.created_at)}</p>
               </div>
 
               {/* Items */}
@@ -218,7 +237,7 @@ const AdminDIYOrders = () => {
                   })()}
                 </div>
                 <div className="mt-2 pt-2 border-t border-gray-200">
-                  <p className="font-bold text-lg text-green-700">
+                  <p className="font-bold text-base sm:text-lg text-green-700">
                     Total: ₹{(() => {
                       const normalizeAmount = (amt: number) => {
                         if (!amt || typeof amt !== 'number') return 0;
@@ -237,7 +256,7 @@ const AdminDIYOrders = () => {
               <div className="border-t border-gray-200 pt-4 space-y-3">
                 <div>
                   <p className="font-semibold text-sm text-gray-700 mb-2">Delivery Status:</p>
-                  <div className="grid grid-cols-2 gap-2">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                     {deliveryStatusOptions.map((option) => {
                       const Icon = option.icon;
                       const isSelected = selectedStatus[order.id] === option.value;
@@ -271,7 +290,7 @@ const AdminDIYOrders = () => {
                 {/* Delivery Time Checkboxes */}
                 <div>
                   <p className="font-semibold text-sm text-gray-700 mb-2">Delivery Time:</p>
-                  <div className="grid grid-cols-2 gap-2">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                     {deliveryTimeOptions.map((time) => {
                       const isSelected = selectedTime[order.id] === time;
                       return (

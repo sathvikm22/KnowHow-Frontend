@@ -9,12 +9,10 @@ const BASE_URL = 'https://www.knowhowindia.in';
  */
 const CANONICAL_PATH_MAPPINGS: Record<string, string> = {
   '/home': '/',
-  '/shipping': '/privacy-policy',
-  '/shipping-policy': '/privacy-policy',
+  '/shipping': '/shipping-policy',
   '/terms': '/terms-and-conditions',
   '/terms-of-service': '/terms-and-conditions',
   '/contact': '/contact-us',
-  '/cancellations-refunds': '/terms-and-conditions'
 };
 
 /**

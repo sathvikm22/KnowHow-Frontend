@@ -23,6 +23,18 @@ const routes = [
     description: 'Contact Know How Café in Bangalore for creative workshops, group bookings, DIY kits and customer support.',
     fallback: '<h1>Contact Know How Café</h1><p>Get in touch about creative workshops, group bookings, DIY kits and customer support in Bangalore.</p>',
   },
+  {
+    path: 'cancellations-refunds',
+    title: 'Cancellation and Refund Policy | Know How Café',
+    description: 'Read Know How Café’s policy for workshop cancellation requests, approved refunds, duplicate payments and DIY kit returns.',
+    fallback: '<h1>Cancellation and Refund Policy</h1><p>Know How Café’s policy for workshop cancellations, approved refunds, duplicate payments and DIY kit returns.</p>',
+  },
+  {
+    path: 'shipping-policy',
+    title: 'Shipping Policy | Know How Café',
+    description: 'Read Know How Café’s DIY kit delivery, address, shipping-charge and order-status policy.',
+    fallback: '<h1>Shipping Policy</h1><p>Know How Café’s policy for DIY kit delivery, delivery details and order-status updates.</p>',
+  },
 ];
 
 const replaceMeta = (html, attribute, value, content) => {

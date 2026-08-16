@@ -7,7 +7,6 @@ import { logout } from '@/lib/api';
 const adminNav = [
   { name: 'Bookings', path: '/admin/dashboard/bookings' },
   { name: 'DIY Orders', path: '/admin/dashboard/diy-orders' },
-  { name: 'Users', path: '/admin/dashboard/users' },
   { name: 'Add Ons', path: '/admin/dashboard/addons' },
 ];
 

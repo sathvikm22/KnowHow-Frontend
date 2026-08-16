@@ -561,8 +561,10 @@ class ApiClient {
     });
   }
 
-  async getAllDIYOrders(page = 1, pageSize = 24): Promise<ApiResponse<{ orders: any[] }>> {
-    return this.request(`/all-diy-orders?page=${page}&pageSize=${pageSize}`, {
+  async getAllDIYOrders(page = 1, pageSize = 24, search = ''): Promise<ApiResponse<{ orders: any[] }>> {
+    const query = new URLSearchParams({ page: String(page), pageSize: String(pageSize) });
+    if (search.trim()) query.set('search', search.trim());
+    return this.request(`/all-diy-orders?${query.toString()}`, {
       method: 'GET',
     });
   }
@@ -591,8 +593,10 @@ class ApiClient {
     });
   }
 
-  async getAllBookings(page = 1, pageSize = 24): Promise<ApiResponse<{ bookings: any[] }>> {
-    return this.request(`/all-bookings?page=${page}&pageSize=${pageSize}`, {
+  async getAllBookings(page = 1, pageSize = 24, search = ''): Promise<ApiResponse<{ bookings: any[] }>> {
+    const query = new URLSearchParams({ page: String(page), pageSize: String(pageSize) });
+    if (search.trim()) query.set('search', search.trim());
+    return this.request(`/all-bookings?${query.toString()}`, {
       method: 'GET',
     });
   }

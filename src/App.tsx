@@ -8,9 +8,8 @@ import Index from "./pages/Index";
 import CookieConsent from './components/CookieConsent';
 import { initializeCookieConsent } from './utils/cookieConsent';
 import { CartProvider } from './contexts/CartContext';
-import { clearLocalAuthState, restoreSessionFromCookies } from './utils/auth';
+import { restoreSessionFromCookies } from './utils/auth';
 import ProtectedRoute from './components/ProtectedRoute';
-import { api } from './lib/api';
 
 // Keep the landing page immediately available and defer route code until a visitor needs it.
 // This preserves all existing routes and UI while reducing the initial JavaScript download.
@@ -24,11 +23,12 @@ const Cart = lazy(() => import('./pages/Cart'));
 const Checkout = lazy(() => import('./pages/Checkout'));
 const ForgotPassword = lazy(() => import('./pages/ForgotPassword'));
 const AdminBookings = lazy(() => import('./pages/AdminBookings'));
-const AdminUsers = lazy(() => import('./pages/AdminUsers'));
 const AdminAddOns = lazy(() => import('./pages/AdminAddOns'));
 const GoogleAuthCallback = lazy(() => import('./pages/GoogleAuthCallback'));
 const PrivacyPolicy = lazy(() => import('./pages/PrivacyPolicy'));
 const TermsAndConditions = lazy(() => import('./pages/TermsAndConditions'));
+const CancellationRefundPolicy = lazy(() => import('./pages/CancellationRefundPolicy'));
+const ShippingPolicy = lazy(() => import('./pages/ShippingPolicy'));
 const ContactUs = lazy(() => import('./pages/ContactUs'));
 const Orders = lazy(() => import('./pages/Orders'));
 const MyOrders = lazy(() => import('./pages/MyOrders'));
@@ -54,22 +54,11 @@ const App = () => {
     initializeCookieConsent();
 
     const restoreSession = async () => {
-      const restored = await restoreSessionFromCookies();
-      if (restored) return;
-
       const userName = localStorage.getItem('userName');
-      if (!userName) return;
-
-      try {
-        const response = await api.getCurrentUser();
-        if (response.success && response.user) {
-          window.dispatchEvent(new CustomEvent('authStateChanged'));
-        } else {
-          clearLocalAuthState();
-        }
-      } catch {
-        clearLocalAuthState();
-      }
+      // Protected pages verify existing sessions. Avoid a second /auth/me call
+      // on each admin reload, which caused the route to remount and flicker.
+      if (userName) return;
+      await restoreSessionFromCookies();
     };
 
     restoreSession();
@@ -105,14 +94,14 @@ const App = () => {
               <Route path="/forgot-password" element={<ForgotPassword />} />
               <Route path="/auth/google/callback" element={<GoogleAuthCallback />} />
               <Route path="/privacy-policy" element={<PrivacyPolicy />} />
-              <Route path="/shipping-policy" element={<Navigate to="/privacy-policy" replace />} />
-              <Route path="/shipping" element={<Navigate to="/privacy-policy" replace />} />
+              <Route path="/shipping-policy" element={<ShippingPolicy />} />
+              <Route path="/shipping" element={<Navigate to="/shipping-policy" replace />} />
               <Route path="/terms-and-conditions" element={<TermsAndConditions />} />
               <Route path="/terms" element={<Navigate to="/terms-and-conditions" replace />} />
               <Route path="/terms-of-service" element={<Navigate to="/terms-and-conditions" replace />} />
               <Route path="/contact-us" element={<ContactUs />} />
               <Route path="/contact" element={<Navigate to="/contact-us" replace />} />
-              <Route path="/cancellations-refunds" element={<Navigate to="/terms-and-conditions" replace />} />
+              <Route path="/cancellations-refunds" element={<CancellationRefundPolicy />} />
               <Route path="/orders" element={<ProtectedRoute requireAuth={true}><Orders /></ProtectedRoute>} />
               <Route path="/my-orders" element={<ProtectedRoute requireAuth={true}><MyOrders /></ProtectedRoute>} />
               <Route path="/all-orders" element={<ProtectedRoute requireAuth={true}><AllOrders /></ProtectedRoute>} />
@@ -122,7 +111,6 @@ const App = () => {
               <Route path="/failed" element={<PaymentFailed />} />
               <Route path="/admin/dashboard/bookings" element={<AdminRoute><AdminBookings /></AdminRoute>} />
               <Route path="/admin/dashboard/diy-orders" element={<AdminRoute><AdminDIYOrders /></AdminRoute>} />
-              <Route path="/admin/dashboard/users" element={<AdminRoute><AdminUsers /></AdminRoute>} />
               <Route path="/admin/dashboard/addons" element={<AdminRoute><AdminAddOns /></AdminRoute>} />
               <Route path="*" element={<NotFound />} />
               </Routes>
